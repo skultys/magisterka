@@ -9,6 +9,7 @@ namespace magisterka
     {
         static void Main(string[] args)
         {
+            Console.ReadKey();
         }
     }
 }
