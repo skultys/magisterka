@@ -223,9 +223,33 @@ namespace magisterka
         }
     }
 
+    class CatastropheOperator : IEvolutionaryOperator
+    {
+        public ISolution Execute(IPopulation population)
+        {
+            return new Solution();
+        }
+    }
+
+    class QapData
+    {
+    }
+
     class QGA : IEvolutionAlgorithm
     {
+        CrossoverOperator crossOperator;
+        MutationOperator mutOperator;
+        CatastropheOperator catOperator;
+
+        public QGA(QapData qapData)
+        {
+            crossOperator = new CrossoverOperator();
+            mutOperator = new MutationOperator();
+            catOperator = new CatastropheOperator();
+        }
+
         public IPopulation Population { get; set; }
+
         public double EvaluateSolution(ISolution solution)
         {
             return 0.0;
