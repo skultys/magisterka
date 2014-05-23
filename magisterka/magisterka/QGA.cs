@@ -119,7 +119,7 @@ namespace magisterka
             }
         }
 
-        Chromosome this[int index]
+        public Chromosome this[int index]
         {
             set
             {
@@ -233,6 +233,22 @@ namespace magisterka
 
     class QapData
     {
+        int size;
+
+        public double[][] Distance;
+        public double[][] Flow;
+
+        public QapData(int QapSize)
+        {
+            this.size = QapSize;
+            this.Distance = new double[QapSize][];
+            this.Flow = new double[QapSize][];
+            for (int i = 0; i < QapSize; i++)
+            {
+                this.Distance[i] = new double[QapSize];
+                this.Flow[i] = new double[QapSize];
+            }
+        }
     }
 
     class QGA : IEvolutionAlgorithm
@@ -240,19 +256,26 @@ namespace magisterka
         CrossoverOperator crossOperator;
         MutationOperator mutOperator;
         CatastropheOperator catOperator;
+        QapData qapData;
 
         public QGA(QapData qapData)
         {
             crossOperator = new CrossoverOperator();
             mutOperator = new MutationOperator();
             catOperator = new CatastropheOperator();
+            this.qapData = qapData;
         }
 
         public IPopulation Population { get; set; }
 
         public double EvaluateSolution(ISolution solution)
         {
-            return 0.0;
+            double solValue = 0.0;
+            for (int i = 0; i < this.qapData.Distance.Length - 1; i++)
+            {
+                //solValue += solution
+            }
+            return solValue;
         }
 
         public void InitRandomPopulation()
