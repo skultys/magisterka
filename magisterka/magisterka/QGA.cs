@@ -9,35 +9,33 @@ namespace magisterka
 {
     class Qbit
     {
-        int qbitState;
+        private static Random rand = new Random();
+
         public double Alpha { set; get; }
         public double Beta { set; get; }
 
         public Qbit()
         {
-            qbitState = 0;
             this.Alpha = 1.0/Math.Sqrt(2.0);
             this.Beta = 1.0/Math.Sqrt(2.0);
         }
 
         public Qbit(double alpha, double beta)
         {
-            qbitState = 0;
             this.Alpha = alpha;
             this.Beta = beta;
         }
 
-        public int EvaluateState(double treshold)
+        public int EvaluateState()
         {
+            double treshold = rand.NextDouble();
             double alphaSquare = this.Alpha * this.Alpha;
             if (alphaSquare > treshold)
             {
-                qbitState = 1;
                 return 1;
             }
             else
             {
-                qbitState = 0;
                 return 0;
             }
         }
@@ -58,7 +56,7 @@ namespace magisterka
 
     class Chromosome
     {
-        List<Qbit> genes;
+        List<Qbit> genes = null;
         int decodedValue;
 
         public Chromosome()
@@ -69,17 +67,26 @@ namespace magisterka
         
         public Chromosome(int size)
         {
-            genes = new List<Qbit>(size);
+            genes = new List<Qbit>();
             decodedValue = 0;
+            for (int i = 0; i < size; i++)
+            {
+                Qbit qbit = new Qbit();
+                this.genes.Add(qbit);
+            }
         }
 
-        public int DecodeChromosome(double treshold)
+        public int DecodeChromosome()
         {
             int chromosomeValue = 0;
-            for (int i = 0; i < this.genes.Count; i++)
+            int state;
+            for (int i = this.genes.Count - 1; i >= 0; i--)
             {
-                chromosomeValue += this[i].EvaluateState(treshold) * (int)Math.Pow(2.0, i);
+                state = this[i].EvaluateState();
+                chromosomeValue += state * (int)Math.Pow(2.0, i);
+                Console.Write(state);
             }
+            Console.WriteLine();
             decodedValue = chromosomeValue;
             return chromosomeValue;
         }
@@ -99,23 +106,16 @@ namespace magisterka
 
     class Solution : ISolution
     {
-        List<int> orderList;
-        List<Chromosome> chromosomeList;
-
-        public Solution()
-        {
-            orderList = new List<int>();
-            List<Chromosome> chromosomeList = new List<Chromosome>();
-        }
+        List<Chromosome> chromosomes = null;
 
         public Solution(int size)
         {
-            orderList = new List<int>(size);
+            this.chromosomes = new List<Chromosome>();
             int chromosomeSize = (int)(Math.Log(size, 2.0) + 1);
             for (int i = 0; i < size; i++)
             {
                 Chromosome chromosome = new Chromosome(chromosomeSize);
-                this.chromosomeList.Add(chromosome);
+                this.chromosomes.Add(chromosome);
             }
         }
 
@@ -123,11 +123,11 @@ namespace magisterka
         {
             set
             {
-                this.chromosomeList[index] = value;
+                this.chromosomes[index] = value;
             }
             get
             {
-                return this.chromosomeList[index];
+                return this.chromosomes[index];
             }
         }
 
@@ -137,7 +137,7 @@ namespace magisterka
     class Population : IPopulation {
         int popSize;
         int currPopSize;
-        List<Solution> solutions;
+        List<Solution> solutions = null;
 
         public Population()
         {
@@ -211,7 +211,7 @@ namespace magisterka
     {
         public ISolution Execute(IPopulation population)
         {
-            return new Solution();
+            return new Solution(1);
         }
     }
 
@@ -227,27 +227,46 @@ namespace magisterka
     {
         public ISolution Execute(IPopulation population)
         {
-            return new Solution();
+            return new Solution(1);
         }
     }
 
-    class QapData
+    public sealed class QapData
     {
-        int size;
+        private static QapData m_oInstance = null;
+        private double[,] Distance = null;
+        private double[,] Flow = null;
 
-        public double[][] Distance;
-        public double[][] Flow;
-
-        public QapData(int QapSize)
+        public static QapData Instance
         {
-            this.size = QapSize;
-            this.Distance = new double[QapSize][];
-            this.Flow = new double[QapSize][];
-            for (int i = 0; i < QapSize; i++)
+            get
             {
-                this.Distance[i] = new double[QapSize];
-                this.Flow[i] = new double[QapSize];
+                if (m_oInstance == null)
+                {
+                    m_oInstance = new QapData();
+                }
+                return m_oInstance;
             }
+        }
+
+        public void setQapData(double[,] distance, double[,] flow)
+        {
+            this.Distance = distance;
+            this.Flow = flow;
+        }
+
+        public double[,] getDistance()
+        {
+            return this.Distance;
+        }
+
+        public double[,] getFlow()
+        {
+            return this.Flow;
+        }
+
+        private QapData()
+        {
         }
     }
 
@@ -257,6 +276,7 @@ namespace magisterka
         MutationOperator mutOperator;
         CatastropheOperator catOperator;
         QapData qapData;
+        bool isStopped;
 
         public QGA(QapData qapData)
         {
@@ -264,18 +284,14 @@ namespace magisterka
             mutOperator = new MutationOperator();
             catOperator = new CatastropheOperator();
             this.qapData = qapData;
+            this.isStopped = false;
         }
 
         public IPopulation Population { get; set; }
 
         public double EvaluateSolution(ISolution solution)
         {
-            double solValue = 0.0;
-            for (int i = 0; i < this.qapData.Distance.Length - 1; i++)
-            {
-                //solValue += solution
-            }
-            return solValue;
+            return solution.Goal;
         }
 
         public void InitRandomPopulation()
@@ -288,7 +304,7 @@ namespace magisterka
 
         public bool Stop()
         {
-            return false;
+            return this.isStopped;
         }
 
         public ISolution GetBestSolution()

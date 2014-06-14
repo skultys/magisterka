@@ -9,15 +9,32 @@ namespace magisterka
     {
         static void Main(string[] args)
         {
-            QapData d = new QapData(2);
-            d.Distance[0][0] = new double();
-            d.Distance[0][1] = new double();
-            d.Distance[1][0] = new double();
-            d.Distance[1][1] = new double();
-            Console.WriteLine(d.Distance[0][0]);
-            Console.WriteLine(d.Distance[0][1]);
-            Console.WriteLine(d.Distance[1][0]);
-            Console.WriteLine(d.Distance[1][1]);
+            double[,] flow = { { 1.0, 2.0 }, { 3.0, 4.0 } };
+            double[,] flow2 = new double[2,2];
+            for (int i = 0; i < 2; i++)
+            {
+                for (int j = 0; j < 2; j++)
+                {
+                    flow2[i, j] = flow[i, j];
+                }
+            }
+            flow2[1, 1] = 10;
+
+            QapData.Instance.setQapData(flow, flow2);
+
+            int psize = 100;
+
+            Population pop = new Population(10, psize);
+
+            Solution solution = new Solution(10);
+
+            foreach (Solution sol in pop)
+            {
+                solution = sol;
+            }
+
+            Console.WriteLine(solution[0].DecodeChromosome());
+
             Console.ReadKey();
         }
     }
