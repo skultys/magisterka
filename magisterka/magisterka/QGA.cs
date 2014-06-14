@@ -79,14 +79,10 @@ namespace magisterka
         public int DecodeChromosome()
         {
             int chromosomeValue = 0;
-            int state;
             for (int i = this.genes.Count - 1; i >= 0; i--)
             {
-                state = this[i].EvaluateState();
-                chromosomeValue += state * (int)Math.Pow(2.0, i);
-                Console.Write(state);
+                chromosomeValue += this[i].EvaluateState() * (int)Math.Pow(2.0, i);
             }
-            Console.WriteLine();
             decodedValue = chromosomeValue;
             return chromosomeValue;
         }
@@ -107,16 +103,20 @@ namespace magisterka
     class Solution : ISolution
     {
         List<Chromosome> chromosomes = null;
+        List<int> permutation = null;
 
         public Solution(int size)
         {
             this.chromosomes = new List<Chromosome>();
+            this.permutation = new List<int>();
             int chromosomeSize = (int)(Math.Log(size, 2.0) + 1);
             for (int i = 0; i < size; i++)
             {
                 Chromosome chromosome = new Chromosome(chromosomeSize);
                 this.chromosomes.Add(chromosome);
+                this.permutation.Add(0);
             }
+            toPermutation();
         }
 
         public Chromosome this[int index]
@@ -129,6 +129,53 @@ namespace magisterka
             {
                 return this.chromosomes[index];
             }
+        }
+
+        private void toPermutation()
+        {
+            List<Tuple<int, int> > tupleList = new List<Tuple<int, int> >();
+
+            for (int i = 0; i < this.chromosomes.Count; i++)
+            {
+                Tuple<int, int> tuple = new Tuple<int, int>(i, this.chromosomes[i].DecodeChromosome());
+                tupleList.Add(tuple);
+            }
+
+            tupleList.Sort((a, b) =>
+                {
+                    if (a.Item2 < b.Item2) return -1;
+                    else
+                    {
+                        if (a.Item2 == b.Item2 && a.Item1 < b.Item1) return -1;
+                        else return 1;
+                    }
+                }
+            );
+
+            foreach (var el in tupleList)
+            {
+                Console.WriteLine(el);
+            }
+            Console.WriteLine();
+
+            for (int i = 0; i < tupleList.Count; i++)
+            {
+                tupleList[i] = new Tuple<int, int>(tupleList[i].Item1, i + 1);
+            }
+
+            foreach (var tuple in tupleList)
+            {
+                int val = tuple.Item2;
+                this.permutation[tuple.Item1] = val;
+            }
+
+            foreach (int val in this.permutation)
+            {
+                Console.WriteLine(val);
+            }
+
+            Console.WriteLine();
+            Console.WriteLine();
         }
 
         public double Goal { set; get; }

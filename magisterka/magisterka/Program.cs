@@ -22,18 +22,9 @@ namespace magisterka
 
             QapData.Instance.setQapData(flow, flow2);
 
-            int psize = 100;
+            int psize = 10;
 
-            Population pop = new Population(10, psize);
-
-            Solution solution = new Solution(10);
-
-            foreach (Solution sol in pop)
-            {
-                solution = sol;
-            }
-
-            Console.WriteLine(solution[0].DecodeChromosome());
+            Population pop = new Population(1, psize);
 
             Console.ReadKey();
         }
