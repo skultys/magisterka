@@ -84,7 +84,6 @@ namespace OptimisationClassLibrary
     public interface ISolution
     {
         double Goal { get; set; }
-
     }
 
 
