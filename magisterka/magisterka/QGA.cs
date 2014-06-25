@@ -86,8 +86,6 @@ namespace magisterka
             double tempAlpha = this.Alpha;
             this.Alpha = Math.Cos(theta) * this.Alpha - Math.Sin(theta) * this.Beta;
             this.Beta =  Math.Sin(theta) * tempAlpha + Math.Cos(theta) * this.Beta;
-
-            //Console.WriteLine(this.Alpha + " " + this.Beta);
         }
 
         public void ExecuteNotGate()
@@ -160,7 +158,7 @@ namespace magisterka
     class Solution : ISolution
     {
         List<Chromosome> chromosomes = null;
-        List<int> permutation = null;
+        public List<int> permutation = null;
         double goal;
         int solSize;
 
@@ -356,9 +354,16 @@ namespace magisterka
 
         public int solSize { get; set; }
 
-        public int bitsInSol { get; set; }
+        int bitsInSol;
 
         public double MutationProbability { get; set; }
+
+        public MutationOperator(double probability, int solSize)
+        {
+            this.MutationProbability = probability;
+            this.solSize = solSize;
+            this.bitsInSol = (int)(Math.Log(solSize, 2.0) + 1);
+        }
 
         public ISolution Execute(IPopulation population)
         {
@@ -379,9 +384,30 @@ namespace magisterka
         }
     }
 
-    class CrossoverOperator : ICrossoverOperator
+    class OxCrossoverOperator : ICrossoverOperator
     {
         public double CrossoverProbability { get; set; }
+
+        public OxCrossoverOperator(double probability = 0.0)
+        {
+            this.CrossoverProbability = probability;
+        }
+
+        public ISolution[] Execute(IPopulation population)
+        {
+            return new Solution[0];
+        }
+    }
+
+
+    class PmxCrossoverOperator : ICrossoverOperator
+    {
+        public double CrossoverProbability { get; set; }
+
+        public PmxCrossoverOperator(double probability = 0.0)
+        {
+            this.CrossoverProbability = probability;
+        }
 
         public ISolution[] Execute(IPopulation population)
         {
@@ -402,7 +428,13 @@ namespace magisterka
     {
         public int solSize { get; set; }
 
-        public int bitsInSol { get; set; }
+        int bitsInSol;
+
+        public RotationGateOperator(int solSize)
+        {
+            this.solSize = solSize;
+            this.bitsInSol = (int)(Math.Log(solSize, 2.0) + 1);
+        }
 
         public void Execute(IPopulation population, Solution best)
         {
@@ -416,7 +448,6 @@ namespace magisterka
                     }
                 }
                 sol.toPermutation();
-                //Console.WriteLine();
             }
         }
     }
@@ -462,7 +493,7 @@ namespace magisterka
 
     class QgAlgorithm : IEvolutionAlgorithm
     {
-        CrossoverOperator crossOperator = null;
+        PmxCrossoverOperator crossOperator = null;
         public MutationOperator mutOperator = null;
         CatastropheOperator catOperator = null;
         public RotationGateOperator rotOperator = null;
@@ -474,17 +505,11 @@ namespace magisterka
 
         public QgAlgorithm(double[,] distance, double[,] flow, double crossProb, double mutProb, double catProb, int iterations, int popSize, int problemSize)
         {
-            crossOperator = new CrossoverOperator();
-            crossOperator.CrossoverProbability = crossProb;
+            crossOperator = new PmxCrossoverOperator(crossProb);
 
-            mutOperator = new MutationOperator();
-            mutOperator.MutationProbability = mutProb;
-            mutOperator.solSize = problemSize;
-            mutOperator.bitsInSol = (int)(Math.Log(problemSize, 2.0) + 1);
+            mutOperator = new MutationOperator(mutProb, problemSize);
 
-            rotOperator = new RotationGateOperator();
-            rotOperator.bitsInSol = (int)(Math.Log(problemSize, 2.0) + 1);
-            rotOperator.solSize = problemSize;
+            rotOperator = new RotationGateOperator(problemSize);
 
             catOperator = new CatastropheOperator();
             catOperator.CastastropheProbability = catProb;

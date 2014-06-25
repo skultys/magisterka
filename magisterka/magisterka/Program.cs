@@ -11,7 +11,7 @@ namespace magisterka
         {
             Random rand = new Random();
 
-            int psize = 5;
+            int psize = 2;
 
             double[,] distance = new double[psize, psize];
 
@@ -39,10 +39,11 @@ namespace magisterka
             {
                 for (int i = 0; i < psize; i++)
                 {
-                    for (int j = 0; j < bits; j++)
+                    /*for (int j = 0; j < bits; j++)
                     {
                         Console.Write(sol[i][j].observedState);
-                    }
+                    }*/
+                    Console.Write(sol.permutation[i]);
                     Console.Write(" ");
                 }
                 Console.Write("\t goal: " + sol.Goal);
@@ -53,11 +54,12 @@ namespace magisterka
 
             for (int i = 0; i < psize; i++)
             {
-                for (int j = 0; j < bits; j++)
+                /*for (int j = 0; j < bits; j++)
                 {
                     //Console.WriteLine(best[i][j].Alpha + " " + best[i][j].Beta);
                     Console.Write(best[i][j].observedState);
-                }
+                }*/
+                Console.Write(best.permutation[i]);
                 Console.Write(" ");
             }
             Console.Write("\t goal: " + best.Goal);
@@ -71,11 +73,12 @@ namespace magisterka
             {
                 for (int i = 0; i < psize; i++)
                 {
-                    for (int j = 0; j < bits; j++)
+                    /*for (int j = 0; j < bits; j++)
                     {
                         //Console.WriteLine(sol[i][j].Alpha + " " + sol[i][j].Beta);
                         Console.Write(sol[i][j].observedState);
-                    }
+                    }*/
+                    Console.Write(sol.permutation[i]);
                     Console.Write(" ");
                 }
                 Console.Write("\t goal: " + sol.Goal);
