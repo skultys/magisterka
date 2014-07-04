@@ -153,14 +153,31 @@ namespace magisterka
                 return this.genes[index];
             }
         }
+
+        public int Value
+        {
+            get
+            {
+                return this.decodedValue;
+            }
+        }
     }
 
     class Solution : ISolution
     {
         List<Chromosome> chromosomes = null;
+
+        //zmienic na private
         public List<int> permutation = null;
         double goal;
         int solSize;
+
+        public int Size {
+            get
+            {
+                return this.solSize;
+            }
+        }
 
         public Solution(int size)
         {
@@ -415,6 +432,87 @@ namespace magisterka
         }
     }
 
+    class CxCrossoverOperator : ICrossoverOperator
+    {
+        public double CrossoverProbability { get; set; }
+
+        public CxCrossoverOperator(double probability = 0.0)
+        {
+            this.CrossoverProbability = probability;
+        }
+
+        public ISolution[] Execute(IPopulation population)
+        {
+            Population pop = population as Population;
+            return new Solution[0];
+        }
+
+        public ISolution[] Execute(Solution parentOne, Solution parentTwo)
+        {
+            Solution[] childrenArray = new Solution[2];
+            int size = parentOne.Size;
+            if (parentOne.Size == 1)
+            {
+                childrenArray[0] = new Solution(parentOne);
+                childrenArray[1] = new Solution(parentTwo);
+                return childrenArray;
+            }
+            else
+            {
+                List<Tuple<Chromosome, int, Chromosome, int, int>> tupleList = new List<Tuple<Chromosome, int, Chromosome, int, int>>();
+                Chromosome[] childOne = new Chromosome[size];
+                Chromosome[] childTwo = new Chromosome[size];
+                int[] permutationOne = new int[size];
+                int[] permutationTwo = new int[size];
+                for (int i = 0; i < size; i++)
+                {
+                    Tuple<Chromosome, int, Chromosome, int, int> tuple = new Tuple<Chromosome, int, Chromosome, int, int>(parentOne[i], parentOne.permutation[i], parentTwo[i], parentTwo.permutation[i], i);
+                    tupleList.Add(tuple);
+                }
+                bool swap = false;
+                while (tupleList.Count != 0)
+                {
+                    int stopCondition = tupleList[0].Item2;
+                    int currentValue = tupleList[0].Item2;
+                    int tupleIndex;
+                    do
+                    {
+                        tupleIndex = tupleList.FindIndex(t => t.Item2 == currentValue);
+                        currentValue = tupleList[tupleIndex].Item4;
+                        if (!swap)
+                        {
+                            childOne[tupleList[tupleIndex].Item5] = new Chromosome(tupleList[tupleIndex].Item1);
+                            childTwo[tupleList[tupleIndex].Item5] = new Chromosome(tupleList[tupleIndex].Item3);
+                            permutationOne[tupleList[tupleIndex].Item5] = tupleList[tupleIndex].Item2;
+                            permutationTwo[tupleList[tupleIndex].Item5] = tupleList[tupleIndex].Item4;
+                        }
+                        else
+                        {
+                            childOne[tupleList[tupleIndex].Item5] = new Chromosome(tupleList[tupleIndex].Item3);
+                            childTwo[tupleList[tupleIndex].Item5] = new Chromosome(tupleList[tupleIndex].Item1);
+                            permutationOne[tupleList[tupleIndex].Item5] = tupleList[tupleIndex].Item4;
+                            permutationTwo[tupleList[tupleIndex].Item5] = tupleList[tupleIndex].Item2;
+                        }
+                        tupleList.RemoveAt(tupleIndex);
+                    }
+                    while (currentValue != stopCondition);
+                    swap = !swap;
+                }
+                for (int i = 0; i < size; i++)
+                {
+                    Console.Write(permutationOne[i] + "\t");
+                }
+                Console.WriteLine();
+                Console.WriteLine();
+                for (int i = 0; i < size; i++)
+                {
+                    Console.Write(permutationTwo[i] + "\t");
+                }
+            }
+            return childrenArray;
+        }
+    }
+
     class CatastropheOperator : IEvolutionaryOperator
     {
         public double CastastropheProbability { get; set; }
@@ -494,6 +592,8 @@ namespace magisterka
     class QgAlgorithm : IEvolutionAlgorithm
     {
         PmxCrossoverOperator crossOperator = null;
+        //zmienic na private
+        public CxCrossoverOperator cxOperator = null;
         public MutationOperator mutOperator = null;
         CatastropheOperator catOperator = null;
         public RotationGateOperator rotOperator = null;
@@ -506,6 +606,8 @@ namespace magisterka
         public QgAlgorithm(double[,] distance, double[,] flow, double crossProb, double mutProb, double catProb, int iterations, int popSize, int problemSize)
         {
             crossOperator = new PmxCrossoverOperator(crossProb);
+
+            cxOperator = new CxCrossoverOperator();
 
             mutOperator = new MutationOperator(mutProb, problemSize);
 

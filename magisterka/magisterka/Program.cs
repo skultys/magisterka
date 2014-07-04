@@ -11,7 +11,7 @@ namespace magisterka
         {
             Random rand = new Random();
 
-            int psize = 2;
+            int psize = 8;
 
             double[,] distance = new double[psize, psize];
 
@@ -27,63 +27,77 @@ namespace magisterka
             }
 
             QgAlgorithm alg = new QgAlgorithm(distance, flow, 0.2, 0.5, 0.02, 1000, 3, psize);
-
             alg.InitRandomPopulation();
-            alg.GetBestSolution();
-
-            Solution best = alg.best;
-
-            int bits = (int)(Math.Log(psize, 2.0) + 1);
 
             foreach (Solution sol in alg.Population)
             {
                 for (int i = 0; i < psize; i++)
                 {
-                    /*for (int j = 0; j < bits; j++)
-                    {
-                        Console.Write(sol[i][j].observedState);
-                    }*/
-                    Console.Write(sol.permutation[i]);
-                    Console.Write(" ");
+                    Console.Write(sol.permutation[i] + "\t");
                 }
-                Console.Write("\t goal: " + sol.Goal);
                 Console.WriteLine();
             }
 
-            Console.WriteLine("BEST");
-
-            for (int i = 0; i < psize; i++)
-            {
-                /*for (int j = 0; j < bits; j++)
-                {
-                    //Console.WriteLine(best[i][j].Alpha + " " + best[i][j].Beta);
-                    Console.Write(best[i][j].observedState);
-                }*/
-                Console.Write(best.permutation[i]);
-                Console.Write(" ");
-            }
-            Console.Write("\t goal: " + best.Goal);
-
-            Console.WriteLine();
             Console.WriteLine();
 
-            alg.rotOperator.Execute(alg.Population, best);
 
-            foreach (Solution sol in alg.Population)
-            {
-                for (int i = 0; i < psize; i++)
-                {
-                    /*for (int j = 0; j < bits; j++)
-                    {
-                        //Console.WriteLine(sol[i][j].Alpha + " " + sol[i][j].Beta);
-                        Console.Write(sol[i][j].observedState);
-                    }*/
-                    Console.Write(sol.permutation[i]);
-                    Console.Write(" ");
-                }
-                Console.Write("\t goal: " + sol.Goal);
-                Console.WriteLine();
-            }
+            alg.cxOperator.Execute((Solution)alg.Population[0], (Solution)alg.Population[1]);
+            //alg.InitRandomPopulation();
+            //alg.GetBestSolution();
+
+            //Solution best = alg.best;
+
+            //int bits = (int)(Math.Log(psize, 2.0) + 1);
+
+            //foreach (Solution sol in alg.Population)
+            //{
+            //    for (int i = 0; i < psize; i++)
+            //    {
+            //        /*for (int j = 0; j < bits; j++)
+            //        {
+            //            Console.Write(sol[i][j].observedState);
+            //        }*/
+            //        Console.Write(sol.permutation[i]);
+            //        Console.Write(" ");
+            //    }
+            //    Console.Write("\t goal: " + sol.Goal);
+            //    Console.WriteLine();
+            //}
+
+            //Console.WriteLine("BEST");
+
+            //for (int i = 0; i < psize; i++)
+            //{
+            //    /*for (int j = 0; j < bits; j++)
+            //    {
+            //        //Console.WriteLine(best[i][j].Alpha + " " + best[i][j].Beta);
+            //        Console.Write(best[i][j].observedState);
+            //    }*/
+            //    Console.Write(best.permutation[i]);
+            //    Console.Write(" ");
+            //}
+            //Console.Write("\t goal: " + best.Goal);
+
+            //Console.WriteLine();
+            //Console.WriteLine();
+
+            //alg.rotOperator.Execute(alg.Population, best);
+
+            //foreach (Solution sol in alg.Population)
+            //{
+            //    for (int i = 0; i < psize; i++)
+            //    {
+            //        /*for (int j = 0; j < bits; j++)
+            //        {
+            //            //Console.WriteLine(sol[i][j].Alpha + " " + sol[i][j].Beta);
+            //            Console.Write(sol[i][j].observedState);
+            //        }*/
+            //        Console.Write(sol.permutation[i]);
+            //        Console.Write(" ");
+            //    }
+            //    Console.Write("\t goal: " + sol.Goal);
+            //    Console.WriteLine();
+            //}
 
             Console.ReadKey();
         }
