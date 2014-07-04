@@ -98,8 +98,8 @@ namespace magisterka
 
     class Chromosome
     {
-        List<Qbit> genes = null;
-        int decodedValue;
+        private List<Qbit> genes = null;
+        private int decodedValue;
 
         public Chromosome()
         {
@@ -172,7 +172,8 @@ namespace magisterka
         double goal;
         int solSize;
 
-        public int Size {
+        public int Size
+        {
             get
             {
                 return this.solSize;
@@ -212,6 +213,19 @@ namespace magisterka
 
             this.goal = anotherSolution.goal;
             this.solSize = anotherSolution.solSize;
+        }
+
+        public Solution(Chromosome[] chromosomes)
+        {
+            this.solSize = chromosomes.Length;
+            this.goal = 0.0;
+            this.chromosomes = new List<Chromosome>(chromosomes);
+            this.permutation = new List<int>();
+            for (int i = 0; i < this.Size; i++)
+            {
+                this.permutation.Add(0);
+            }
+            toPermutation();
         }
 
         public Chromosome this[int index]
@@ -279,6 +293,15 @@ namespace magisterka
             {
                 return this.goal;
             }
+        }
+
+        public void PrintSolution()
+        {
+            foreach (int i in this.permutation)
+            {
+                Console.Write(i + "  ");
+            }
+            Console.WriteLine();
         }
     }
 
@@ -385,6 +408,7 @@ namespace magisterka
         public ISolution Execute(IPopulation population)
         {
             double ifMutate;
+            Solution solTuReturn = null;
             foreach(Solution sol in population)
             {
                 ifMutate = rand.NextDouble();
@@ -395,9 +419,11 @@ namespace magisterka
 
                     sol[selectedChromosome][selectedQbit].ExecuteNotGate();
                     sol.toPermutation();
+                    solTuReturn = new Solution(sol);
+                    break;
                 }
             }
-            return new Solution(1);
+            return solTuReturn;
         }
     }
 
@@ -451,65 +477,48 @@ namespace magisterka
         {
             Solution[] childrenArray = new Solution[2];
             int size = parentOne.Size;
-            if (parentOne.Size == 1)
+            List<Tuple<Chromosome, int, Chromosome, int, int>> tupleList = new List<Tuple<Chromosome, int, Chromosome, int, int>>();
+            Chromosome[] childOne = new Chromosome[size];
+            Chromosome[] childTwo = new Chromosome[size];
+            int[] permutationOne = new int[size];
+            int[] permutationTwo = new int[size];
+            for (int i = 0; i < size; i++)
             {
-                childrenArray[0] = new Solution(parentOne);
-                childrenArray[1] = new Solution(parentTwo);
-                return childrenArray;
+                Tuple<Chromosome, int, Chromosome, int, int> tuple = new Tuple<Chromosome, int, Chromosome, int, int>(parentOne[i], parentOne.permutation[i], parentTwo[i], parentTwo.permutation[i], i);
+                tupleList.Add(tuple);
             }
-            else
+            bool swap = false;
+            while (tupleList.Count != 0)
             {
-                List<Tuple<Chromosome, int, Chromosome, int, int>> tupleList = new List<Tuple<Chromosome, int, Chromosome, int, int>>();
-                Chromosome[] childOne = new Chromosome[size];
-                Chromosome[] childTwo = new Chromosome[size];
-                int[] permutationOne = new int[size];
-                int[] permutationTwo = new int[size];
-                for (int i = 0; i < size; i++)
+                int stopCondition = tupleList[0].Item2;
+                int currentValue = tupleList[0].Item2;
+                int tupleIndex;
+                do
                 {
-                    Tuple<Chromosome, int, Chromosome, int, int> tuple = new Tuple<Chromosome, int, Chromosome, int, int>(parentOne[i], parentOne.permutation[i], parentTwo[i], parentTwo.permutation[i], i);
-                    tupleList.Add(tuple);
-                }
-                bool swap = false;
-                while (tupleList.Count != 0)
-                {
-                    int stopCondition = tupleList[0].Item2;
-                    int currentValue = tupleList[0].Item2;
-                    int tupleIndex;
-                    do
+                    tupleIndex = tupleList.FindIndex(t => t.Item2 == currentValue);
+                    currentValue = tupleList[tupleIndex].Item4;
+                    if (!swap)
                     {
-                        tupleIndex = tupleList.FindIndex(t => t.Item2 == currentValue);
-                        currentValue = tupleList[tupleIndex].Item4;
-                        if (!swap)
-                        {
-                            childOne[tupleList[tupleIndex].Item5] = new Chromosome(tupleList[tupleIndex].Item1);
-                            childTwo[tupleList[tupleIndex].Item5] = new Chromosome(tupleList[tupleIndex].Item3);
-                            permutationOne[tupleList[tupleIndex].Item5] = tupleList[tupleIndex].Item2;
-                            permutationTwo[tupleList[tupleIndex].Item5] = tupleList[tupleIndex].Item4;
-                        }
-                        else
-                        {
-                            childOne[tupleList[tupleIndex].Item5] = new Chromosome(tupleList[tupleIndex].Item3);
-                            childTwo[tupleList[tupleIndex].Item5] = new Chromosome(tupleList[tupleIndex].Item1);
-                            permutationOne[tupleList[tupleIndex].Item5] = tupleList[tupleIndex].Item4;
-                            permutationTwo[tupleList[tupleIndex].Item5] = tupleList[tupleIndex].Item2;
-                        }
-                        tupleList.RemoveAt(tupleIndex);
+                        childOne[tupleList[tupleIndex].Item5] = new Chromosome(tupleList[tupleIndex].Item1);
+                        childTwo[tupleList[tupleIndex].Item5] = new Chromosome(tupleList[tupleIndex].Item3);
+                        permutationOne[tupleList[tupleIndex].Item5] = tupleList[tupleIndex].Item2;
+                        permutationTwo[tupleList[tupleIndex].Item5] = tupleList[tupleIndex].Item4;
                     }
-                    while (currentValue != stopCondition);
-                    swap = !swap;
+                    else
+                    {
+                        childOne[tupleList[tupleIndex].Item5] = new Chromosome(tupleList[tupleIndex].Item3);
+                        childTwo[tupleList[tupleIndex].Item5] = new Chromosome(tupleList[tupleIndex].Item1);
+                        permutationOne[tupleList[tupleIndex].Item5] = tupleList[tupleIndex].Item4;
+                        permutationTwo[tupleList[tupleIndex].Item5] = tupleList[tupleIndex].Item2;
+                    }
+                    tupleList.RemoveAt(tupleIndex);
                 }
-                for (int i = 0; i < size; i++)
-                {
-                    Console.Write(permutationOne[i] + "\t");
-                }
-                Console.WriteLine();
-                Console.WriteLine();
-                for (int i = 0; i < size; i++)
-                {
-                    Console.Write(permutationTwo[i] + "\t");
-                }
+                while (currentValue != stopCondition);
+                swap = !swap;
             }
-            return childrenArray;
+            childrenArray[0] = new Solution(childOne);
+            childrenArray[1] = new Solution(childTwo);
+        return childrenArray;
         }
     }
 
