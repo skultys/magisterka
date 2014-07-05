@@ -11,7 +11,7 @@ namespace magisterka
         {
             Random rand = new Random();
 
-            int psize = 15;
+            int psize = 10;
 
             double[,] distance = new double[psize, psize];
 
@@ -29,14 +29,19 @@ namespace magisterka
             QgAlgorithm alg = new QgAlgorithm(distance, flow, 0.2, 0.5, 0.02, 1000, 3, psize);
             alg.InitRandomPopulation();
 
-            foreach (Solution sol in alg.Population)
-            {
-                sol.PrintSolution();
-            }
+            ((Solution)alg.Population[0]).PrintSolution();
+            ((Solution)alg.Population[1]).PrintSolution();
 
-            Console.WriteLine();
 
-            alg.cxOperator.Execute((Solution)alg.Population[0], (Solution)alg.Population[1]);
+            var OxResult = alg.oxOperator.Execute((Solution)alg.Population[0], (Solution)alg.Population[1]);
+
+            //((Solution)OxResult[0]).PrintSolution();
+            //((Solution)OxResult[1]).PrintSolution();
+            //Console.WriteLine(((Solution)alg.Population[0]).Goal);
+            //Console.WriteLine(((Solution)alg.Population[1]).Goal);
+
+            //Console.WriteLine(OxResult[0].Goal);
+            //Console.WriteLine(OxResult[1].Goal);
 
             Console.ReadKey();
         }

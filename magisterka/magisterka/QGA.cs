@@ -431,6 +431,8 @@ namespace magisterka
     {
         public double CrossoverProbability { get; set; }
 
+        private static Random rand = new Random();
+
         public OxCrossoverOperator(double probability = 0.0)
         {
             this.CrossoverProbability = probability;
@@ -440,12 +442,112 @@ namespace magisterka
         {
             return new Solution[0];
         }
+
+        public Solution[] Execute(Solution parentOne, Solution parentTwo)
+        {
+            int size = parentOne.Size;
+
+            //int[] permutationOne = new int[size];
+            //int[] permutationTwo = new int[size];
+
+            int leftBound = rand.Next(size - 1);
+            int rightBound = rand.Next(size - 1);
+            Solution[] childrenArray = new Solution[2];
+            if (leftBound > rightBound)
+            {
+                int temp = rightBound;
+                rightBound = leftBound;
+                leftBound = temp;
+            }
+
+            //Console.WriteLine("left " + leftBound);
+            //Console.WriteLine("right " + rightBound);
+            Console.WriteLine();
+
+            Chromosome[] childOne = new Chromosome[size];
+            Chromosome[] childTwo = new Chromosome[size];
+
+            for (int i = leftBound; i <= rightBound; i++)
+            {
+                childOne[i] = new Chromosome(parentOne[i]);
+                childTwo[i] = new Chromosome(parentTwo[i]);
+                //permutationOne[i] = parentOne.permutation[i];
+                //permutationTwo[i] = parentTwo.permutation[i];
+            }
+
+            int currentIndex = (rightBound  + 1) % size;
+            int anotherParentIndex = currentIndex;
+            int toAdd;
+            bool skip;
+            while (currentIndex != leftBound)
+            {
+                skip = false;
+                toAdd = parentTwo.permutation[anotherParentIndex];
+                for (int i = leftBound; i <= rightBound; i++)
+                {
+                    if (toAdd == parentOne.permutation[i])
+                    {
+                        anotherParentIndex = (anotherParentIndex + 1) % size;
+                        skip = true;
+                        break;
+                    }
+                }
+                if (!skip)
+                {
+                    //permutationOne[currentIndex] = parentTwo.permutation[anotherParentIndex];
+                    childOne[currentIndex] = new Chromosome(parentTwo[anotherParentIndex]);
+                    anotherParentIndex = (anotherParentIndex + 1) % size;
+                    currentIndex = (currentIndex + 1) % size;
+                }
+            }
+                    
+            currentIndex = (rightBound + 1) % size;
+            anotherParentIndex = currentIndex;
+            while (currentIndex != leftBound)
+            {
+                skip = false;
+                toAdd = parentOne.permutation[anotherParentIndex];
+                for (int i = leftBound; i <= rightBound; i++)
+                {
+                    if (toAdd == parentTwo.permutation[i])
+                    {
+                        anotherParentIndex = (anotherParentIndex + 1) % size;
+                        skip = true;
+                        break;
+                    }
+                }
+                if (!skip)
+                {
+                    //permutationTwo[currentIndex] = parentOne.permutation[anotherParentIndex];
+                    childTwo[currentIndex] = new Chromosome(parentOne[anotherParentIndex]);
+                    anotherParentIndex = (anotherParentIndex + 1) % size;
+                    currentIndex = (currentIndex + 1) % size;
+                }
+            }
+
+            /*for (int i = 0; i < size; i++)
+            {
+                Console.Write(permutationOne[i] + " ");
+            }
+
+            Console.WriteLine();
+            for (int i = 0; i < size; i++)
+            {
+                Console.Write(permutationTwo[i] + " ");
+            }*/
+
+            childrenArray[0] = new Solution(childOne);
+            childrenArray[1] = new Solution(childTwo);
+            return childrenArray;
+        }
     }
 
 
     class PmxCrossoverOperator : ICrossoverOperator
     {
         public double CrossoverProbability { get; set; }
+
+        private static Random rand = new Random();
 
         public PmxCrossoverOperator(double probability = 0.0)
         {
@@ -473,15 +575,13 @@ namespace magisterka
             return new Solution[0];
         }
 
-        public ISolution[] Execute(Solution parentOne, Solution parentTwo)
+        public Solution[] Execute(Solution parentOne, Solution parentTwo)
         {
             Solution[] childrenArray = new Solution[2];
             int size = parentOne.Size;
             List<Tuple<Chromosome, int, Chromosome, int, int>> tupleList = new List<Tuple<Chromosome, int, Chromosome, int, int>>();
             Chromosome[] childOne = new Chromosome[size];
             Chromosome[] childTwo = new Chromosome[size];
-            int[] permutationOne = new int[size];
-            int[] permutationTwo = new int[size];
             for (int i = 0; i < size; i++)
             {
                 Tuple<Chromosome, int, Chromosome, int, int> tuple = new Tuple<Chromosome, int, Chromosome, int, int>(parentOne[i], parentOne.permutation[i], parentTwo[i], parentTwo.permutation[i], i);
@@ -501,15 +601,11 @@ namespace magisterka
                     {
                         childOne[tupleList[tupleIndex].Item5] = new Chromosome(tupleList[tupleIndex].Item1);
                         childTwo[tupleList[tupleIndex].Item5] = new Chromosome(tupleList[tupleIndex].Item3);
-                        permutationOne[tupleList[tupleIndex].Item5] = tupleList[tupleIndex].Item2;
-                        permutationTwo[tupleList[tupleIndex].Item5] = tupleList[tupleIndex].Item4;
                     }
                     else
                     {
                         childOne[tupleList[tupleIndex].Item5] = new Chromosome(tupleList[tupleIndex].Item3);
                         childTwo[tupleList[tupleIndex].Item5] = new Chromosome(tupleList[tupleIndex].Item1);
-                        permutationOne[tupleList[tupleIndex].Item5] = tupleList[tupleIndex].Item4;
-                        permutationTwo[tupleList[tupleIndex].Item5] = tupleList[tupleIndex].Item2;
                     }
                     tupleList.RemoveAt(tupleIndex);
                 }
@@ -602,6 +698,7 @@ namespace magisterka
     {
         PmxCrossoverOperator crossOperator = null;
         //zmienic na private
+        public OxCrossoverOperator oxOperator = null;
         public CxCrossoverOperator cxOperator = null;
         public MutationOperator mutOperator = null;
         CatastropheOperator catOperator = null;
@@ -617,6 +714,8 @@ namespace magisterka
             crossOperator = new PmxCrossoverOperator(crossProb);
 
             cxOperator = new CxCrossoverOperator();
+
+            oxOperator = new OxCrossoverOperator();
 
             mutOperator = new MutationOperator(mutProb, problemSize);
 
