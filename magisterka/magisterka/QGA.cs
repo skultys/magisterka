@@ -610,6 +610,52 @@ namespace magisterka
                 }
             }
 
+            for (int i = 0; i < size; i++)
+            {
+                for (int j = 0; j < MappingArray.Count; j++)
+                {
+                    if (parentOne.permutation[i] == MappingArray[j].Item2)
+                    {
+                        for (int k = 0; k < size; k++)
+                        {
+                            if (parentTwo.permutation[k] == MappingArray[j].Item1)
+                            {
+                                childOne[i] = new Chromosome(parentTwo[k]);
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        childOne[i] = new Chromosome(parentOne[i]);
+                    }
+                }
+                if (i == leftBound) i = rightBound + 1;
+            }
+
+            for (int i = 0; i < size; i++)
+            {
+                for (int j = 0; j < MappingArray.Count; j++)
+                {
+                    if (parentTwo.permutation[i] == MappingArray[j].Item1)
+                    {
+                        for (int k = 0; k < size; k++)
+                        {
+                            if (parentOne.permutation[k] == MappingArray[j].Item2)
+                            {
+                                childTwo[i] = new Chromosome(parentOne[k]);
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        childTwo[i] = new Chromosome(parentTwo[i]);
+                    }
+                }
+                if (i == leftBound) i = rightBound + 1;
+            }
+
             return childrenArray;
         }
     }
