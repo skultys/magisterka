@@ -165,11 +165,8 @@ namespace magisterka
 
     class Solution : ISolution
     {
-        List<Chromosome> chromosomes = null;
-
-        //zmienic na private
+        private List<Chromosome> chromosomes = null;
         public List<int> permutation = null;
-        double goal;
         int solSize;
 
         public int Size
@@ -185,7 +182,7 @@ namespace magisterka
             this.chromosomes = new List<Chromosome>();
             this.permutation = new List<int>();
             int chromosomeSize = (int)(Math.Log(size, 2.0) + 1);
-            this.goal = 0.0;
+            this.Goal = 0.0;
             this.solSize = size;
             for (int i = 0; i < size; i++)
             {
@@ -211,14 +208,14 @@ namespace magisterka
                 this.permutation.Add(anotherSolution.permutation[i]);
             }
 
-            this.goal = anotherSolution.goal;
+            this.Goal = anotherSolution.Goal;
             this.solSize = anotherSolution.solSize;
         }
 
         public Solution(Chromosome[] chromosomes)
         {
             this.solSize = chromosomes.Length;
-            this.goal = 0.0;
+            this.Goal = 0.0;
             this.chromosomes = new List<Chromosome>(chromosomes);
             this.permutation = new List<int>();
             for (int i = 0; i < this.Size; i++)
@@ -272,28 +269,18 @@ namespace magisterka
                 this.permutation[tuple.Item1] = val;
             }
 
-            this.goal = 0.0;
+            this.Goal = 0.0;
             for (int i = 0; i < this.permutation.Count - 1; i++)
             {
                 int first = this.permutation[i] - 1;
                 int second = this.permutation[i + 1] - 1;
                 double flowValue = (QapData.Instance.getFlow())[first, second];
                 double distanceValue = (QapData.Instance.getDistance())[first, second];
-                this.goal += (flowValue + distanceValue);
+                this.Goal += (flowValue + distanceValue);
             }
         }
 
-        public double Goal
-        {
-            set
-            {
-                this.goal = value;
-            }
-            get
-            {
-                return this.goal;
-            }
-        }
+        public double Goal { get; set; }
 
         public void PrintSolution()
         {
@@ -462,7 +449,7 @@ namespace magisterka
 
             //Console.WriteLine("left " + leftBound);
             //Console.WriteLine("right " + rightBound);
-            Console.WriteLine();
+            //Console.WriteLine();
 
             Chromosome[] childOne = new Chromosome[size];
             Chromosome[] childTwo = new Chromosome[size];
@@ -557,6 +544,73 @@ namespace magisterka
         public ISolution[] Execute(IPopulation population)
         {
             return new Solution[0];
+        }
+
+        public Solution[] Execute(Solution parentOne, Solution parentTwo)
+        {
+            int size = parentOne.Size;
+
+            int[] permutationOne = new int[size];
+            int[] permutationTwo = new int[size];
+
+            int leftBound = rand.Next(size - 1);
+            int rightBound = rand.Next(size - 1);
+            Solution[] childrenArray = new Solution[2];
+            List<Tuple<int, int>> MappingArray = new List<Tuple<int, int>>();
+
+            if (leftBound > rightBound)
+            {
+                int temp = rightBound;
+                rightBound = leftBound;
+                leftBound = temp;
+            }
+
+            //Console.WriteLine("left " + leftBound);
+            //Console.WriteLine("right " + rightBound);
+            //Console.WriteLine();
+
+            Chromosome[] childOne = new Chromosome[size];
+            Chromosome[] childTwo = new Chromosome[size];
+
+            for (int i = leftBound; i <= rightBound; i++)
+            {
+                childOne[i] = new Chromosome(parentOne[i]);
+                childTwo[i] = new Chromosome(parentTwo[i]);
+                permutationOne[i] = parentOne.permutation[i];
+                permutationTwo[i] = parentTwo.permutation[i];
+                Tuple<int, int> MappingTuple = new Tuple<int, int>(parentOne.permutation[i], parentTwo.permutation[i]);
+                MappingArray.Add(MappingTuple);
+            }
+
+            bool bondingStopped = false;
+            //sklejanie mapowan
+            for (int i = 0; i < MappingArray.Count; i++)
+            {
+                if (MappingArray[i].Item1 == MappingArray[i].Item2)
+                {
+                    MappingArray.RemoveAt(i);
+                    i--;
+                }
+            }
+            while (!bondingStopped)
+            {
+                bondingStopped = true;
+                for (int i = 0; i < MappingArray.Count; i++)
+                {
+                    for (int j = 0; j < MappingArray.Count; j++)
+                    {
+                        if (MappingArray[i].Item2 == MappingArray[j].Item1)
+                        {
+                            bondingStopped = false;
+                            MappingArray[i] = new Tuple<int, int>(MappingArray[i].Item1, MappingArray[j].Item2);
+                            MappingArray.RemoveAt(j);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return childrenArray;
         }
     }
 
