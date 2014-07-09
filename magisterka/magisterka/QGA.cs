@@ -550,8 +550,8 @@ namespace magisterka
         {
             int size = parentOne.Size;
 
-            int[] permutationOne = new int[size];
-            int[] permutationTwo = new int[size];
+            //int[] permutationOne = new int[size];
+            //int[] permutationTwo = new int[size];
 
             int leftBound = rand.Next(size - 1);
             int rightBound = rand.Next(size - 1);
@@ -565,19 +565,15 @@ namespace magisterka
                 leftBound = temp;
             }
 
-            //Console.WriteLine("left " + leftBound);
-            //Console.WriteLine("right " + rightBound);
-            //Console.WriteLine();
-
             Chromosome[] childOne = new Chromosome[size];
             Chromosome[] childTwo = new Chromosome[size];
 
             for (int i = leftBound; i <= rightBound; i++)
             {
-                childOne[i] = new Chromosome(parentOne[i]);
-                childTwo[i] = new Chromosome(parentTwo[i]);
-                permutationOne[i] = parentOne.permutation[i];
-                permutationTwo[i] = parentTwo.permutation[i];
+                childOne[i] = new Chromosome(parentTwo[i]);
+                childTwo[i] = new Chromosome(parentOne[i]);
+                //permutationOne[i] = parentTwo.permutation[i];
+                //permutationTwo[i] = parentOne.permutation[i];
                 Tuple<int, int> MappingTuple = new Tuple<int, int>(parentOne.permutation[i], parentTwo.permutation[i]);
                 MappingArray.Add(MappingTuple);
             }
@@ -610,8 +606,15 @@ namespace magisterka
                 }
             }
 
+            bool mappingFound = false;
+
             for (int i = 0; i < size; i++)
             {
+                if (i == leftBound)
+                {
+                    i = rightBound;
+                    continue;
+                }
                 for (int j = 0; j < MappingArray.Count; j++)
                 {
                     if (parentOne.permutation[i] == MappingArray[j].Item2)
@@ -621,20 +624,30 @@ namespace magisterka
                             if (parentTwo.permutation[k] == MappingArray[j].Item1)
                             {
                                 childOne[i] = new Chromosome(parentTwo[k]);
+                                //permutationOne[i] = parentTwo.permutation[k];
+                                mappingFound = true;
                                 break;
                             }
                         }
                     }
-                    else
-                    {
-                        childOne[i] = new Chromosome(parentOne[i]);
-                    }
+                    if (mappingFound) break;
                 }
-                if (i == leftBound) i = rightBound + 1;
+                if(!mappingFound)
+                {
+                    childOne[i] = new Chromosome(parentOne[i]);
+                    //permutationOne[i] = parentOne.permutation[i];
+                }
+                mappingFound = false;
             }
 
+            mappingFound = false;
             for (int i = 0; i < size; i++)
             {
+                if (i == leftBound)
+                {
+                    i = rightBound;
+                    continue;
+                }
                 for (int j = 0; j < MappingArray.Count; j++)
                 {
                     if (parentTwo.permutation[i] == MappingArray[j].Item1)
@@ -644,18 +657,37 @@ namespace magisterka
                             if (parentOne.permutation[k] == MappingArray[j].Item2)
                             {
                                 childTwo[i] = new Chromosome(parentOne[k]);
+                                //permutationTwo[i] = parentOne.permutation[k];
+                                mappingFound = true;
                                 break;
                             }
                         }
                     }
-                    else
-                    {
-                        childTwo[i] = new Chromosome(parentTwo[i]);
-                    }
+                    if (mappingFound) break;
                 }
-                if (i == leftBound) i = rightBound + 1;
+                if (!mappingFound)
+                {
+                    childTwo[i] = new Chromosome(parentTwo[i]);
+                    //permutationTwo[i] = parentTwo.permutation[i];
+                }
+                mappingFound = false;
             }
 
+            /*Console.WriteLine("lef: " + leftBound + " right: " + rightBound);
+            for (int i = 0; i < size; i++)
+            {
+                Console.Write(permutationOne[i] + "  ");
+            }
+            Console.WriteLine();
+
+            for (int i = 0; i < size; i++) 
+            {
+                Console.Write(permutationTwo[i] + "  ");
+            }
+            Console.WriteLine();*/
+
+            childrenArray[0] = new Solution(childOne);
+            childrenArray[1] = new Solution(childTwo);
             return childrenArray;
         }
     }
@@ -800,8 +832,9 @@ namespace magisterka
         //zmienic na private
         public OxCrossoverOperator oxOperator = null;
         public CxCrossoverOperator cxOperator = null;
+        public PmxCrossoverOperator pmxOperator = null;
         public MutationOperator mutOperator = null;
-        CatastropheOperator catOperator = null;
+        private CatastropheOperator catOperator = null;
         public RotationGateOperator rotOperator = null;
         bool isStopped;
         int iterations;
@@ -816,6 +849,8 @@ namespace magisterka
             cxOperator = new CxCrossoverOperator();
 
             oxOperator = new OxCrossoverOperator();
+
+            pmxOperator = new PmxCrossoverOperator();
 
             mutOperator = new MutationOperator(mutProb, problemSize);
 

@@ -27,16 +27,16 @@ namespace magisterka
             }
 
             QgAlgorithm alg = new QgAlgorithm(distance, flow, 0.2, 0.5, 0.02, 1000, 3, psize);
-            //alg.InitRandomPopulation();
+            alg.InitRandomPopulation();
 
-            //((Solution)alg.Population[0]).PrintSolution();
-            //((Solution)alg.Population[1]).PrintSolution();
+            ((Solution)alg.Population[0]).PrintSolution();
+            ((Solution)alg.Population[1]).PrintSolution();
 
 
-            //var OxResult = alg.oxOperator.Execute((Solution)alg.Population[0], (Solution)alg.Population[1]);
+            var pmxResult = alg.pmxOperator.Execute((Solution)alg.Population[0], (Solution)alg.Population[1]);
 
-            //((Solution)OxResult[0]).PrintSolution();
-            //((Solution)OxResult[1]).PrintSolution();
+            //((Solution)pmxResult[0]).PrintSolution();
+            //((Solution)pmxResult[1]).PrintSolution();
             //Console.WriteLine(((Solution)alg.Population[0]).Goal);
             //Console.WriteLine(((Solution)alg.Population[1]).Goal);
 
