@@ -306,16 +306,33 @@ namespace magisterka
 
         public Population(int solutionsCount, int problemSize)
         {
-            solutions = new List<Solution>();
+            this.solutions = new List<Solution>();
             this.popSize = this.currPopSize = solutionsCount;
             this.problemSize = problemSize;
             for (int i = 0; i < solutionsCount; i++)
             {
                 Solution solution = new Solution(problemSize);
-                solutions.Add(solution);
+                this.solutions.Add(solution);
             }
         }
 
+        public Population(Solution[] solutions)
+        {
+            this.solutions = new List<Solution>(solutions);
+            this.popSize = this.currPopSize = solutions.Length;
+            this.problemSize = solutions[0].Size;
+        }
+
+        public void SortAscending()
+        {
+            this.solutions.Sort((a, b) => a.Goal.CompareTo(b.Goal));
+        }
+
+        public void SortDescending()
+        {
+            this.solutions.Sort((a, b) => b.Goal.CompareTo(a.Goal));
+        }
+        
         public int Size
         {
             get
@@ -395,7 +412,7 @@ namespace magisterka
         public ISolution Execute(IPopulation population)
         {
             double ifMutate;
-            Solution solTuReturn = null;
+            Solution solToReturn = null;
             foreach(Solution sol in population)
             {
                 ifMutate = rand.NextDouble();
@@ -406,11 +423,11 @@ namespace magisterka
 
                     sol[selectedChromosome][selectedQbit].ExecuteNotGate();
                     sol.toPermutation();
-                    solTuReturn = new Solution(sol);
+                    solToReturn = new Solution(sol);
                     break;
                 }
             }
-            return solTuReturn;
+            return solToReturn;
         }
     }
 
@@ -427,7 +444,38 @@ namespace magisterka
 
         public ISolution[] Execute(IPopulation population)
         {
-            return new Solution[0];
+            Solution[] crossedPopulation = new Solution[population.Size];
+            List<Solution> chosenSolutions = new List<Solution>();
+
+            foreach (Solution sol in population) {
+                double ifChosen = rand.NextDouble();
+                if(ifChosen < this.CrossoverProbability)
+                {
+                    Solution tempSol = new Solution(sol);
+                    chosenSolutions.Add(tempSol);
+                }
+            }
+
+            if (chosenSolutions.Count != population.Size)
+            {
+                int stop = population.Size - chosenSolutions.Count;
+                for (int i = 0; i < stop; i++)
+                {
+                    int whichSol = rand.Next(chosenSolutions.Count - 1);
+                    int position = rand.Next(chosenSolutions.Count - 1);
+                    Solution tempSol = new Solution(chosenSolutions[whichSol]);
+                    chosenSolutions.Insert(position, tempSol);
+                }
+            }
+
+            for (int i = 0; i < population.Size; i += 2)
+            {
+                Solution[] temp = new Solution[2];
+                temp = Execute(chosenSolutions[i], chosenSolutions[i + 1]);
+                crossedPopulation[i] = new Solution(temp[0]);
+                crossedPopulation[i + 1] = new Solution(temp[1]);
+            }
+            return crossedPopulation;
         }
 
         public Solution[] Execute(Solution parentOne, Solution parentTwo)
@@ -543,7 +591,39 @@ namespace magisterka
 
         public ISolution[] Execute(IPopulation population)
         {
-            return new Solution[0];
+            Solution[] crossedPopulation = new Solution[population.Size];
+            List<Solution> chosenSolutions = new List<Solution>();
+
+            foreach (Solution sol in population)
+            {
+                double ifChosen = rand.NextDouble();
+                if (ifChosen < this.CrossoverProbability)
+                {
+                    Solution tempSol = new Solution(sol);
+                    chosenSolutions.Add(tempSol);
+                }
+            }
+
+            if (chosenSolutions.Count != population.Size)
+            {
+                int stop = population.Size - chosenSolutions.Count;
+                for (int i = 0; i < stop; i++)
+                {
+                    int whichSol = rand.Next(chosenSolutions.Count - 1);
+                    int position = rand.Next(chosenSolutions.Count - 1);
+                    Solution tempSol = new Solution(chosenSolutions[whichSol]);
+                    chosenSolutions.Insert(position, tempSol);
+                }
+            }
+
+            for (int i = 0; i < population.Size; i += 2)
+            {
+                Solution[] temp = new Solution[2];
+                temp = Execute(chosenSolutions[i], chosenSolutions[i + 1]);
+                crossedPopulation[i] = new Solution(temp[0]);
+                crossedPopulation[i + 1] = new Solution(temp[1]);
+            }
+            return crossedPopulation;
         }
 
         public Solution[] Execute(Solution parentOne, Solution parentTwo)
@@ -695,6 +775,7 @@ namespace magisterka
     class CxCrossoverOperator : ICrossoverOperator
     {
         public double CrossoverProbability { get; set; }
+        private static Random rand = new Random();
 
         public CxCrossoverOperator(double probability = 0.0)
         {
@@ -703,8 +784,39 @@ namespace magisterka
 
         public ISolution[] Execute(IPopulation population)
         {
-            Population pop = population as Population;
-            return new Solution[0];
+            Solution[] crossedPopulation = new Solution[population.Size];
+            List<Solution> chosenSolutions = new List<Solution>();
+
+            foreach (Solution sol in population)
+            {
+                double ifChosen = rand.NextDouble();
+                if (ifChosen < this.CrossoverProbability)
+                {
+                    Solution tempSol = new Solution(sol);
+                    chosenSolutions.Add(tempSol);
+                }
+            }
+
+            if (chosenSolutions.Count != population.Size)
+            {
+                int stop = population.Size - chosenSolutions.Count;
+                for (int i = 0; i < stop; i++)
+                {
+                    int whichSol = rand.Next(chosenSolutions.Count - 1);
+                    int position = rand.Next(chosenSolutions.Count - 1);
+                    Solution tempSol = new Solution(chosenSolutions[whichSol]);
+                    chosenSolutions.Insert(position, tempSol);
+                }
+            }
+
+            for (int i = 0; i < population.Size; i += 2)
+            {
+                Solution[] temp = new Solution[2];
+                temp = Execute(chosenSolutions[i], chosenSolutions[i + 1]);
+                crossedPopulation[i] = new Solution(temp[0]);
+                crossedPopulation[i + 1] = new Solution(temp[1]);
+            }
+            return crossedPopulation;
         }
 
         public Solution[] Execute(Solution parentOne, Solution parentTwo)
@@ -826,6 +938,77 @@ namespace magisterka
         }
     }
 
+    class SelectionOperator
+    {
+        private List<double> distribution = null;
+        private static Random rand = new Random();
+        public double CrossoverProbability { get; set; }
+        private double bigNumber;
+
+        public SelectionOperator(double probability, int solSize)
+        {
+            this.bigNumber = 0.0;
+            double maxFlow = 0.0;
+            double maxDistance = 0.0;
+            this.CrossoverProbability = probability;
+            for (int i = 0; i < solSize; i++)
+            {
+                for (int j = 0; j < solSize; j++)
+                {
+                    if (maxFlow < (QapData.Instance.getFlow())[i, j]) maxFlow = (QapData.Instance.getFlow())[i, j];
+                    if (maxDistance < (QapData.Instance.getDistance())[i, j]) maxFlow = (QapData.Instance.getDistance())[i, j];
+                }
+            }
+            bigNumber = (maxDistance + maxFlow) * solSize;
+        }
+
+        Population RouletteMethod(Population population)
+        {
+            int size = population.Size;
+            Solution[] chosenSolutions = new Solution[size];
+            this.distribution = new List<double>();
+
+            double fitSum = 0.0;
+            double currentFitSum = 0.0;
+
+            foreach (Solution sol in population)
+            {
+                fitSum += (this.bigNumber - sol.Goal);
+            }
+
+            foreach (Solution sol in population)
+            {
+                currentFitSum += (this.bigNumber - sol.Goal);
+                double probability = currentFitSum / fitSum;
+                distribution.Add(probability);
+            }
+
+            this.distribution[size - 1] = 1.0;
+
+            List<Solution> solutionsToMix = new List<Solution>();
+
+            for (int i = 0; i < size; i++)
+            {
+                double toChoose = rand.NextDouble();
+                for (int j = 0; j < size; j++)
+                {
+                    if (toChoose >= distribution[j])
+                    {
+                        chosenSolutions[i] = new Solution((Solution)population[i]);
+                        break;
+                    }
+                }
+            }
+
+            return new Population(chosenSolutions);
+        }
+
+        Solution[] RankingMethod(Population population)
+        {
+            return new Solution[0];
+        }
+    }
+
     class QgAlgorithm : IEvolutionAlgorithm
     {
         PmxCrossoverOperator crossOperator = null;
@@ -862,6 +1045,7 @@ namespace magisterka
             this.isStopped = false;
             this.iterations = iterations;
             this.popSize = popSize;
+            if (popSize % 2 != 0) popSize += 1;
             this.problemSize = problemSize;
 
             QapData.Instance.setQapData(distance, flow);

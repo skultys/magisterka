@@ -11,7 +11,7 @@ namespace magisterka
         {
             Random rand = new Random();
 
-            int psize = 10;
+            int psize = 15;
 
             double[,] distance = new double[psize, psize];
 
@@ -26,14 +26,34 @@ namespace magisterka
                 }
             }
 
-            QgAlgorithm alg = new QgAlgorithm(distance, flow, 0.2, 0.5, 0.02, 1000, 3, psize);
+            QgAlgorithm alg = new QgAlgorithm(distance, flow, 0.2, 0.5, 0.02, 1000, 5, psize);
             alg.InitRandomPopulation();
 
-            ((Solution)alg.Population[0]).PrintSolution();
-            ((Solution)alg.Population[1]).PrintSolution();
+            /*foreach (Solution sol in alg.Population)
+            {
+                Console.WriteLine(sol.Goal);
+            }
+
+            ((Population)alg.Population).SortAscending();
+
+            Console.WriteLine();
+            foreach (Solution sol in alg.Population)
+            {
+                Console.WriteLine(sol.Goal);
+            }
+
+            ((Population)alg.Population).SortDescending();
+
+            Console.WriteLine();
+            foreach (Solution sol in alg.Population)
+            {
+                Console.WriteLine(sol.Goal);
+            }
+            //((Solution)alg.Population[0]).PrintSolution();
+            //((Solution)alg.Population[1]).PrintSolution();*/
 
 
-            var pmxResult = alg.pmxOperator.Execute((Solution)alg.Population[0], (Solution)alg.Population[1]);
+            //var pmxResult = alg.pmxOperator.Execute((Solution)alg.Population[0], (Solution)alg.Population[1]);
 
             //((Solution)pmxResult[0]).PrintSolution();
             //((Solution)pmxResult[1]).PrintSolution();
