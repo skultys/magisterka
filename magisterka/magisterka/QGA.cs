@@ -270,13 +270,14 @@ namespace magisterka
             }
 
             this.Goal = 0.0;
+            double[,] flowM = QapData.Instance.getFlow();
+            double[,] distanceM = QapData.Instance.getDistance();
             for (int i = 0; i < this.permutation.Count - 1; i++)
             {
-                int first = this.permutation[i] - 1;
-                int second = this.permutation[i + 1] - 1;
-                double flowValue = (QapData.Instance.getFlow())[first, second];
-                double distanceValue = (QapData.Instance.getDistance())[first, second];
-                this.Goal += (flowValue + distanceValue);
+                for (int j = 0; j < this.permutation.Count - 1; j++)
+                {
+                    this.Goal += flowM[i, j] * distanceM[this.permutation[i] - 1, this.permutation[j] - 1];
+                }
             }
         }
 
@@ -959,7 +960,7 @@ namespace magisterka
                     if (maxDistance < (QapData.Instance.getDistance())[i, j]) maxFlow = (QapData.Instance.getDistance())[i, j];
                 }
             }
-            bigNumber = (maxDistance + maxFlow) * solSize;
+            bigNumber = (maxDistance + maxFlow) * solSize * solSize;
         }
 
         Population RouletteMethod(Population population)

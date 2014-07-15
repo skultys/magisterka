@@ -29,12 +29,12 @@ namespace magisterka
             QgAlgorithm alg = new QgAlgorithm(distance, flow, 0.2, 0.5, 0.02, 1000, 5, psize);
             alg.InitRandomPopulation();
 
-            /*foreach (Solution sol in alg.Population)
+            foreach (Solution sol in alg.Population)
             {
                 Console.WriteLine(sol.Goal);
             }
 
-            ((Population)alg.Population).SortAscending();
+            /*((Population)alg.Population).SortAscending();
 
             Console.WriteLine();
             foreach (Solution sol in alg.Population)
