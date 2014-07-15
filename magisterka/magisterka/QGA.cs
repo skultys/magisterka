@@ -10,10 +10,17 @@ namespace magisterka
     class Qbit
     {
         private static Random rand = new Random();
-        public int observedState;
-
+        private int observedState;
         public double Alpha { set; get; }
         public double Beta { set; get; }
+
+        public int ObservedState
+        {
+            get
+            {
+                return this.observedState;
+            }
+        }
 
         public Qbit()
         {
@@ -166,7 +173,7 @@ namespace magisterka
     class Solution : ISolution
     {
         private List<Chromosome> chromosomes = null;
-        public List<int> permutation = null;
+        private List<int> permutation = null;
         int solSize;
 
         public int Size
@@ -174,6 +181,14 @@ namespace magisterka
             get
             {
                 return this.solSize;
+            }
+        }
+
+        public List<int> Permutation
+        {
+            get
+            {
+                return this.permutation;
             }
         }
 
@@ -294,10 +309,10 @@ namespace magisterka
     }
 
     class Population : IPopulation {
-        int popSize;
-        int problemSize;
-        int currPopSize;
-        List<Solution> solutions = null;
+        private int popSize;
+        private int problemSize;
+        private int currPopSize;
+        private List<Solution> solutions = null;
 
         public Population()
         {
@@ -518,10 +533,10 @@ namespace magisterka
             while (currentIndex != leftBound)
             {
                 skip = false;
-                toAdd = parentTwo.permutation[anotherParentIndex];
+                toAdd = parentTwo.Permutation[anotherParentIndex];
                 for (int i = leftBound; i <= rightBound; i++)
                 {
-                    if (toAdd == parentOne.permutation[i])
+                    if (toAdd == parentOne.Permutation[i])
                     {
                         anotherParentIndex = (anotherParentIndex + 1) % size;
                         skip = true;
@@ -542,10 +557,10 @@ namespace magisterka
             while (currentIndex != leftBound)
             {
                 skip = false;
-                toAdd = parentOne.permutation[anotherParentIndex];
+                toAdd = parentOne.Permutation[anotherParentIndex];
                 for (int i = leftBound; i <= rightBound; i++)
                 {
-                    if (toAdd == parentTwo.permutation[i])
+                    if (toAdd == parentTwo.Permutation[i])
                     {
                         anotherParentIndex = (anotherParentIndex + 1) % size;
                         skip = true;
@@ -655,7 +670,7 @@ namespace magisterka
                 childTwo[i] = new Chromosome(parentOne[i]);
                 //permutationOne[i] = parentTwo.permutation[i];
                 //permutationTwo[i] = parentOne.permutation[i];
-                Tuple<int, int> MappingTuple = new Tuple<int, int>(parentOne.permutation[i], parentTwo.permutation[i]);
+                Tuple<int, int> MappingTuple = new Tuple<int, int>(parentOne.Permutation[i], parentTwo.Permutation[i]);
                 MappingArray.Add(MappingTuple);
             }
 
@@ -698,11 +713,11 @@ namespace magisterka
                 }
                 for (int j = 0; j < MappingArray.Count; j++)
                 {
-                    if (parentOne.permutation[i] == MappingArray[j].Item2)
+                    if (parentOne.Permutation[i] == MappingArray[j].Item2)
                     {
                         for (int k = 0; k < size; k++)
                         {
-                            if (parentTwo.permutation[k] == MappingArray[j].Item1)
+                            if (parentTwo.Permutation[k] == MappingArray[j].Item1)
                             {
                                 childOne[i] = new Chromosome(parentTwo[k]);
                                 //permutationOne[i] = parentTwo.permutation[k];
@@ -731,11 +746,11 @@ namespace magisterka
                 }
                 for (int j = 0; j < MappingArray.Count; j++)
                 {
-                    if (parentTwo.permutation[i] == MappingArray[j].Item1)
+                    if (parentTwo.Permutation[i] == MappingArray[j].Item1)
                     {
                         for (int k = 0; k < size; k++)
                         {
-                            if (parentOne.permutation[k] == MappingArray[j].Item2)
+                            if (parentOne.Permutation[k] == MappingArray[j].Item2)
                             {
                                 childTwo[i] = new Chromosome(parentOne[k]);
                                 //permutationTwo[i] = parentOne.permutation[k];
@@ -829,7 +844,7 @@ namespace magisterka
             Chromosome[] childTwo = new Chromosome[size];
             for (int i = 0; i < size; i++)
             {
-                Tuple<Chromosome, int, Chromosome, int, int> tuple = new Tuple<Chromosome, int, Chromosome, int, int>(parentOne[i], parentOne.permutation[i], parentTwo[i], parentTwo.permutation[i], i);
+                Tuple<Chromosome, int, Chromosome, int, int> tuple = new Tuple<Chromosome, int, Chromosome, int, int>(parentOne[i], parentOne.Permutation[i], parentTwo[i], parentTwo.Permutation[i], i);
                 tupleList.Add(tuple);
             }
             bool swap = false;
@@ -874,9 +889,9 @@ namespace magisterka
 
     class RotationGateOperator : IEvolutionaryOperator
     {
-        public int solSize { get; set; }
+        private int solSize;
 
-        int bitsInSol;
+        private int bitsInSol;
 
         public RotationGateOperator(int solSize)
         {
@@ -943,15 +958,13 @@ namespace magisterka
     {
         private List<double> distribution = null;
         private static Random rand = new Random();
-        public double CrossoverProbability { get; set; }
         private double bigNumber;
 
-        public SelectionOperator(double probability, int solSize)
+        public SelectionOperator(int solSize)
         {
             this.bigNumber = 0.0;
             double maxFlow = 0.0;
             double maxDistance = 0.0;
-            this.CrossoverProbability = probability;
             for (int i = 0; i < solSize; i++)
             {
                 for (int j = 0; j < solSize; j++)
@@ -1012,14 +1025,13 @@ namespace magisterka
 
     class QgAlgorithm : IEvolutionAlgorithm
     {
-        PmxCrossoverOperator crossOperator = null;
-        //zmienic na private
-        public OxCrossoverOperator oxOperator = null;
-        public CxCrossoverOperator cxOperator = null;
-        public PmxCrossoverOperator pmxOperator = null;
-        public MutationOperator mutOperator = null;
+        private OxCrossoverOperator oxOperator = null;
+        private CxCrossoverOperator cxOperator = null;
+        private PmxCrossoverOperator pmxOperator = null;
+        private MutationOperator mutOperator = null;
         private CatastropheOperator catOperator = null;
-        public RotationGateOperator rotOperator = null;
+        private RotationGateOperator rotOperator = null;
+        private SelectionOperator selOPerator = null;
         bool isStopped;
         int iterations;
         int popSize;
@@ -1028,28 +1040,21 @@ namespace magisterka
 
         public QgAlgorithm(double[,] distance, double[,] flow, double crossProb, double mutProb, double catProb, int iterations, int popSize, int problemSize)
         {
-            crossOperator = new PmxCrossoverOperator(crossProb);
+            QapData.Instance.setQapData(distance, flow);
 
-            cxOperator = new CxCrossoverOperator();
-
-            oxOperator = new OxCrossoverOperator();
-
-            pmxOperator = new PmxCrossoverOperator();
-
+            cxOperator = new CxCrossoverOperator(crossProb);
+            oxOperator = new OxCrossoverOperator(crossProb);
+            pmxOperator = new PmxCrossoverOperator(crossProb);
             mutOperator = new MutationOperator(mutProb, problemSize);
-
             rotOperator = new RotationGateOperator(problemSize);
-
             catOperator = new CatastropheOperator();
             catOperator.CastastropheProbability = catProb;
-
+            selOPerator = new SelectionOperator(problemSize);
             this.isStopped = false;
             this.iterations = iterations;
             this.popSize = popSize;
             if (popSize % 2 != 0) popSize += 1;
             this.problemSize = problemSize;
-
-            QapData.Instance.setQapData(distance, flow);
         }
 
         public IPopulation Population { get; set; }
@@ -1066,9 +1071,28 @@ namespace magisterka
 
         public void Execute()
         {
+            InitRandomPopulation();
             for (int i = 0; i < this.iterations; i++)
             {
+                this.Population = new Population((Solution[])this.pmxOperator.Execute(this.Population));
+                this.mutOperator.Execute(this.Population);
+                this.rotOperator.Execute(this.Population, (Solution)GetBestSolution());
             }
+
+            Solution bestSolution = (Solution)GetBestSolution();
+
+            int bitsInSol = (int)(Math.Log(problemSize, 2.0) + 1);
+
+            /*for (int i = 0; i < this.problemSize; i++)
+            {
+                for (int j = 0; j < bitsInSol; j++)
+                {
+                    Console.Write(bestSolution[i][j].Alpha + " " + bestSolution[i][j].Beta);
+                    Console.WriteLine();
+                }
+            }*/
+            best.PrintSolution();
+
             this.isStopped = true;
         }
 
