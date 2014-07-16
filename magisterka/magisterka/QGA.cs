@@ -24,8 +24,8 @@ namespace magisterka
 
         public Qbit()
         {
-            this.Alpha = 1.0/Math.Sqrt(2.0);
-            this.Beta = 1.0/Math.Sqrt(2.0);
+            this.Alpha = 1.0 / Math.Sqrt(2.0);
+            this.Beta = 1.0 / Math.Sqrt(2.0);
         }
 
         public Qbit(Qbit anotherQbit)
@@ -308,7 +308,8 @@ namespace magisterka
         }
     }
 
-    class Population : IPopulation {
+    class Population : IPopulation
+    {
         private int popSize;
         private int problemSize;
         private int currPopSize;
@@ -976,7 +977,7 @@ namespace magisterka
             bigNumber = (maxDistance + maxFlow) * solSize * solSize;
         }
 
-        Population RouletteMethod(Population population)
+        public Population RouletteMethod(Population population)
         {
             int size = population.Size;
             Solution[] chosenSolutions = new Solution[size];
@@ -1006,9 +1007,9 @@ namespace magisterka
                 double toChoose = rand.NextDouble();
                 for (int j = 0; j < size; j++)
                 {
-                    if (toChoose >= distribution[j])
+                    if (toChoose <= distribution[j])
                     {
-                        chosenSolutions[i] = new Solution((Solution)population[i]);
+                        chosenSolutions[i] = new Solution((Solution)population[j]);
                         break;
                     }
                 }
@@ -1017,7 +1018,7 @@ namespace magisterka
             return new Population(chosenSolutions);
         }
 
-        Solution[] RankingMethod(Population population)
+        public Solution[] RankingMethod(Population population)
         {
             return new Solution[0];
         }
@@ -1074,9 +1075,11 @@ namespace magisterka
             InitRandomPopulation();
             for (int i = 0; i < this.iterations; i++)
             {
-                this.Population = new Population((Solution[])this.pmxOperator.Execute(this.Population));
+                this.Population = new Population((Solution[])this.pmxOperator.Execute(this.selOPerator.RouletteMethod((Population)this.Population)));
                 this.mutOperator.Execute(this.Population);
                 this.rotOperator.Execute(this.Population, (Solution)GetBestSolution());
+                //((Solution)GetBestSolution()).PrintSolution();
+                //Console.WriteLine(GetBestSolution().Goal);
             }
 
             Solution bestSolution = (Solution)GetBestSolution();
@@ -1091,7 +1094,6 @@ namespace magisterka
                     Console.WriteLine();
                 }
             }*/
-            best.PrintSolution();
 
             this.isStopped = true;
         }
