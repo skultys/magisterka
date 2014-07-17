@@ -287,9 +287,24 @@ namespace magisterka
             this.Goal = 0.0;
             double[,] flowM = QapData.Instance.getFlow();
             double[,] distanceM = QapData.Instance.getDistance();
-            for (int i = 0; i < this.permutation.Count - 1; i++)
+
+
+            /*this.permutation[0] = 3;
+            this.permutation[1] = 10;
+            this.permutation[2] = 11;
+            this.permutation[3] = 2;
+            this.permutation[4] = 12;
+            this.permutation[5] = 5;
+            this.permutation[6] = 6;
+            this.permutation[7] = 7;
+            this.permutation[8] = 8;
+            this.permutation[9] = 1;
+            this.permutation[10] = 4;
+            this.permutation[11] = 9;*/
+
+            for (int i = 0; i < this.permutation.Count; i++)
             {
-                for (int j = 0; j < this.permutation.Count - 1; j++)
+                for (int j = 0; j < this.permutation.Count; j++)
                 {
                     this.Goal += flowM[i, j] * distanceM[this.permutation[i] - 1, this.permutation[j] - 1];
                 }
@@ -335,7 +350,12 @@ namespace magisterka
 
         public Population(Solution[] solutions)
         {
-            this.solutions = new List<Solution>(solutions);
+            this.solutions = new List<Solution>();
+            foreach (Solution sol in solutions)
+            {
+                Solution temp = new Solution(sol);
+                this.solutions.Add(temp);
+            }
             this.popSize = this.currPopSize = solutions.Length;
             this.problemSize = solutions[0].Size;
         }
@@ -1078,22 +1098,22 @@ namespace magisterka
                 this.Population = new Population((Solution[])this.pmxOperator.Execute(this.selOPerator.RouletteMethod((Population)this.Population)));
                 this.mutOperator.Execute(this.Population);
                 this.rotOperator.Execute(this.Population, (Solution)GetBestSolution());
-                //((Solution)GetBestSolution()).PrintSolution();
-                //Console.WriteLine(GetBestSolution().Goal);
-            }
-
-            Solution bestSolution = (Solution)GetBestSolution();
-
-            int bitsInSol = (int)(Math.Log(problemSize, 2.0) + 1);
-
-            /*for (int i = 0; i < this.problemSize; i++)
-            {
-                for (int j = 0; j < bitsInSol; j++)
+                /*foreach (Solution sol in this.Population)
                 {
-                    Console.Write(bestSolution[i][j].Alpha + " " + bestSolution[i][j].Beta);
+                    Console.WriteLine(sol.Goal);
+                }*/
+            }
+            int bits = (int)(Math.Log(problemSize, 2.0) + 1);
+            for (int i = 0; i < this.best.Size; i++)
+            {
+                for (int j = 0; j < bits; j++)
+                {
+                    Console.Write("alfa: " + this.best[i][j].Alpha + "\tbeta: " + this.best[i][j].Beta);
                     Console.WriteLine();
                 }
-            }*/
+                Console.WriteLine();
+                Console.WriteLine();
+            }
 
             this.isStopped = true;
         }

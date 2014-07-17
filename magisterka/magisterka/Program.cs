@@ -35,27 +35,17 @@ namespace magisterka
                     index2 = lines[i].IndexOf(" ", 0);
                     if (index2 < 0) index2 = lines[i].Length;
                     string number = lines[i].Substring(0, index2);
-                    distance[i - 1, j] = Convert.ToDouble(number);
+                    flow[i - 1, j] = Convert.ToDouble(number);
                     lines[i] = (lines[i].Substring(index2)).Trim();
 
                     index2 = lines[lines.Count - i].IndexOf(" ", 0);
                     if (index2 < 0) index2 = lines[lines.Count - i].Length;
                     number = lines[lines.Count - i].Substring(0, index2);
-                    flow[i - 1, j] = Convert.ToDouble(number);
+                    distance[length - i, j] = Convert.ToDouble(number);
                     lines[lines.Count - i] = (lines[lines.Count - i].Substring(index2)).Trim();
 
                     j++;
                 }
-            }
-            for (int i = 0; i < length; i++)
-            {
-                Console.WriteLine(testData[lines.Count - i]);
-                for (int j = 0; j < length; j++)
-                {
-                    Console.Write("  " + flow[i, j]);
-                }
-                Console.WriteLine();
-                Console.WriteLine();
             }
 
             QgAlgorithm alg = new QgAlgorithm(distance, flow, 1.0, 0.05, 0.02, 1000, 20, length);
