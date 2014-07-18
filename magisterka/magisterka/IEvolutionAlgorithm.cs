@@ -34,7 +34,8 @@ namespace OptimisationClassLibrary
         /// <param name="idx"></param>
         void Remove(int idx);
 
-
+        void SortAscending();
+        void SortDescending();
     }
 
 
@@ -84,6 +85,7 @@ namespace OptimisationClassLibrary
     public interface ISolution
     {
         double Goal { get; set; }
+        int Size { get; }
     }
 
 

@@ -118,6 +118,7 @@ namespace magisterka
         {
             genes = new List<Qbit>();
             decodedValue = 0;
+            PermutationValue = 0;
             for (int i = 0; i < size; i++)
             {
                 Qbit qbit = new Qbit();
@@ -136,6 +137,7 @@ namespace magisterka
             }
 
             this.decodedValue = anotherChromosome.decodedValue;
+            this.PermutationValue = anotherChromosome.PermutationValue;
         }
 
         public int DecodeChromosome()
@@ -168,12 +170,14 @@ namespace magisterka
                 return this.decodedValue;
             }
         }
+
+        public int PermutationValue { get; set; }
     }
 
     class Solution : ISolution
     {
         private List<Chromosome> chromosomes = null;
-        private List<int> permutation = null;
+        //private List<int> permutation = null;
         int solSize;
 
         public int Size
@@ -184,18 +188,18 @@ namespace magisterka
             }
         }
 
-        public List<int> Permutation
+        /*public List<int> Permutation
         {
             get
             {
                 return this.permutation;
             }
-        }
+        }*/
 
         public Solution(int size)
         {
             this.chromosomes = new List<Chromosome>();
-            this.permutation = new List<int>();
+            //this.permutation = new List<int>();
             int chromosomeSize = (int)(Math.Log(size, 2.0) + 1);
             this.Goal = 0.0;
             this.solSize = size;
@@ -203,7 +207,7 @@ namespace magisterka
             {
                 Chromosome chromosome = new Chromosome(chromosomeSize);
                 this.chromosomes.Add(chromosome);
-                this.permutation.Add(0);
+                //this.permutation.Add(0);
             }
             toPermutation();
         }
@@ -211,17 +215,17 @@ namespace magisterka
         public Solution(Solution anotherSolution)
         {
             this.chromosomes = new List<Chromosome>();
-            this.permutation = new List<int>();
+            //this.permutation = new List<int>();
             for (int i = 0; i < anotherSolution.chromosomes.Count; i++)
             {
                 Chromosome chr = new Chromosome(anotherSolution.chromosomes[i]);
                 this.chromosomes.Add(chr);
             }
 
-            for (int i = 0; i < anotherSolution.permutation.Count; i++)
+            /*for (int i = 0; i < anotherSolution.permutation.Count; i++)
             {
                 this.permutation.Add(anotherSolution.permutation[i]);
-            }
+            }*/
 
             this.Goal = anotherSolution.Goal;
             this.solSize = anotherSolution.solSize;
@@ -231,13 +235,19 @@ namespace magisterka
         {
             this.solSize = chromosomes.Length;
             this.Goal = 0.0;
-            this.chromosomes = new List<Chromosome>(chromosomes);
-            this.permutation = new List<int>();
+            this.chromosomes = new List<Chromosome>();
+            foreach (Chromosome chr in chromosomes)
+            {
+                Chromosome temp = new Chromosome(chr);
+                this.chromosomes.Add(temp);
+            }
+            /*this.permutation = new List<int>();
             for (int i = 0; i < this.Size; i++)
             {
-                this.permutation.Add(0);
-            }
-            toPermutation();
+                this.permutation.Add(chromosomes[i].PermutationValue);
+            }*/
+
+            EvaluateGoal();
         }
 
         public Chromosome this[int index]
@@ -255,11 +265,13 @@ namespace magisterka
         public void toPermutation()
         {
             List<Tuple<int, int> > tupleList = new List<Tuple<int, int> >();
+            List<int> permutation = new List<int>();
 
             for (int i = 0; i < this.chromosomes.Count; i++)
             {
                 Tuple<int, int> tuple = new Tuple<int, int>(i, this.chromosomes[i].DecodeChromosome());
                 tupleList.Add(tuple);
+                permutation.Add(0);
             }
 
             tupleList.Sort((a, b) =>
@@ -281,32 +293,42 @@ namespace magisterka
             foreach (var tuple in tupleList)
             {
                 int val = tuple.Item2;
-                this.permutation[tuple.Item1] = val;
+                permutation[tuple.Item1] = val;
             }
 
+            for (int i = 0; i < this.chromosomes.Count; i++)
+            {
+                this.chromosomes[i].PermutationValue = permutation[i];
+            }
+
+            EvaluateGoal();
+        }
+
+        void EvaluateGoal()
+        {
             this.Goal = 0.0;
             double[,] flowM = QapData.Instance.getFlow();
             double[,] distanceM = QapData.Instance.getDistance();
 
 
-            /*this.permutation[0] = 3;
-            this.permutation[1] = 10;
-            this.permutation[2] = 11;
-            this.permutation[3] = 2;
-            this.permutation[4] = 12;
-            this.permutation[5] = 5;
-            this.permutation[6] = 6;
-            this.permutation[7] = 7;
-            this.permutation[8] = 8;
-            this.permutation[9] = 1;
-            this.permutation[10] = 4;
-            this.permutation[11] = 9;*/
+            /*this[0].PermutationValue = 3;
+            this[1].PermutationValue = 10;
+            this[2].PermutationValue = 11;
+            this[3].PermutationValue = 2;
+            this[4].PermutationValue = 12;
+            this[5].PermutationValue = 5;
+            this[6].PermutationValue = 6;
+            this[7].PermutationValue = 7;
+            this[8].PermutationValue = 8;
+            this[9].PermutationValue = 1;
+            this[10].PermutationValue = 4;
+            this[11].PermutationValue = 9;*/
 
-            for (int i = 0; i < this.permutation.Count; i++)
+            for (int i = 0; i < this.chromosomes.Count; i++)
             {
-                for (int j = 0; j < this.permutation.Count; j++)
+                for (int j = 0; j < this.chromosomes.Count; j++)
                 {
-                    this.Goal += flowM[i, j] * distanceM[this.permutation[i] - 1, this.permutation[j] - 1];
+                    this.Goal += distanceM[i, j] * flowM[this.chromosomes[i].PermutationValue - 1, this.chromosomes[j].PermutationValue - 1];
                 }
             }
         }
@@ -315,9 +337,9 @@ namespace magisterka
 
         public void PrintSolution()
         {
-            foreach (int i in this.permutation)
+            foreach (Chromosome chr in this.chromosomes)
             {
-                Console.Write(i + "  ");
+                Console.Write(chr.PermutationValue + "  ");
             }
             Console.WriteLine();
         }
@@ -348,7 +370,21 @@ namespace magisterka
             }
         }
 
-        public Population(Solution[] solutions)
+        public Population(Population anotherPopulation)
+        {
+            this.solutions = new List<Solution>();
+
+            foreach (Solution sol in anotherPopulation)
+            {
+                Solution tempSol = new Solution(sol);
+                this.solutions.Add(tempSol);
+                this.popSize = anotherPopulation.Size;
+                this.problemSize = anotherPopulation.problemSize;
+                this.currPopSize = anotherPopulation.currPopSize;
+            }
+        }
+
+        public Population(ISolution[] solutions)
         {
             this.solutions = new List<Solution>();
             foreach (Solution sol in solutions)
@@ -492,8 +528,17 @@ namespace magisterka
                     chosenSolutions.Add(tempSol);
                 }
             }
-
-            if (chosenSolutions.Count != population.Size)
+            
+            if (chosenSolutions.Count == 0)
+            {
+                for (int i = 0; i < population.Size; i++)
+                {
+                    int index = rand.Next(population.Size - 1);
+                    Solution tempSol = new Solution((Solution)population[index]);
+                    chosenSolutions.Add(tempSol);
+                }
+            }
+            else if (chosenSolutions.Count != population.Size)
             {
                 int stop = population.Size - chosenSolutions.Count;
                 for (int i = 0; i < stop; i++)
@@ -554,10 +599,12 @@ namespace magisterka
             while (currentIndex != leftBound)
             {
                 skip = false;
-                toAdd = parentTwo.Permutation[anotherParentIndex];
+                //toAdd = parentTwo.Permutation[anotherParentIndex];
+                toAdd = parentTwo[anotherParentIndex].PermutationValue;
                 for (int i = leftBound; i <= rightBound; i++)
                 {
-                    if (toAdd == parentOne.Permutation[i])
+                    //if (toAdd == parentOne.Permutation[i])
+                    if (toAdd == parentOne[i].PermutationValue)
                     {
                         anotherParentIndex = (anotherParentIndex + 1) % size;
                         skip = true;
@@ -578,10 +625,12 @@ namespace magisterka
             while (currentIndex != leftBound)
             {
                 skip = false;
-                toAdd = parentOne.Permutation[anotherParentIndex];
+                //toAdd = parentOne.Permutation[anotherParentIndex];
+                toAdd = parentOne[anotherParentIndex].PermutationValue;
                 for (int i = leftBound; i <= rightBound; i++)
                 {
-                    if (toAdd == parentTwo.Permutation[i])
+                    //if (toAdd == parentTwo.Permutation[i])
+                    if (toAdd == parentTwo[i].PermutationValue)
                     {
                         anotherParentIndex = (anotherParentIndex + 1) % size;
                         skip = true;
@@ -640,8 +689,16 @@ namespace magisterka
                     chosenSolutions.Add(tempSol);
                 }
             }
-
-            if (chosenSolutions.Count != population.Size)
+            if (chosenSolutions.Count == 0)
+            {
+                for (int i = 0; i < population.Size; i++)
+                {
+                    int index = rand.Next(population.Size - 1);
+                    Solution tempSol = new Solution((Solution)population[index]);
+                    chosenSolutions.Add(tempSol);
+                }
+            }
+            else if (chosenSolutions.Count != population.Size)
             {
                 int stop = population.Size - chosenSolutions.Count;
                 for (int i = 0; i < stop; i++)
@@ -691,7 +748,8 @@ namespace magisterka
                 childTwo[i] = new Chromosome(parentOne[i]);
                 //permutationOne[i] = parentTwo.permutation[i];
                 //permutationTwo[i] = parentOne.permutation[i];
-                Tuple<int, int> MappingTuple = new Tuple<int, int>(parentOne.Permutation[i], parentTwo.Permutation[i]);
+                //Tuple<int, int> MappingTuple = new Tuple<int, int>(parentOne.Permutation[i], parentTwo.Permutation[i]);
+                Tuple<int, int> MappingTuple = new Tuple<int, int>(parentOne[i].PermutationValue, parentTwo[i].PermutationValue);
                 MappingArray.Add(MappingTuple);
             }
 
@@ -734,11 +792,13 @@ namespace magisterka
                 }
                 for (int j = 0; j < MappingArray.Count; j++)
                 {
-                    if (parentOne.Permutation[i] == MappingArray[j].Item2)
+                    //if (parentOne.Permutation[i] == MappingArray[j].Item2)
+                    if (parentOne[i].PermutationValue == MappingArray[j].Item2)
                     {
                         for (int k = 0; k < size; k++)
                         {
-                            if (parentTwo.Permutation[k] == MappingArray[j].Item1)
+                            //if (parentTwo.Permutation[k] == MappingArray[j].Item1)
+                            if (parentTwo[k].PermutationValue == MappingArray[j].Item1)
                             {
                                 childOne[i] = new Chromosome(parentTwo[k]);
                                 //permutationOne[i] = parentTwo.permutation[k];
@@ -767,11 +827,13 @@ namespace magisterka
                 }
                 for (int j = 0; j < MappingArray.Count; j++)
                 {
-                    if (parentTwo.Permutation[i] == MappingArray[j].Item1)
+                    //if (parentTwo.Permutation[i] == MappingArray[j].Item1)
+                    if (parentTwo[i].PermutationValue == MappingArray[j].Item1)
                     {
                         for (int k = 0; k < size; k++)
                         {
-                            if (parentOne.Permutation[k] == MappingArray[j].Item2)
+                            //if (parentOne.Permutation[k] == MappingArray[j].Item2)
+                            if (parentOne[k].PermutationValue == MappingArray[j].Item2)
                             {
                                 childTwo[i] = new Chromosome(parentOne[k]);
                                 //permutationTwo[i] = parentOne.permutation[k];
@@ -834,7 +896,16 @@ namespace magisterka
                 }
             }
 
-            if (chosenSolutions.Count != population.Size)
+            if (chosenSolutions.Count == 0)
+            {
+                for (int i = 0; i < population.Size; i++)
+                {
+                    int index = rand.Next(population.Size - 1);
+                    Solution tempSol = new Solution((Solution)population[index]);
+                    chosenSolutions.Add(tempSol);
+                }
+            }
+            else if (chosenSolutions.Count != population.Size)
             {
                 int stop = population.Size - chosenSolutions.Count;
                 for (int i = 0; i < stop; i++)
@@ -865,7 +936,8 @@ namespace magisterka
             Chromosome[] childTwo = new Chromosome[size];
             for (int i = 0; i < size; i++)
             {
-                Tuple<Chromosome, int, Chromosome, int, int> tuple = new Tuple<Chromosome, int, Chromosome, int, int>(parentOne[i], parentOne.Permutation[i], parentTwo[i], parentTwo.Permutation[i], i);
+                //Tuple<Chromosome, int, Chromosome, int, int> tuple = new Tuple<Chromosome, int, Chromosome, int, int>(parentOne[i], parentOne.Permutation[i], parentTwo[i], parentTwo.Permutation[i], i);
+                Tuple<Chromosome, int, Chromosome, int, int> tuple = new Tuple<Chromosome, int, Chromosome, int, int>(parentOne[i], parentOne[i].PermutationValue, parentTwo[i], parentTwo[i].PermutationValue, i);
                 tupleList.Add(tuple);
             }
             bool swap = false;
@@ -920,8 +992,10 @@ namespace magisterka
             this.bitsInSol = (int)(Math.Log(solSize, 2.0) + 1);
         }
 
-        public void Execute(IPopulation population, Solution best)
+        public void Execute(IPopulation population)
         {
+            population.SortAscending();
+            Solution best = population[0] as Solution;
             foreach (Solution sol in population)
             {
                 for (int i = 0; i < this.solSize; i++)
@@ -979,27 +1053,12 @@ namespace magisterka
     {
         private List<double> distribution = null;
         private static Random rand = new Random();
-        private double bigNumber;
 
-        public SelectionOperator(int solSize)
+        public Population RouletteMethod(IPopulation population)
         {
-            this.bigNumber = 0.0;
-            double maxFlow = 0.0;
-            double maxDistance = 0.0;
-            for (int i = 0; i < solSize; i++)
-            {
-                for (int j = 0; j < solSize; j++)
-                {
-                    if (maxFlow < (QapData.Instance.getFlow())[i, j]) maxFlow = (QapData.Instance.getFlow())[i, j];
-                    if (maxDistance < (QapData.Instance.getDistance())[i, j]) maxFlow = (QapData.Instance.getDistance())[i, j];
-                }
-            }
-            bigNumber = (maxDistance + maxFlow) * solSize * solSize;
-        }
-
-        public Population RouletteMethod(Population population)
-        {
+            population.SortAscending();
             int size = population.Size;
+            double bigNumber = population[population.Size - 1].Goal;
             Solution[] chosenSolutions = new Solution[size];
             this.distribution = new List<double>();
 
@@ -1008,12 +1067,12 @@ namespace magisterka
 
             foreach (Solution sol in population)
             {
-                fitSum += (this.bigNumber - sol.Goal);
+                fitSum += (bigNumber - sol.Goal);
             }
 
             foreach (Solution sol in population)
             {
-                currentFitSum += (this.bigNumber - sol.Goal);
+                currentFitSum += (bigNumber - sol.Goal);
                 double probability = currentFitSum / fitSum;
                 distribution.Add(probability);
             }
@@ -1070,7 +1129,7 @@ namespace magisterka
             rotOperator = new RotationGateOperator(problemSize);
             catOperator = new CatastropheOperator();
             catOperator.CastastropheProbability = catProb;
-            selOPerator = new SelectionOperator(problemSize);
+            selOPerator = new SelectionOperator();
             this.isStopped = false;
             this.iterations = iterations;
             this.popSize = popSize;
@@ -1093,29 +1152,37 @@ namespace magisterka
         public void Execute()
         {
             InitRandomPopulation();
+            //double avarage;
             for (int i = 0; i < this.iterations; i++)
             {
-                this.Population = new Population((Solution[])this.pmxOperator.Execute(this.selOPerator.RouletteMethod((Population)this.Population)));
+                //avarage = 0.0;
+                //foreach (Solution sol in this.Population) avarage += sol.Goal;
+                //Console.WriteLine("Srednia wartosc startowa w iteracji nr        " + i + " : " + avarage / this.popSize);
+
+                this.Population = new Population(this.selOPerator.RouletteMethod(this.Population));
+                //avarage = 0.0;
+                //foreach (Solution sol in this.Population) avarage += sol.Goal;
+                //Console.WriteLine("Srednia wartosc po selekcji w iteracji nr     " + i + " : " + avarage / this.popSize);
+
+                this.Population = new Population(this.pmxOperator.Execute(this.Population));
+                //avarage = 0.0;
+                //foreach (Solution sol in this.Population) avarage += sol.Goal;
+                //Console.WriteLine("Srednia wartosc po krzyzowaniu w iteracji nr  " + i + " : " + avarage / this.popSize);
+
                 this.mutOperator.Execute(this.Population);
-                this.rotOperator.Execute(this.Population, (Solution)GetBestSolution());
-                /*foreach (Solution sol in this.Population)
-                {
-                    Console.WriteLine(sol.Goal);
-                }*/
-            }
-            int bits = (int)(Math.Log(problemSize, 2.0) + 1);
-            for (int i = 0; i < this.best.Size; i++)
-            {
-                for (int j = 0; j < bits; j++)
-                {
-                    Console.Write("alfa: " + this.best[i][j].Alpha + "\tbeta: " + this.best[i][j].Beta);
-                    Console.WriteLine();
-                }
-                Console.WriteLine();
-                Console.WriteLine();
+
+                this.rotOperator.Execute(this.Population);
+                /*avarage = 0.0;
+                foreach (Solution sol in this.Population) avarage += sol.Goal;
+                Console.WriteLine("Srednia wartosc po rotacji w iteracji nr      " + i + " : " + avarage / this.popSize);*/
+                //Console.WriteLine();
+                //Console.ReadKey();
             }
 
             this.isStopped = true;
+            GetBestSolution();
+            this.best.PrintSolution();
+            Console.WriteLine(this.best.Goal);
         }
 
         public bool Stop()
@@ -1135,6 +1202,23 @@ namespace magisterka
                 }
             }
             return this.best;
+        }
+    }
+
+    class testOne
+    {
+        public void execute(testTwo two)
+        {
+            two.Dupa = 1;
+        }
+    }
+
+    class testTwo
+    {
+        public int Dupa { set; get; }
+        public testTwo()
+        {
+            this.Dupa = 666;
         }
     }
 }

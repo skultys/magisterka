@@ -35,20 +35,20 @@ namespace magisterka
                     index2 = lines[i].IndexOf(" ", 0);
                     if (index2 < 0) index2 = lines[i].Length;
                     string number = lines[i].Substring(0, index2);
-                    flow[i - 1, j] = Convert.ToDouble(number);
+                    distance[i - 1, j] = Convert.ToDouble(number);
                     lines[i] = (lines[i].Substring(index2)).Trim();
 
                     index2 = lines[lines.Count - i].IndexOf(" ", 0);
                     if (index2 < 0) index2 = lines[lines.Count - i].Length;
                     number = lines[lines.Count - i].Substring(0, index2);
-                    distance[length - i, j] = Convert.ToDouble(number);
+                    flow[length - i, j] = Convert.ToDouble(number);
                     lines[lines.Count - i] = (lines[lines.Count - i].Substring(index2)).Trim();
 
                     j++;
                 }
             }
 
-            QgAlgorithm alg = new QgAlgorithm(distance, flow, 1.0, 0.05, 0.02, 1000, 20, length);
+            QgAlgorithm alg = new QgAlgorithm(distance, flow, 0.7, 0.02, 0.02, 1000, 100, length);
             alg.Execute();
 
             Console.ReadKey();
