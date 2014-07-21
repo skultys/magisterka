@@ -41,7 +41,7 @@ namespace magisterka
             this.Beta = beta;
         }
 
-        public int EvaluateState()
+        public int  EvaluateState()
         {
             double treshold = rand.NextDouble();
             double alphaSquare = this.Alpha * this.Alpha;
@@ -57,39 +57,8 @@ namespace magisterka
             }
         }
 
-        public void ExecuteRotationGate(Qbit best)
+        public void ExecuteRotationGate(double theta)
         {
-            double theta;
-            double alphaTimesBeta = this.Alpha * this.Beta;
-            double angle = 0.0;
-            int sign = 0;
-            if (this.observedState == 1 && best.observedState == 0)
-            {
-                if (alphaTimesBeta > 0) sign = -1;
-                else if (alphaTimesBeta < 0) sign = 1;
-                else if (this.Alpha == 0)
-                {
-                    double d = rand.NextDouble();
-                    if (d > 0.5) sign = 1;
-                    else sign = -1;
-                }
-                angle = 0.5 * Math.PI;
-            }
-            else if (this.observedState == 1 && best.observedState == 1)
-            {
-                if (alphaTimesBeta > 0) sign = 1;
-                else if (alphaTimesBeta < 0) sign = -1;
-                else if (this.Beta == 0)
-                {
-                    double d = rand.NextDouble();
-                    if (d > 0.5) sign = 1;
-                    else sign = -1;
-                }
-                angle = 0.2 * Math.PI;
-            };
-
-            theta = angle * sign;
-
             double tempAlpha = this.Alpha;
             this.Alpha = Math.Cos(theta) * this.Alpha - Math.Sin(theta) * this.Beta;
             this.Beta =  Math.Sin(theta) * tempAlpha + Math.Cos(theta) * this.Beta;
@@ -992,12 +961,11 @@ namespace magisterka
             this.bitsInSol = (int)(Math.Log(solSize, 2.0) + 1);
         }
 
-        public void Execute(IPopulation population)
+        public void Execute(IPopulation population, Solution best)
         {
-            population.SortAscending();
-            Solution best = population[0] as Solution;
             foreach (Solution sol in population)
             {
+                if()
                 for (int i = 0; i < this.solSize; i++)
                 {
                     for (int j = 0; j < this.bitsInSol; j++)
@@ -1153,25 +1121,26 @@ namespace magisterka
         {
             InitRandomPopulation();
             //double avarage;
-            for (int i = 0; i < this.iterations; i++)
+            for (int i = 1; i < this.iterations; i++)
             {
+                GetBestSolution();
                 //avarage = 0.0;
                 //foreach (Solution sol in this.Population) avarage += sol.Goal;
                 //Console.WriteLine("Srednia wartosc startowa w iteracji nr        " + i + " : " + avarage / this.popSize);
 
-                this.Population = new Population(this.selOPerator.RouletteMethod(this.Population));
+                //this.Population = new Population(this.selOPerator.RouletteMethod(this.Population));
                 //avarage = 0.0;
                 //foreach (Solution sol in this.Population) avarage += sol.Goal;
                 //Console.WriteLine("Srednia wartosc po selekcji w iteracji nr     " + i + " : " + avarage / this.popSize);
 
-                this.Population = new Population(this.pmxOperator.Execute(this.Population));
+                //this.Population = new Population(this.pmxOperator.Execute(this.Population));
                 //avarage = 0.0;
                 //foreach (Solution sol in this.Population) avarage += sol.Goal;
                 //Console.WriteLine("Srednia wartosc po krzyzowaniu w iteracji nr  " + i + " : " + avarage / this.popSize);
 
-                this.mutOperator.Execute(this.Population);
+                //this.mutOperator.Execute(this.Population);
 
-                this.rotOperator.Execute(this.Population);
+                this.rotOperator.Execute(this.Population, this.best);
                 /*avarage = 0.0;
                 foreach (Solution sol in this.Population) avarage += sol.Goal;
                 Console.WriteLine("Srednia wartosc po rotacji w iteracji nr      " + i + " : " + avarage / this.popSize);*/

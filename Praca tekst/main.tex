@@ -1,0 +1,89 @@
+\documentclass[11pt]{aghdpl}
+% \documentclass[en,11pt]{aghdpl}  % praca w języku angielskim
+\usepackage[polish]{babel}
+%\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+
+% dodatkowe pakiety
+\usepackage{enumerate}
+\usepackage{listings}
+\lstloadlanguages{TeX}
+
+\lstset{
+  literate={ą}{{\k{a}}}1
+           {ć}{{\'c}}1
+           {ę}{{\k{e}}}1
+           {ó}{{\'o}}1
+           {ń}{{\'n}}1
+           {ł}{{\l{}}}1
+           {ś}{{\'s}}1
+           {ź}{{\'z}}1
+           {ż}{{\.z}}1
+           {Ą}{{\k{A}}}1
+           {Ć}{{\'C}}1
+           {Ę}{{\k{E}}}1
+           {Ó}{{\'O}}1
+           {Ń}{{\'N}}1
+           {Ł}{{\L{}}}1
+           {Ś}{{\'S}}1
+           {Ź}{{\'Z}}1
+           {Ż}{{\.Z}}1
+}
+
+%---------------------------------------------------------------------------
+
+\author{Stefan Kultys}
+\shortauthor{S. Kultys}
+
+\titlePL{Algorytmy przybliżone dla zagadnienia przydziału kwadratowego}
+\titleEN{Approximation algorithms for qadratic assignment problem}
+
+\shorttitlePL{Algorytmy przybliżone dla zagadnienia przydziału kwadratowego} % skrócona wersja tytułu jeśli jest bardzo długi
+\shorttitleEN{Approximation algorithms for qadratic assignment problem}
+
+\thesistype{Praca dyplomowa magisterska}
+%\thesistype{Master of Science Thesis}
+
+\supervisor{dr inż. Wojciech Chmiel}
+%\supervisor{Marcin Szpyrka PhD, DSc}
+
+\degreeprogramme{Automatyka i Robotyka}
+%\degreeprogramme{Computer Science}
+
+\date{2014}
+
+\department{Katedra Automatyki i Inżynierii Biomedycznej}
+%\department{Department of Applied Computer Science}
+
+\faculty{Wydział Elektrotechniki, Automatyki,\protect\\[-1mm] Informatyki i Inżynierii Biomedycznej}
+%\faculty{Faculty of Electrical Engineering, Automatics, Computer Science and Biomedical Engineering}
+
+\acknowledgements{Serdeczne podziękowania dla bla bla bla}
+
+
+\setlength{\cftsecnumwidth}{10mm}
+
+%---------------------------------------------------------------------------
+\setcounter{secnumdepth}{4}
+
+\begin{document}
+
+\titlepages
+\setcounter{tocdepth}{3}
+\tableofcontents
+\clearpage
+
+\include{rozdzial1}
+\include{rozdzial2}
+\include{rozdzial3}
+\include{rozdzial4}
+\include{rozdzial5}
+\include{rozdzial6}
+\include{rozdzial7}
+\include{rozdzial8}
+\include{rozdzial9}
+\include{rozdzial10}
+\include{rozdzial11}
+\include{bibliografia}
+
+\end{document}
