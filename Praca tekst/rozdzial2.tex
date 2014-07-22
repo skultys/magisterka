@@ -3,15 +3,53 @@
 
 \section{Opis problemu}
 \label{sec:opis}
-Zagadnienie przydział kwadratowego (Qadratic Assignment Problem - QAP) jest jednym najtrudniejszych problemów optymalizacji kombinatorycznej. Należy on klasy problemów NP - trudnych i dla rozmiarów o wartości większej niż 30 wymagane jest stosowanie algorytmów przybliżonych w celu jego rozwiązania. Zagadnienia przydziału kwadratowego zostało przedstawione przez Koopmansa i Beckmanna w roku 1957. Problem ten jest matematycznym modelem sytuacji, w której chcemy przydzielić pewną ilość placówek do takiej samej ilości lokalizacji (miejsc) znając przy tym odległości pomiędzy danymi lokalizacjami oraz przepływu miedzy placówkami. Przydziału tego należy dokonać minimalizując koszt tej operacji, który jest proporcjonalny do przepływu pomiędzy placówkami pomnożonego przez odległość między miejscami, do których te placówki zostały przydzielone. Z racji, iż trudność rozwiązania tego problemu jest duża oraz, że modeluje on wiele faktycznych zagadnień, wielu autorów poświęciło mu dużo uwagi, przez co znaleźć można wiele różnych publikacji traktujących o problemie QAP.
+Zagadnienie przydział kwadratowego (Qadratic Assignment Problem - QAP) jest jednym najtrudniejszych problemów optymalizacji kombinatorycznej. Należy on klasy problemów NP - trudnych i dla rozmiarów o wartości większej niż 30 wymagane jest stosowanie algorytmów przybliżonych w celu jego rozwiązania. Zagadnienia przydziału kwadratowego zostało przedstawione przez Koopmansa i Beckmanna w roku 1957 do rozwiązania zagadnień ekonomicznych. Problem ten jest matematycznym modelem sytuacji, w której chcemy przydzielić pewną ilość placówek do takiej samej ilości lokalizacji (miejsc) znając przy tym odległości pomiędzy danymi lokalizacjami oraz przepływu miedzy placówkami. Przydziału tego należy dokonać minimalizując koszt tej operacji, który jest proporcjonalny do przepływu pomiędzy placówkami pomnożonego przez odległość między miejscami, do których te placówki zostały przydzielone. Istnieją również wersje tego problemu, w których podany jest również koszt samego przydziału placówki do lokalizacji. Z racji, iż trudność rozwiązania tego problemu jest duża oraz, że modeluje on wiele faktycznych zagadnień, wielu autorów poświęciło mu dużo uwagi, przez co znaleźć można wiele różnych publikacji traktujących o problemie QAP. Niewątpliwie postępujący rozwój w dziedzinie informatyki i elektroniki pozwolił na analizę coraz bardziej złożonych problemów i tworzenie nowych metod, które dotychczas nie byłyby możliwe do wykorzystania. 
 
 \section{Obszary zastosowań}
 \label{sec:zastosowanie}
-Przy pomocy problemu przydziału kwadratowego można modelować wiele różnych zagadnień, które występują wokoło. Do dziedzin,w których zagadnienie QAP znajduje zastosowanie należą m. in:
+Przy pomocy problemu przydziału kwadratowego można modelować wiele różnych zagadnień, które występują w otaczającym nas świecie. Do dziedzin, w których zagadnienie QAP znajduje zastosowanie, należą m. in:
 \begin{itemize}
 \item ekonomia,
 \item informatyka,
-\item elektronika, np. projektowanie układów elektroniki,
-\item logistyka, np. lokalizacja współpracujących ze sobą fabryk, zakładów produkcyjnych, oddziałów w szpitalach,
-\item mechanika - wyważanie turbin w silnikach odrzutowych.
+\item elektronika,
+\item logistyka,
+\item mechanika,
+\item architektura.
 \end{itemize}
+
+Do wybranych problemów z spośród wymienionych wyżej dziedzin należą m. in:
+\begin{itemize}
+\item projektowanie zagospodarowania przestrzennego w nowopowstających miastach,
+\item projektowanie układów elektroniki,
+\item właściwa lokalizacja fabryk,
+\item organizacja biur, oddziałów szpitalnych,
+\item wyważanie turbin w silnikach odrzutowych.   
+\end{itemize}
+
+\section{Model matematyczny}
+\label{sec:model}
+Model matematyczny zagadnienia przydziału kwadratowego może być przedstawiony w następujący sposób:
+
+\textit{Dany jest zbiór:}
+\newline
+\begin{equation}
+N=\{1,...,n\}
+\end{equation}
+\newline
+\textit{oraz następujące macierze o wymiarach $n\times n$:}
+\newline
+\begin{equation}
+A=(a_{ij}),\; B=(b_{ij}),\; C=(c_{ij})
+\end{equation}
+\newline
+\textit{gdzie macierz $A$ jest macierzą odległości pomiędzy lokalizacjami. Z tego powodu często macierz ta oznacza jest też literą $D$, od angielskiego słowa distance, oznaczającego odległość. Macierz $B$ jest macierzą określającą pewne powiązania pomiędzy placówkami, np. przepływ informacji, ilość połączeń, ilość towaru jaką należy przetransportować z jednej lokalizacji do drugiej, itp. Macierz ta jest też oznaczana literą $F$ (ang. flow - przepływ). Macierz $C$ określa  koszt przydziału  placówki do lokalizacji.
+Dana jest również funkcja celu, będąca określona w następującej sposób:}
+\newline
+\begin{equation}
+\Phi(\pi)=\sum_{i=1}^n\sum_{j=1}^n a_{ij}\cdot b_{\pi(i),\pi(j)} + \sum_{i=1}^n c_{\pi(i),i}
+\end{equation}
+\newline
+\textit{gdzie $\pi$ jest permutacją $\pi=(\pi(1),\pi(2),...,\pi(n))$, a $\pi(i)$ oznacza numer placówki przydzielonej do i-tej lokalizacji. Funkcja celu określa więc ogólny koszt przydziału i eksploatacji przydzielonego systemu. Szukana jest zatem permutacja minimalizująca funkcję celu, czyli taka, dla której wspomniany koszt jest najmniejszy.}
+
+\section{Złożoność obliczeniowa}
+Rozwiązanie problemu QAP jest permutacją. Należy przydzielić \textit{n} placówek do \textit{n} miejsc. Wynika stąd, że wszystkich możliwości przydziału jest \textit{n!}. Jak zostało wspomniane wcześniej zagadnienie przydziału kwadratowego jest problemem NP-trudnym, czyli zadaniem o złożoności co najmniej wykładniczej. Zadanie o złożoności silni jest zadaniem o złożoności jeszcze większej niż wykładnicza. Wynika z tego fakt, iż już dla stosunkowo małych rozmiarów problemu czas znalezienia rozwiązania poprzez wykorzystanie algorytmów znajdujących dokładne rozwiązanie staje się praktycznie niemożliwe. Zjawiska modelowane zagadnieniem QAP mają rozmiary nierzadko liczony w setkach i większe. Znalezienie dokładnego rozwiązania mogłoby wtedy zająć czas nawet dłuższy niż znany wiek Wszechświata. Chcąc więc znaleźć rozwiązanie postawionego problemu należy stosować algorytmy, które poradzą sobie w czasie zdecydowanie krótszym. Receptą są algorytmy przybliżone, inaczej zwane aproskymacyjne. Zagadnieniu algorytmów przybliżonych poświęcony jest następny rozdział niniejszej pracy.
