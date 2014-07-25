@@ -12,17 +12,108 @@ Ciekawą rzeczą związaną z algorytmami przybliżonymi jest fakt, że wiele z 
 Poniżej zostaną przedstawione kilka algorytmów aproksymujących, zostaną przedstawione podstawowe informacje na ich temat, opisany schemat ich działania, a także to, w jaki sposób przy ich pomocy można by próbować rozwiązać problem QAP.
 \section{Particle Swarm Optimization}
 \label{sec:PSO}
+\subsection{Geneza i opis algorytmu}
+Algorytm Particle Swarm Optimization (PSO), czyli algorytm optymalizacji rojem cząstek, po raz pierwszy został przedstawiony w pracy Jamesa Kennedy'ego i Russella Eberharta w 1995 roku, jako metoda optymalizacji nieliniowych funkcji ciągłych. Metoda powstała w oparciu o przeprowadzane symulacje uproszczonych modeli zachowań społecznych. Inspiracją dla autorów były przeprowadzane przez naukowców komputerowe symulacje zachowań stad ptaków czy ławic ryb.
 
-Algorytm Particle Swarm Optimization (PSO), czyli algorytm optymalizacji rojem cząstek, po raz pierwszy został przedstawiony w pracy Jamesa Kennedy'ego i Russella Eberharta w 1995 roku, jako metoda optymalizacji nieliniowych funkcji ciągłych. Metoda powstała w oparciu o przeprowadzane symulacje uproszczonych modeli zachowań społecznych. Inspiracją dla autorów były przeprowadzane przez naukowców komputerowe  symulacje zachowań stad ptaków czy ławic ryb.
+Zachowania stad ptaków zawsze interesowały naukowców. Chcieli oni dociec w jaki sposób ptaki potrafią, latając w licznych stadach, lecieć w sposób synchroniczny, często zmieniając kierunek lotu czy też błyskawicznie się przegrupowując. Z czasem powstawały różnego rodzaju modele tychże zachowań, programy pozwalające na symulowanie ich. Również ciekawą rzeczą był fakt, że ptaki potrafią znaleźć sobie pożywienie, ominąć zagrożenie, mimo że nie posiadają początkowo wiedzy na ten temat. Pojawiły się tezy, że potrafią one wykorzystać zdobytą wiedzę przez inne osobniki, czy tez poprzednie pokolenia. Dążenie do znalezienia pokarmu, próby unikania sytuacji niebezpiecznych czy drapieżników są czynnikami decydującymi o poprawie \"sytuacji życiowej\" ptaków. Jest to swego rodzaju optymalizacja dokonywana samoistnie przez naturę. Analiza tych zachowań stała się punktem wyjścia do tworzenia algorytmów pozwalających na rozwiązywanie wielu trudnych problemów.
 
-Zachowania stad ptaków zawsze interesowały naukowców. Chcieli oni dociec w jaki sposób ptaki potrafią, latając w licznych stadach, lecieć tak synchronicznie, często zmieniając kierunek lotu czy też błyskawicznie się przegrupować. Z czasem powstawały różnego rodzaju modele tychże zachowań, programy pozwalające na zasymulowanie ich. Również ciekawą rzeczą był fakt, że ptaki potrafią znaleźć sobie pożywienie, ominąć zagrożenie, mimo że nie posiadają początkowo wiedzy na ten temat. Można by rzec, iż potrafią one w pewnym sensie dokonywać optymalizacji swojej sytuacji. Analiza tych zachowań stała się punktem wyjścia do tworzenia algorytmów pozwalających na rozwiązywanie wielu trudnych problemów.
+Algorytm PSO w pewien sposób przypomina wspomniane wcześniej symulacje, lecz zawiera też parę istotnych różnic. W klasycznej wersji, algorytm zawiera rój cząstek poruszających się w wielowymiarowej przestrzeni, który inicjowany jest w sposób losowy. Cząstki te reprezentują rozwiązania problemu i scharakteryzowane są swoją prędkością i położeniem. Ruch cząstek w kolejnych iteracjach ma na celu przeszukiwanie przestrzeni rozwiązań. Każda z cząstek zapamiętuje znalezioną przez siebie dotychczas najlepszą pozycję. W oparciu o te pozycje, w każdej iteracji cząstki mają aktualizowaną swoją prędkość i położenie.
 
-Algorytm PSO w pewien sposób przypomina opisane wyżej symulacje, lecz zawiera też parę istotnych różnic. W klasycznej wersji, algorytm zawiera rój cząstek inicjowany w sposób losowy, poruszających się w wielowymiarowej przestrzeni. Cząstki te reprezentują rozwiązania problemu i scharakteryzowane są swoją prędkością i położeniem. Ruch cząstek w kolejnych iteracjach ma na celu przeszukiwanie przestrzeni rozwiązań. Każda z cząstek zapamiętuje znalezioną przez siebie dotychczas najlepszą pozycję. W oparciu o te pozycje, w każdej iteracji cząstki mają aktualizowaną swoją prędkość i położenie.
+Algorytm PSO posiada wiele zalet. Przede wszystkim jest bardzo prosty i wydajny, oraz pozwala na optymalizację wielu różnych funkcji. Aktualizacja prędkości i położenia cząstek wymaga jedynie podstawowych operacji matematycznych. Algorytm nie wymaga również zapamiętywania dużej ilości danych, dlatego jest wydajny z punktu widzenia szybkości działania i nie wymaga wielu zasobów pamięci. Ważną cechą jest również to, że jest on bardzo odporny na wpadnięcie do minimum lokalnego.
+
+\subsection{Model matematyczny algorytmu}
+Model matematyczny algorytmu PSO może być przedstawiony w następujący sposób:
+\textit{Mamy dany rój cząstek, który składa się z n cząstek. Każda z nich porusza się w d-wymiarowej przestrzeni. Każda z cząstek opisana jest przez dwa wektory:}
+
+\begin{itemize}
+\item\textit{wektor położenia:}
+\newline
+\begin{equation}
+x_i = [x_{i1},x_{i2},...,x_{id}]
+\end{equation}
+\newline
+\item\textit{wektor prędkości:}
+\newline
+\begin{equation}
+v_i = [v_{i1},v_{i2},...,v_{id}]
+\end{equation}
+\newline
+\end{itemize}
+
+\textit{Ponadto, każda z cząstek zapamiętuje znalezioną przez siebie najlepszą dotychczas pozycję w wektorze:}
+\newline
+\begin{equation}
+x_i^b=[x_{i1}^b,x_{i2}^b,...,x_{id}^b]
+\end{equation} 
+\newline
+\textit{Zapamiętywana jest również w wektorze $x^*$ najlepsza dotychczas pozycja w ogóle znaleziona przez wszystkie cząstki w roju.}
+
+\textit{Wartości prędkości i położenia w każdej iteracji algorytmu aktualizowane są odpowiednio według poniższych wzorów[odniesienie]:}
+\newline
+\begin{equation}
+v_{ij}(t)=w \cdot v_{ij}(t-1)+c_1\cdot r_1 \cdot (x_{ij}^b(t-1)-x_{ij}(t-1))+c_2 \cdot r_2 \cdot (x_j^*(t-1)-x_{ij}(t-1))
+\end{equation}
+\newline
+\begin{equation}
+x_{ij}(t)=x_{ij}(t-1)+v_{ij}(t)
+\end{equation}
+\newline
+\textit{gdzie liczby $r_1$ i $r_2$ są wybierane losowo z przedziału $[0,1]$, natomiast współczynniki $c_1$ i $c_2$ odpowiadają za to, w jakim stopniu do aktualizacji prędkości brane są pod uwagę najlepsze znalezione dotychczas położenia każdej z cząstek z osobna i najlepsze położenie w ogóle. Parametr $w$ określa bezwładność cząstek i z czasem maleje liniowo do $0$.}
+
+\subsection{Pseudokod dla algorytmu PSO}
+Poniżej znajduje się pseudokod, który opisuje jak krok po kroku działa algorytm optymalizacji rojem cząstek:
+\newpage
+\begin{algorithm}[H]
+	Wczytaj rozmiar roju n, wymiar d, ilość iteracji t i inne parametry\;
+ 	\While{nie wystąpił warunek stopu}
+ 	{
+ 		$t\leftarrow t+1$\;
+  		\For{$i\leftarrow 1$ \KwTo $n$}
+  		{
+  			Policz dopasowanie cząstki $x_i$\;
+  			\If{$x_i$ jest lepsza niż $x_i^b$}
+  			{
+  				$x_i^b \leftarrow x_i$
+  			}
+  			\If{$x_i^b$ jest lepsza niż $x^*$}
+  			{
+  				$x^* \leftarrow x_i^b$
+  			}
+  		}
+  		\For{$i\leftarrow 1$ \KwTo $n$}
+  		{
+  			\For{$j\leftarrow 1$ \KwTo $d$}
+  			{
+  				Zaktualizuj prędkość $v_{ij}$\;
+  				Zaktualizuj położenie $x_{ij}$\;
+  			}
+  		}
+ 	}
+ 	\caption{Algorytm PSO}
+\end{algorithm}
+
+\subsection{Zastosowanie algorytmu PSO dla problemu QAP}
+Aby było możliwe zastosowanie algorytmu PSO do rozwiązania problemu przydziału kwadratowego, należy odpowiednio ująć problem QAP, by dało się go wpasować w model algorytmu. Przede wszystkim rozwiązaniami zagadnienia przydziału kwadratowego są permutacje, czyli jest to problem dyskretny. Pozycje cząstek w algorytmie PSO mogą zmieniać się w sposób ciągły, położenie nie musi być określone współrzędnymi całkowitymi. Również w permutacji liczby nie mogą się powtarzać. Natomiast nie stoi nic na przeszkodzie, by zwrócona przez algorytm pozycja cząstki była opisana w każdym kierunku przez współrzędne o tej samej wartości. Proste mapowanie: wartość położenia w $i-tym$ kierunku określa przydzielenie do $i-tej$ lokalizacji obiektu o tejże wartości może powodować, że dany obiekt będzie przydzielony wielokrotnie.
 \section{Algorytm Taboo Search}
 \label{sec:TS}
+\subsection{Geneza i opis algorytmu}
+\subsection{Model matematyczny algorytmu}
+\subsection{Zastosowanie algorytmu Tabbo Search dla problemu QAP}
 
 \section{Algorytm mrówkowy}
 \label{sec:mrowka}
+\subsection{Geneza i opis algorytmu}
+Algorytm mrówkowy (Ant Algoirthm) został stworzony przez Marco Dorigo, jak metoda rozwiązywania trudnych problemów optymalizacji jakimi są przykładowo problem komiwojażera (TSP, Travelling Salesman Problem) czy problem przydziału kwadratowego QAP. Inspiracją do powstania algorytmu była obserwacja faktycznych, istniejących w naturze, rojów mrówek. Uwagę naukowców przykuło to, że mrówki, które same są dosyć prostymi stworzeniami, działając w grupie potrafią osiągnąć wysoki poziom organizacji, żyją w zhierarchiwizowanym społeczeństwie. Również ciekawą cechą w zachowaniu mrówek jest to, że nastawione są bardziej na przeżycie całej społeczności niż pojedynczego osobnika. Posiadają one także niespotykane umiejętności pozwalające im na znajdywanie najkrótszej drogi pomiędzy mrowiskiem a     miejscem, w którym znajduje się pożywienie.
+
+Ważnym czynnikiem pozwalającym na znajdywanie najkrótszej ścieżki do źródła pokarmu oraz zapamiętywania tejże drogi są substancje chemiczne wydzielana przez mrówki, zwane feromonami. Insekty te mają zdolność wyczuwania feromonów i dzięki temu najprawdopodobniej potrafią wybrać drogę, dla której stężenie feromonów jest największe. Pozwala to również innym osobnikom, na wykorzystanie informacji o lokacji pożywienia zdobytej przez inne mrówki.
+
+Można w związku z powyższym metaforycznie stwierdzić, że mrówki posiadają zdolność wychodzenia z minimów lokalnych i wybierają minimum globalne.
+
+\subsection{Model matematyczny algorytmu}
+\subsection{Zastosowanie algorytmu mrówkowego dla problemu QAP}
 
 \section{Algorytm ewolucyjny}
 \label{sec:AE}
+\subsection{Geneza i opis algorytmu}
+\subsection{Model matematyczny algorytmu}
+\subsection{Zastosowanie algorytmu PSO dla problemu QAP}
