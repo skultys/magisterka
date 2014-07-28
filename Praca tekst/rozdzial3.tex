@@ -94,12 +94,42 @@ Poniżej znajduje się pseudokod, który opisuje jak krok po kroku działa algor
 
 \subsection{Zastosowanie algorytmu PSO dla problemu QAP}
 Aby było możliwe zastosowanie algorytmu PSO do rozwiązania problemu przydziału kwadratowego, należy odpowiednio ująć problem QAP, by dało się go wpasować w model algorytmu. Przede wszystkim rozwiązaniami zagadnienia przydziału kwadratowego są permutacje, czyli jest to problem dyskretny. Pozycje cząstek w algorytmie PSO mogą zmieniać się w sposób ciągły, położenie nie musi być określone współrzędnymi całkowitymi. Również w permutacji liczby nie mogą się powtarzać. Natomiast nie stoi nic na przeszkodzie, by zwrócona przez algorytm pozycja cząstki była opisana w każdym kierunku przez współrzędne o tej samej wartości. Proste mapowanie: wartość położenia w $i-tym$ kierunku określa przydzielenie do $i-tej$ lokalizacji obiektu o tejże wartości może powodować, że dany obiekt będzie przydzielony wielokrotnie.
-\section{Algorytm Taboo Search}
+\section{Algorytm Tabu Search}
 \label{sec:TS}
 \subsection{Geneza i opis algorytmu}
-\subsection{Model matematyczny algorytmu}
-\subsection{Zastosowanie algorytmu Tabbo Search dla problemu QAP}
+Algorytm Tabu Search został zaproponowany przez Freda Glovera w roku 1986. Jest to metaheurystyka pozwalająca innym metodom optymalizacji unikać sytuacji, w których te wpadają w minima lokalne. Dzięki metodzie tabu search udało się znaleźć optymalne lub prawie optymalne rozwiązania dla bardzo wielu problemów optymalizacji takich jak szeregowanie zadań, problem przydziału kwadratowego, rozpoznawanie charakteru, kolorowanie grafów.
 
+Słowo tabu kojarzone jest przede wszystkim z czymś zakazanym, najczęściej na tle kulturowym. W przypadku algorytmu należy je rozumieć bardziej jako ograniczenie. W ogólności algorytm tabu search polega na zabranianiu wykonywania danej operacji modyfikującej rozwiązanie zwanej ruchem. Ruch jest funkcją, która transformuje dane rozwiązanie w inne, w przypadku permutacji może to być zamiana miejscami dwóch liczb. W danym momencie możliwy jest pewien podzbiór rozwiązań, w które inne może być przetransformowane. Z dostępnych ruchów wybierany jest ten, który powoduje polepszenie rozwiązania i ostatnio wykonany ruch dodawany jest do tablicy ruchów zabronionych na pewną określoną liczbę iteracji algorytmu. Mechanizm ten pozwalaj na wyjście z minimum lokalnego i pozwala uniknąć ruchów cyklicznych. Jednakże w pewnych określanych sytuacjach możliwe jest wykonanie ruchu zabronionego. Zdefiniowana jest specjalna funkcja, zwana funkcją aspiracji, która pozwala obliczyć, czy zabroniony ruch będzie jednak opłacalny.
+
+Algorytm zatrzymuje się, gdy spełniony jest jeden z warunków zatrzymania. Takimi warunkami mogą być wykonanie z góry założonej iteracji algorytmu czy też wykonaniu ustalonej liczby ruchów, które nie prowadzą do dalszej poprawy rozwiązania.
+
+\subsection{Pseudokod algorytmu Tabu Search}
+\begin{algorithm}[H]
+	Inicjalizuj pierwsze rozwiązanie x\;
+	Inicjalizuj rozwiązanie najlepsze $x^b$: $x^b \leftarrow x$\;
+ 	\While{nie wystąpił warunek stopu}
+ 	{
+ 		Przygotuj listę możliwych ruchów dla obecnego rozwiązania\;
+ 		Wybierz najlepszy możliwy ruch z uwzględnieniem tablicy tabu i kryterium aspiracji\;
+ 		Przypisz otrzymane w ruchu rozwiązanie do rozwiązania aktualnego x\;
+ 		\If{rozwiązanie x jest lepsze od $x^b$}
+ 		{
+ 			$x^b \leftarrow x$
+ 		} 		
+ 		Zaktualizuj tablicę tabu i kryterium aspiracji\;		
+ 	}
+ 	\caption{Algorytm Tabu Search}
+\end{algorithm}
+
+\subsection{Zastosowanie algorytmu Tabu Search dla problemu QAP}
+Rozwiązaniami problemu przydziału kwadratowego są permutacje określające przydział placówek do lokalizacji. Należy więc, mając dane aktualne rozwiązanie problemu QAP, określić w jaki sposób będzie wykonywany ruch w kolejnych iteracjach działania algorytmu. Zmiana aktualnego rozwiązania musi odbyć się w sposób, który nie spowoduje, że do danej lokalizacji zostanie przypisany więcej niż jeden obiekt, jak również któryś z obiektów nie zostanie desygnowany do żadnego z miejsc. W przeciwieństwie do, przykładowo, algorytmu PSO, strategia Tabu Search pozwala na przeszukiwanie przestrzeni rozwiązań w sposób dosyć prosty. Istnieje wiele metod dokonywania ruchów w przypadku, gdy rozwiązanie jest permutacją. Najczęściej spotykanym w literaturze jest sposób polegający na zamianie miejscem dwóch elementów permutacji. Wynika stąd, że dla permutacji o długości $n$ istnieje $n\choose 2$ kombinacji takiego wyboru. Wykonane ruchu zapisywane są w tablicy tabu i trzymane są w niej przez określoną liczbę iteracji algorytmu. Poniżej znajduje się przykładowa tablica:
+\begin{figure}[h]
+\includegraphics[scale=0.8]{tabu}
+\end{figure}
+
+W powyższej tablicy w komórce o indeksie $(i,j)$ wpisuje się liczbę iteracji algorytmu, podczas których zamiana obiektów o wartości (nie indeksie) nie można zamienić miejscami. Po każdej iteracji liczba ta jest zmniejsza o $1$. Wpis dodawany jest, gdy nastąpiła zamiana miejscami obiektów o wartościach $i$ i $j$.
+
+Innymi metodami pozwalającymi na wykonanie ruchu w algorytmie TS są przykładowo wstawienie jednego z elementów permutacji w inne miejsce i przesunięcie pozostałych elementów, czy też inwersja wybranej grupy elementów permutacji o określonej szerokości.
 \section{Algorytm mrówkowy}
 \label{sec:mrowka}
 \subsection{Geneza i opis algorytmu}
