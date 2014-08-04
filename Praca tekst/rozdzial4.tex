@@ -1,4 +1,5 @@
 \chapter{Zastosowanie algorytmu quantum EA dla zagadnienia QAP}
+\label{cha:qap_ea}
 Sposób w jaki działają algorytmy genetyczne, otwarty schemat działania, skłania do tworzenia wielu modyfikacji. Zmianom mogą podlegać operatory krzyżowani, mutacji, sposób kodowania rozwiązania. Można dodawać też nowe operatory o działaniu nieobjętym przez tradycyjne operatory. Z tego powodu, na przestrzeni lat, pojawia się wiele publikacji na temat algorytmów genetycznych i nowych sposób podejścia do tego tematu. W jednej z takich publikacji, autorzy Jinwei Gu, Xingsheng Gu i Manzhan Gu zaproponowali algorytm o nazwie \textit{\"a novel parallel quantum genetic algorithm\" - NPQGA} i przedstawili jego wykorzystanie dla problemu szeregowania zadań. Jednakże algorytm ten nadaje się także dla innych zastosowań, do jakich należy na przykład problem QAP i należy do grupy tak zwanych kwantowych algorytmów ewolucyjnych.
 
 \section{Opis algorytmu}
@@ -84,5 +85,74 @@ Kąt $\Theta_i$ określony jest poprzez swoją wartość i kierunek obrotu:
 \Theta_i=\Delta_I \cdot s(\alpha_i, \beta_i),
 \end{equation}
 \newline
-gdzie $\Delta_i$ określa o jaki kąt należy dokonać rotacji, a $s(\alpha_i, \beta_i)$ określa kierunek obrotu. Zarówno wartość kąta i jego kierunek  odczytuje się z tablicy \textit{Look Up}.
-\label{cha:qap_ea}
+gdzie $\Delta_i$ określa o jaki kąt należy dokonać rotacji, a $s(\alpha_i, \beta_i)$ określa kierunek obrotu. Zarówno wartość kąta i jego kierunek  odczytuje się z tablicy \textit{Look Up} i zależą od najlepszego rozwiązania znalezionego w danej populacji i wartości parametrów $\alpha$ i $\beta$. Sprawdzany jest stan każdego kubitu w rozwiązaniu najlepszym i porównywany ze stanem odpowiadającego mu kubitu w poddawanym działaniu bramki kwantowej rozwiązaniu. Poniżej znajduje się tablica  \textit{look up} z zaproponowanymi wartościami przez autorów algorytmu:
+\begin{table}[h]
+\label{LUT_TAB}
+\begin{tabular}{l l l l l l l l}
+\hline
+$r_i$ & $b_i$ & $f(r)<f(b)$ & $\Delta\Theta_i \cdot \pi$ & $s(\alpha_i,\beta_i)$ & & & \\
+\cline{5-8} 
+& & & & $\alpha_i \cdot \beta_i > 0$ & $\alpha_i \cdot \beta_i < 0$ & $\alpha_i = 0$ & $\beta_i = 0$ \\
+\hline
+0 & 0 & False & $0.2\pi$ & 0 & 0 & 0 & 0\\
+0 & 0 & True  & 0        & 0 & 0 & 0 & 0\\
+0 & 1 & False & $0.5\pi$ & 0 & 0 & 0 & 0\\
+0 & 1 & True  & 0        & -1 & +1 & +1 lub -1 & 0\\
+1 & 0 & False & $0.5\pi$ & -1 & +1 & +1 lub -1 & 0\\
+1 & 0 & True  & 0        & -1 & +1 & +1 lub -1 & 0\\
+1 & 1 & False & $0.2\pi$ & +1 & -1 & 0 & +1 lub -1\\
+1 & 1 & True  & 0        & +1 & -1 & 0 & +1 lub -1\\
+\hline
+\end{tabular}
+\caption{LUT dla bramki kwantowej}
+\end{table}
+
+W przypadku gdy stan porównywanych kubitów stany są różne i wybrane rozwiązanie jest gorsze niż najlepsze dotychczas, proponowana jest zmiana o większy kąt, a gdy mają taką samą wartość, to zaleca się kąt o mniejszej wartości. Kierunek obrotu zależy od iloczynu prawdopodobieństw, że kubit znajduje się w stanie \textit{0} i \textit{1}. W przypadku problemu szeregowania zadań z minimalizacją czasu wykonań wszystkich z nich, rozwiązanie lepsze ma mniejszą wartość funkcji celu, dlatego kąt zmieniany jest, gdy w w trzeciej kolumnie tabeli znajduje się wartość \textit{False}. Celem działania operatora \textit{rotation gate} jest  modyfikacja rozwiązań w danym pokoleniu, dzięki której będą one bardziej podobne do rozwiązania najlepszego. Rozwiązanie poddane działaniu tego operatora z większym prawdopodobieństwem będzie podobne do osobnika najlepszego.
+
+Autorzy algorytmu zaproponowali również tak zwany operator katastrofy. Jest on wykorzystywany w sytuacji, w której nie uzyskiwana jest poprawa rozwiązania podczas określonej liczby iteracji algorytmu i skutkuje ponownym zainicjowaniem populacji. Zakłada się, że zdarzenie to spowodowane jest znalezieniem ekstremum lokalnego.
+
+\subsection{Równoległość algorytmu}
+Ciekawym elementem algorytmu jest sposób w jaki dokonywany jest przegląd rozwiązań. Zaproponowany został model, w którym istnieje wiele równoległych populacji pogrupowanych w tak zwane uniwersa. W jednym uniwersum znajduje się wiele populacji. Wymiana informacji obydwa się na dwóch poziomach:
+\begin{enumerate}
+\item pomiędzy uniwersami,
+\item pomiędzy populacjami w danym uniwersum.
+\end{enumerate}
+
+Wymiana informacji w obrębie jednego uniwersum wzorowana jest na osmozie. Informacje o dobrych rozwiązaniach wędrują w jedną stronę populacji, dla której suma dopasowania rozwiązań jest gorsza. Natomiast wymiana informacji pomiędzy uniwersami bazuje na czasowej zmianie wartości, do której dążą rozwiązania w innych uniwersach. Po tej wymianie, rozwiązania z jednego wszechświata jak cel swego rozwoju obierają optymalny kierunek innego i na odwrót.
+Obie powyższe strategie zachodzą z ustalaną częstotliwością. Autorzy podają \textit{10\%-20\%} wszystkich iteracji jako typową wartość tego parametru. 
+
+\section{Pseudokod algorytmu NPQGA}
+Poniżej znajduje się pseudokod algorytmu:
+\newpage
+\begin{algorithm}[H]
+	Wczytaj parametry algorytmu\;
+	Zainicjuj populacje, wyznacz ich permutacyjna postać, policz ich dopasowanie, zapisz najlepszy rezultat
+ 	\While{nie wystąpił warunek stopu}
+ 	{
+ 		$t\leftarrow t+1$\;
+  		\For{dla każdej populacji}
+  		{
+  			Wybierz najlepsze rozwiązanie z populacji\;
+  			Dokonaj krzyżowania i mutacji\;
+  			\If{zaistniały warunki dla operatora katastrofy}
+  			{
+  				Użyj operatora katastrofy do wygenerowania następnego pokolenia\;
+  			}
+  			\Else
+  			{
+  				Użyj bramki kwantowej do wygenerowania następnego pokolenia\;
+  			}
+  		}
+  		\For{populacji w każdy uniwersum}
+  		{
+  			Dokonaj wymiany informacji między populacjami\;
+  		}
+  		\For{dla każdego uniwersum}
+  		{
+  			Dokonaj wymiany informacji między uniwersami;
+  		}
+ 	}
+ 	\caption{Algorytm NPQGA}
+\end{algorithm}
+
+Powyższy schemat działania odnosi się do wersji algorytmu wykorzystanej przez jego autorów do rozwiązania problemu szeregowania zadań. Jednym z celów niniejszej pracy było stworzenie aplikacji wykorzystującej jakiś algorytm przybliżony do rozwiązywania problemu przydziału kwadratowego. Powyższy algorytm został zaimplementowany, lecz z pewnymi modyfikacji. Zostały one przedstawione w następnym rozdziale

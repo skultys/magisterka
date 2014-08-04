@@ -1165,8 +1165,13 @@ namespace magisterka
             //double avarage;
             GetBestSolution();
             Console.WriteLine(this.best.Goal);
+            Solution bestSol = new Solution(this.best);
             for (int i = 1; i < this.iterations; i++)
             {
+                this.rotOperator.Execute(this.Population, this.best);
+
+                GetBestSolution();
+
                 //avarage = 0.0;
                 //foreach (Solution sol in this.Population) avarage += sol.Goal;
                 //Console.WriteLine("Srednia wartosc startowa w iteracji nr        " + i + " : " + avarage / this.popSize);
@@ -1182,10 +1187,6 @@ namespace magisterka
                 //Console.WriteLine("Srednia wartosc po krzyzowaniu w iteracji nr  " + i + " : " + avarage / this.popSize);
 
                 this.mutOperator.Execute(this.Population);
-
-                GetBestSolution();
-
-                this.rotOperator.Execute(this.Population, this.best);
 
                 /*avarage = 0.0;
                 foreach (Solution sol in this.Population) avarage += sol.Goal;
@@ -1217,23 +1218,6 @@ namespace magisterka
                 }
             }
             return this.best;
-        }
-    }
-
-    class testOne
-    {
-        public void execute(testTwo two)
-        {
-            two.Dupa = 1;
-        }
-    }
-
-    class testTwo
-    {
-        public int Dupa { set; get; }
-        public testTwo()
-        {
-            this.Dupa = 666;
         }
     }
 }
