@@ -1,2 +1,32 @@
 \chapter{Modyfikacja algorytmu quatum QAP}
 \label{cha:modyfikacja}
+Przestawiony w poprzednim rozdziale algorytm NPQGA nadaje się do rozwiązywania problemu przydziału kwadratowego, lecz w kontekście stworzenia aplikacji, będącej jednym z celów niniejszej pracy, zostały wprowadzone liczne modyfikacje, a także algorytm został uzupełniony o dodatkowe, nie zaproponowane przez jego autorów, cechy. Wszystkie opisane zmiany, a także dodane funkcjonalności zostały zaproponowane i uzgodnione z opiekunem pracy i zostaną przedstawione w tym rozdziale. Jednakże, główna cecha algorytmu, jaką jest wykorzystanie bitów kwantowych do reprezentacji rozwiązań problemu, pozostała bez zmian. Kodowanie osobników wygląda tak samo, jak zostało to opisane w rozdziale poprzednim.
+
+\section{Lista zmian i modyfikacji}
+\subsection{Nierównoległa wersja algorytmu}
+Główną zmianą wprowadzoną do implementowanego algorytmu jest zrezygnowanie z równoległej wersji algorytmu. Istnieje zatem tylko jedna populacja, która ewoluuje razem z kolejnymi iteracjami algorytmu. Implikuje to również brak potrzeby wymiany informacji pomiędzy uniwersami, a także pomiędzy populacjami w każdym z uniwersów.
+
+\subsection{Operator katastrofy}
+W związku z rezygnacją z wielu populacji rozwijanych równolegle, zaniechano również korzystania z operatora katastrofy. Jego stosowanie mogłoby powodować utratę wypracowanego z czasem dobrego rozwiązania, jeśli to nie zmieniałoby się od ustalonej liczby pokoleń. W przypadku wielu równolegle ewoluujących populacji, użycie tego operatora mogłoby pozwolić na wyjście z lokalnego minimum w danej populacji, lecz w przypadku jednej, powodowałoby to utratę jedynego znalezionego rozwiązania i rozpoczęcie szukania optimum od początku. W sytuacji, gdy operator zostałby użyty pod koniec wykonywania algorytmu, szukane od nowa rozwiązanie, w związku z małą ilością pozostałych iteracji, mogłoby dobiegać bardzo od faktycznego optimum.
+
+\subsection{Operatory selekcji}
+W zmodyfikowanej wersji algorytmu zostały wykorzystane dwie wersje operatora selekcji. Pierwsza z nich polega na selekcji ruletkowej. Funkcja dopasowania rozwiązań została uzyskana z funkcji celu w następujący sposób:
+\newline
+\begin{equation}
+f(x_i)= F_{c max} - F(x_i)
+\end{equation}
+\newline
+gdzie $f(x_i)$ jest funkcją dopasowania \textit{i-tego} rozwiązania w pokoleniu, $F_{c max}$ jest wartością funkcji celu dla najgorszego rozwiązania w danym pokoleniu, czyli o największym koszcie przydziału, a $F(x_i)$ jest funkcją celu \textit{i-tego} rozwiązania w pokoleniu. W ten sposób funkcja dopasowania jest zawsze nieujemna, a większa jej wartość oznacza, że rozwiązanie ma lepsze dopasowanie. Następnie w oparciu o wartości dopasowania rozwiązań, w standardowy sposób, budowane jest koło ruletki.
+
+Drugim z operatorów jest operator selekcji bazujący na rankingu rozwiązań. Rozwiązania w aktualnym pokoleniu są szeregowane rosnąco według wartości funkcji celu, czyli rozwiązania o mniejszej wartości funkcji celu mają niższy indeks na liście, czyli mają w rankingu wyższe miejsce. DOKOŃCZYĆ O TYM OPERATORZE.
+
+\subsection{Operatory krzyżowania}
+Oprócz proponowanego przez autorów operatora krzyżowania cyklicznego, zostały również wykorzystane operatory PMX oraz OX.
+Operator PMX, czyli operator krzyżowania z częściowym odwzorowaniem, polega na zamianie w wybranym fragmencie genów pomiędzy rodzicami i utworzeniu na tej podstawie listy odwzorowań. Elementy spoza wybranego fragmentu są wymieniane na zasadzie element za element, jeśli taka wymiana znajduje się na liście z odwzorowaniami, a pozostałe elementy w osobnikach przepisywane są bez zmian. Poniżej znajduje się rysunek z przykładowym działaniem tegoż operatora:
+
+Podczas działania operatora OX, czyli operatora z zachowaniem porządku, wybierane są dwie pozycje genów z rozwiązań rodziców i spomiędzy tych pozycji kopiowane są geny z rodzica pierwszego do potmka pierwszego i z rodzica drugiego do potomka drugiego. Następnie, począwszy od pierwszej pozycji za kopiowanym fragmentem, przenoszone są geny z rodzica pierwszego do rozwiązania potomnego nr 2, z wyłączeniem elementów już się w nim znajdujących i na odwrót, czyli geny rodzica drugiego przenoszone są do potomka pierwszego. Przeniesione elementy są również umieszczane od pierwszej pozycji za skopiowanym fragmentem. Poniżej znajduje się rysunek obrazujący działanie tego operatora:
+
+Zgodnie z założeniem autorów algorytmu, prawdopodobieństwo zajścia krzyżowania powinno zmniejszać się wraz z rosnącą liczbą iteracji algorytmu. W zmodyfikowanej wersji algorytmu dostępny jest wybór, czy to prawdopodobieństwo jest zmniejszane czy nie. Jeśli spośród wybranych na drodze działania operatora selekcji rozwiązań do krzyżowania zostanie przeznaczone mniej rozwiązań niż wynosi rozmiar populacji, z wybranych rozwiązań losowo dobierane są brakujące osobniki i wstawiane są do listy przeznaczonych do krzyżowania rozwiązań w losowe miejsca. Następnie każde dwa kolejne na liście rodziców rozwiązania poddawane są wybranemu sposobowi krzyżowania i w ten sposób otrzymywane następne pokolenie rozwiązań, zastępując poprzednie.
+
+\subsection{Operator bramki kwantowej}
+Wprawdzie zaimplementowany w algorytmie operator bramki kwantowej jest też operatorem bramki rotacyjnej i aktualizacja parametrów $\alpha$ i $\beta$ kubitów następuje w sposób opisany wzorem REF DO WZORU, to zostały wykorzystane różne wersje tablicy \textit{look up}, a nie tylko ta proponowana przez autorów algorytmu i przedstawiona w poprzednim rozdziale. W przypadku jednopopulacyjnej wersji algorytmu, operator ten ma zbytnie działanie różnicujące rozwiązania i zdecydowanie pogarsza zbieżność algorytmu. Dlatego testowane są różne wersje uzyskiwania wartości i kierunku kąta $\Theta$ w celu uzyskania jak najlepszych rezultatów działania algorytmu.

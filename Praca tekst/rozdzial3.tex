@@ -94,6 +94,84 @@ Poniżej znajduje się pseudokod, który opisuje jak krok po kroku działa algor
 
 \subsection{Zastosowanie algorytmu PSO dla problemu QAP}
 Aby było możliwe zastosowanie algorytmu PSO do rozwiązania problemu przydziału kwadratowego, należy odpowiednio ująć problem QAP, by dało się go wpasować w model algorytmu. Przede wszystkim rozwiązaniami zagadnienia przydziału kwadratowego są permutacje, czyli jest to problem dyskretny. Pozycje cząstek w algorytmie PSO mogą zmieniać się w sposób ciągły, położenie nie musi być określone współrzędnymi całkowitymi. Również w permutacji liczby nie mogą się powtarzać. Natomiast nie stoi nic na przeszkodzie, by zwrócona przez algorytm pozycja cząstki była opisana w każdym kierunku przez współrzędne o tej samej wartości. Proste mapowanie: wartość położenia w $i-tym$ kierunku określa przydzielenie do $i-tej$ lokalizacji obiektu o tejże wartości może powodować, że dany obiekt będzie przydzielony wielokrotnie.
+Jedno z możliwych zastosowań algorytmu PSO dla problemu QAP zostało zaproponowane w publikacji [REF]. Dla danych zbiorów obiektów i lokalizacji, odpowiednio:
+\newline
+\begin{equation}
+F=\{F_1,F_2,...,F_n\}
+\end{equation}
+\newline
+\begin{equation}
+L=\{L_1,L_2,...,L_n\}
+\end{equation}
+\newline
+tworzy się macierz:
+\newline
+\begin{equation}
+\label{PSO_A}
+A=
+\begin{bmatrix}
+a_{11} & a_{12} & \cdots & a_{1n} \\
+a_{21} & a_{22} & \cdots & a_{2n} \\
+\vdots & \vdots & \ddots & \vdots \\
+a_{n1} & a_{n2} & \cdots & a_{nn} \\
+\end{bmatrix}
+\end{equation}
+\newline
+gdzie $a_{ij}$ oznacza stopień przynależności \textit{j-tego} obiektu do \textit{i-tej} lokalizacji. Z racji, iż rozwiązanie jest permutacją, więc do jednej lokalizacji należy przypisać tylko jeden obiekt, muszą być spełnione ograniczenia:
+\newline
+\begin{equation}
+\label{pso_suma_po_i}
+\sum\limits_{i=1}^n a_{ij}=1
+\end{equation}
+\newline
+\begin{equation}
+\label{pso_suma_po_j}
+\sum\limits_{j=1}^n a_{ij}=1
+\end{equation}
+\newline
+oraz
+\newline
+\begin{equation}
+a_{ij} \in \{0,1\}, \; i=1,2,...,n, \; j=1,2,...,n
+\end{equation}
+\newline
+
+Zastosowanie algorytmu optymalizacji rojem cząstek wymaga zatem przedefiniowania pozycji i prędkości w następujący, bazujący na macierzy \ref{PSO_A}, sposób:
+\newline
+\begin{equation}
+X=
+\begin{bmatrix}
+x_{11} & x_{12} & \cdots & x_{1n} \\
+x_{21} & x_{22} & \cdots & x_{2n} \\
+\vdots & \vdots & \ddots & \vdots \\
+x_{n1} & x_{n2} & \cdots & x_{nn} \\
+\end{bmatrix}
+\end{equation} 
+\newline
+\begin{equation}
+V=
+\begin{bmatrix}
+v_{11} & v_{12} & \cdots & v_{1n} \\
+v_{21} & v_{22} & \cdots & v_{2n} \\
+\vdots & \vdots & \ddots & \vdots \\
+v_{n1} & v_{n2} & \cdots & v_{nn} \\
+\end{bmatrix}
+\end{equation}
+\newline
+przy czym, by spełnione były ograniczenia \ref{pso_suma_po_i} i \ref{pso_suma_po_j} stosuje się normalizację macierzy położenia:
+\newline
+\begin{equation}
+X_norm=
+\begin{bmatrix}
+\frac{x_{11}}{\sum\limits_{i=1}^n x_{i1}} & \frac{x_{12}}{\sum\limits_{i=1}^n x_{i2}} & \cdots &\frac{x_{1n}}{\sum\limits_{i=1}^n x_{in}} \\
+\frac{x_{21}}{\sum\limits_{i=1}^n x_{i1}} & \frac{x_{22}}{\sum\limits_{i=1}^n x_{i2}} & \cdots & \frac{x_{2n}}{\sum\limits_{i=1}^n x_{in}} \\
+\vdots & \vdots & \ddots & \vdots \\
+\frac{x_{n1}}{\sum\limits_{i=1}^n x_{i1}} & \frac{x_{n2}}{\sum\limits_{i=1}^n x_{i2}} & \cdots & \frac{x_{nn}}{\sum\limits_{i=1}^n x_{in}} \\
+\end{bmatrix}
+\end{equation}
+\newline
+
+By uzyskać z macierzy położenia \textit{X} rozwiązanie problemu QAP, w każdej kolumnie macierzy wybierany jest element o największej wartości i przypisywana jest jemu wartość \textit{1}, a pozostałym \textit{0}. PO sprawdzeniu wszystkich kolumn i wierszy otrzymuje się w ten sposób macierz określającą w jaki sposób przypisać obiekty do lokalizacji. Macierz ta spełnia również ograniczenia \ref{pso_suma_po_i} oraz \ref{pso_suma_po_j}.
 
 \section{Algorytm Tabu Search}
 \label{sec:TS}
@@ -124,10 +202,12 @@ Algorytm zatrzymuje się, gdy spełniony jest jeden z warunków zatrzymania. Tak
 
 \subsection{Zastosowanie algorytmu Tabu Search dla problemu QAP}
 Rozwiązaniami problemu przydziału kwadratowego są permutacje określające przydział placówek do lokalizacji. Należy więc, mając dane aktualne rozwiązanie problemu QAP, określić w jaki sposób będzie wykonywany ruch w kolejnych iteracjach działania algorytmu. Zmiana aktualnego rozwiązania musi odbyć się w sposób, który nie spowoduje, że do danej lokalizacji zostanie przypisany więcej niż jeden obiekt, jak również któryś z obiektów nie zostanie desygnowany do żadnego z miejsc. W przeciwieństwie do, przykładowo, algorytmu PSO, strategia Tabu Search pozwala na przeszukiwanie przestrzeni rozwiązań w sposób dosyć prosty. Istnieje wiele metod dokonywania ruchów w przypadku, gdy rozwiązanie jest permutacją. Najczęściej spotykanym w literaturze jest sposób polegający na zamianie miejscem dwóch elementów permutacji. Wynika stąd, że dla permutacji o długości $n$ istnieje $n\choose 2$ kombinacji takiego wyboru. Wykonane ruchu zapisywane są w tablicy tabu i trzymane są w niej przez określoną liczbę iteracji algorytmu. Poniżej znajduje się przykładowa tablica:
+\newpage
 \begin{figure}[h]
+\begin{center}
 \includegraphics[scale=0.8]{tabu}
+\end{center}
 \end{figure}
-
 W powyższej tablicy w komórce o indeksie $(i,j)$ wpisuje się liczbę iteracji algorytmu, podczas których zamiana obiektów o wartości (nie indeksie) nie można zamienić miejscami. Po każdej iteracji liczba ta jest zmniejsza o $1$. Wpis dodawany jest, gdy nastąpiła zamiana miejscami obiektów o wartościach $i$ i $j$.
 
 Innymi metodami pozwalającymi na wykonanie ruchu w algorytmie TS są przykładowo wstawienie jednego z elementów permutacji w inne miejsce i przesunięcie pozostałych elementów, czy też inwersja wybranej grupy elementów permutacji o określonej szerokości.
