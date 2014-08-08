@@ -215,14 +215,47 @@ Innymi metodami pozwalającymi na wykonanie ruchu w algorytmie TS są przykłado
 \section{Algorytm mrówkowy}
 \label{sec:mrowka}
 \subsection{Geneza i opis algorytmu}
-Algorytmy mrówkowe (Ant Algorithm) został stworzony przez Marco Dorigo, jak metoda rozwiązywania trudnych problemów optymalizacji jakimi są przykładowo problem komiwojażera (TSP, Travelling Salesman Problem), czy problem przydziału kwadratowego QAP. Inspiracją do powstania algorytmu była obserwacja faktycznych, istniejących w naturze, rojów mrówek. Uwagę naukowców przykuło to, że mrówki, które same są dosyć prostymi stworzeniami, działając w grupie potrafią osiągnąć wysoki poziom organizacji, żyją w zhierarchiwizowanym społeczeństwie. Również ciekawą cechą w zachowaniu mrówek jest to, że nastawione są bardziej na przeżycie całej społeczności niż pojedynczego osobnika. Posiadają one także niespotykane umiejętności pozwalające im na znajdywanie najkrótszej drogi pomiędzy mrowiskiem a miejscem, w którym znajduje się pożywienie.
+Algorytm mrówkowy (Ant Algorithm) został stworzony przez Marco Dorigo, jako metoda rozwiązywania trudnych problemów optymalizacji jakimi są przykładowo problem komiwojażera (TSP - Travelling Salesman Problem), czy problem przydziału kwadratowego QAP. Inspiracją do powstania algorytmu była obserwacja faktycznych, istniejących w naturze, rojów mrówek. Uwagę naukowców przykuło to, że mrówki, które same są dosyć prostymi stworzeniami, działając w grupie potrafią osiągnąć wysoki poziom organizacji, żyją w zhierarchiwizowanym społeczeństwie. Również ciekawą cechą w zachowaniu mrówek jest to, że nastawione są bardziej na przeżycie całej społeczności niż pojedynczego osobnika. Posiadają one także niespotykane umiejętności pozwalające im na znajdywanie najkrótszej drogi pomiędzy mrowiskiem a miejscem, w którym znajduje się pożywienie.
 
-Ważnym czynnikiem, pozwalającym na znajdywanie najkrótszej ścieżki do źródła pokarmu oraz zapamiętywania tejże drogi, są substancje chemiczne wydzielana przez mrówki, zwane feromonami. Insekty te mają zdolność wyczuwania feromonów i dzięki temu najprawdopodobniej potrafią wybrać drogę, dla której stężenie feromonów jest największe. Pozwala to również innym osobnikom, na wykorzystanie informacji o lokacji pożywienia zdobytej przez inne mrówki. Im częściej dana ścieżka jest uczęszczana przez mrówki, tym większe stężenie feromonów. Mrówki będą zatem korzystać z dróg, na których feromony są bardziej wyczuwalne. Również idąc drogą o mniejszym stężeniu feromonów, mrówki po wyczuciu ich większego stężenia na innej trasie, skierują się na nią tworząc, poprzez zostawianie tegoż związku chemicznego, nowe połączenia.  
+Ważnym czynnikiem, pozwalającym na znajdywanie najkrótszej ścieżki do źródła pokarmu oraz zapamiętywania tejże drogi, są substancje chemiczne wydzielana przez mrówki, zwane feromonami. Insekty te mają zdolność wyczuwania feromonów i dzięki temu najprawdopodobniej potrafią wybrać drogę, dla której stężenie feromonów jest największe. Pozwala to również innym osobnikom, na wykorzystanie informacji o lokacji pożywienia zdobytej przez inne mrówki. Im częściej dana ścieżka jest uczęszczana przez mrówki, tym większe stężenie feromonów. Mrówki będą zatem korzystać z dróg, na których feromony są bardziej wyczuwalne. Również idąc drogą o mniejszym stężeniu feromonów, mrówki po wyczuciu ich większego stężenia na innej trasie, skierują się na nią tworząc, poprzez zostawianie tegoż związku chemicznego, nowe połączenia. Można w związku z powyższym metaforycznie stwierdzić, że mrówki posiadają zdolność wychodzenia z minimów lokalnych i wybierają minimum globalne.
 
-Można w związku z powyższym metaforycznie stwierdzić, że mrówki posiadają zdolność wychodzenia z minimów lokalnych i wybierają minimum globalne.
+Z pierwotnych założeń o algorytmach mrówkowych, wyewoluowała cała rodzina algorytmów mrówkowych, rozszerzając w ten sposób ilość problemów, które można dzięki nim rozwiązać. 
 
-\subsection{Model matematyczny algorytmu}
-\subsection{Zastosowanie algorytmu mrówkowego dla problemu QAP}
+\subsection{System mrówkowy - Ant System (AS)}
+Jednym z możliwych algorytmów mrówkowych jest system mrówkowy. Jest to pierwszy algorytm bazujących na optymalizacji kolonii mrówek (ACO). Na jego podstawie zostało później opracowanych wiele innych algorytmów. Podczas wypracowywania rozwiązania problemu QAP mrówka określa z pewnym prawdopodobieństwem, który obiekt przypisać do danej lokalizacji. Prawdopodobieństwo to można wyznaczyć z poniższego wzoru[FILIPOWICZ]:
+\newline
+\begin{equation}
+p_{ij}^k(t)=\frac{[\tau_{ij}(t)]^\alpha\cdot[\eta_{ij}]^\beta}{\sum\limits_{l\in N_i^k} [\tau_{il}(t)]^\alpha\cdot[\eta_{il}]^\beta}, \; j \in N_i^k
+\end{equation}
+\newline
+gdzie $\alpha$ i $\beta$ są parametrami  określającymi odpowiednio wagę śladu feromonowego $\tau_{ij}$ i wartości heurystycznej $\eta_{ij}$, a $N_i^k$ jest tzw. sąsiedztwem \textit{-tego} węzła, czyli zbiorem pozostałych wolnych pozycji, do których nie zostały jeszcze przydzielone żadne obiekty.
+
+Ślad feromonowy jest aktualizowany w następujący sposób:
+\newline
+\begin{equation}
+\tau_{ij}(t+1)= \rho \cdot \tau_{ij}(t)+\sum\limits_{k=1}^m \Delta \tau_{ij}^k
+\end{equation}
+\newline
+gdzie $\rho$ jest współczynnikiem wyparowywania feromonów zostawianych przez mrówki, a $\Delta_{ij}^k$ określone jest wzorem:
+\newline
+\begin{equation}
+\Delta \tau_{ij}^k = \left\{ \begin{array}{ccc} \frac{Q}{J^k}, \; gdy \; obiekt \; i \; jest \; przypisany \; do \; lokalizacji \; j \\ 0, \; w \; przeciwnym \;  przypadku \end{array} \right.
+\end{equation}
+\newline
+gdzie $J^k$ jest funkcją celu, a parametr \textit{Q} określa ile feromonów zostawia mrówka.
+
+Obliczenie informacji heurystycznej wymaga wykorzystania dwóch wektorów: \textit{a}, którego \textit{i-ty} element jest sumą odległości lokalizacji \textit{i} do pozostałych lokalizacji, a także wektora \textit{b}, którego \textit{i-ty} element jest analogiczną sumą przepływów. Na podstawie tych wektorów wyznaczana jest macierz E:
+\newline
+\begin{equation}
+E=b \cdot a^T.
+\end{equation}
+\newline
+Dzięki tej macierzy zwiększane jest prawdopodobieństwo przypisania do lokalizacji znajdujących się blisko siebie obiektów o dużym przepływie.
+
+Obiekty oraz lokalizacja, które zostały już przydzielone, zostają zablokowane dopóki rozwiązanie problemu QAP nie zostanie ukończone.
+
+\subsection{Algorytm MMAS}
+Algorytm MMAS - \textit{max - min ant system} jest modyfikacją systemu mrówkowego z wprowadzeniem minimalnego i maksymalnego poziomu feromonów. W tej wersji algorytmu tylko jedna, najlepsza w ogóle lub w danej iteracji z mrówek zostawia za sobą ślad feromonów. Inicjując algorytm każdy ze śladów feromonowych jest ustawiany na maksymalną wartość $\tau_max$. 
 
 \section{Algorytmy ewolucyjne}
 \label{sec:AE}
@@ -290,6 +323,6 @@ Poniżej znajduje się pseudokod dla klasycznej wersji algorytmu genetycznego:
  	}
  	\caption{Algorytm genetyczny}
 \end{algorithm}
-\subsection{Zastosowanie algorytmu PSO dla problemu QAP}
+\subsection{Zastosowanie algorytmu genetycznego dla problemu QAP}
 Algorytm genetyczny można w łatwy sposób zaimplementować dla problemu QAP. Postać rozwiązania problemu przydziału kwadratowego to permutacja. Należy więc na każdym etapie działania algorytmu dokonywać zmian w taki sposób, by zwracane w kolejnych iteracjach populacje rozwiązań były populacjami permutacji. Wyżej zostały wymieniowe metody krzyżowania, takie jak operatory OX, PMX, CX, i mutacji, które mogą być stosowane dla rozwiązań permutacyjnych.
 Optymalizacja problemu QAP polega na minimalizacji kosztu przydziału obiektów do lokalizacji. Z tego powodu funkcja celu (wzór) nie nadaje się wprost do oceny przystosowania osobników. Funkcję dopasowania można więc uzyskać z funkcji celu poprzez odejmowanie wartości funkcji celu od pewnej liczby, którą może być największa znaleziona dotychczas wartość funkcji celu, czy też najgorsza wartość dopasowania w ostatniej iteracji itp.
