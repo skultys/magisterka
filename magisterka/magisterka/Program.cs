@@ -48,10 +48,8 @@ namespace magisterka
                 }
             }
 
-            QgAlgorithm alg = new QgAlgorithm(distance, flow, 0.7, 0.02, 0.02, 1000, 100, length);
+            QgAlgorithm alg = new QgAlgorithm(distance, flow, length);
             alg.Execute();
-
-            Console.ReadKey();
         }
     }
 }

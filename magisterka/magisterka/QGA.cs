@@ -1063,6 +1063,15 @@ namespace magisterka
     {
         private List<double> distribution = null;
         private static Random rand = new Random();
+        private double EtaMin;
+        public double EtaMax { get; set; }
+
+        public SelectionOperator(double etaMax = 2.0)
+        {
+            this.EtaMax = etaMax;
+            if (this.EtaMax > 2.0 || this.EtaMax < 1.0) this.EtaMax = 2.0;
+            this.EtaMin = 2.0 - this.EtaMax;
+        }
 
         public Population RouletteMethod(IPopulation population)
         {
@@ -1107,14 +1116,51 @@ namespace magisterka
             return new Population(chosenSolutions);
         }
 
-        public Solution[] RankingMethod(Population population)
+        public Population RankingMethod(IPopulation population)
         {
-            return new Solution[0];
+            population.SortAscending();
+            this.distribution = new List<double>();
+            Solution[] chosenSolutions = new Solution[population.Size];
+            double[] probabilities = new double[population.Size];
+            double probabilitySum = 0.0;
+            double currentSum = 0.0;
+
+            for (int i = 0; i < population.Size; i++)
+            {
+                double probability = (1.0 / population.Size) * (this.EtaMax - ((this.EtaMax - this.EtaMin) * (Convert.ToDouble(i) / (population.Size - 1.0))));
+                probabilities[i] = probability;
+            }
+
+            foreach (double prob in probabilities) probabilitySum += prob;
+
+            for (int i = 0; i < population.Size; i++)
+            {
+                currentSum += probabilities[i];
+                double toAdd = currentSum / probabilitySum;
+                this.distribution.Add(toAdd);
+            }
+            this.distribution[population.Size - 1] = 1.0;
+
+            for (int i = 0; i < population.Size; i++)
+            {
+                double toChoose = rand.NextDouble();
+                for (int j = 0; j < population.Size; j++)
+                {
+                    if (toChoose <= distribution[j])
+                    {
+                        chosenSolutions[i] = new Solution((Solution)population[j]);
+                        break;
+                    }
+                }
+            }
+            return new Population(chosenSolutions);
         }
     }
 
     class QgAlgorithm : IEvolutionAlgorithm
     {
+        private CrossoverOperatorChosen crossOperChosen;
+        private SelectionMethodChosen selMethodChosen;
         private OxCrossoverOperator oxOperator = null;
         private CxCrossoverOperator cxOperator = null;
         private PmxCrossoverOperator pmxOperator = null;
@@ -1127,24 +1173,104 @@ namespace magisterka
         int popSize;
         int problemSize;
         public Solution best = null;
+        private bool isSet;
 
-        public QgAlgorithm(double[,] distance, double[,] flow, double crossProb, double mutProb, double catProb, int iterations, int popSize, int problemSize)
+        public QgAlgorithm(double[,] distance, double[,] flow, int problemSize)
         {
             QapData.Instance.setQapData(distance, flow);
-
-            cxOperator = new CxCrossoverOperator(crossProb);
-            oxOperator = new OxCrossoverOperator(crossProb);
-            pmxOperator = new PmxCrossoverOperator(crossProb);
-            mutOperator = new MutationOperator(mutProb, problemSize);
-            rotOperator = new RotationGateOperator(problemSize);
-            catOperator = new CatastropheOperator();
-            catOperator.CastastropheProbability = catProb;
-            selOPerator = new SelectionOperator();
             this.isStopped = false;
-            this.iterations = iterations;
-            this.popSize = popSize;
-            if (popSize % 2 != 0) popSize += 1;
             this.problemSize = problemSize;
+            this.isSet = false;
+        }
+
+        public void SetParameters()
+        {
+            string enteredValue;
+            double doubleValue;
+            int intValue;
+            bool OK = false;
+            do
+            {
+                try
+                {
+                    Console.Clear();
+                    Console.WriteLine("Enter population size: ");
+                    enteredValue = Console.ReadLine();
+                    intValue = Convert.ToInt32(enteredValue);
+                    if (intValue > 0)
+                    {
+                        this.popSize = intValue;
+                        if (popSize % 2 != 0) popSize += 1;
+                        OK = true;
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Wrong value entered.");
+                        Console.ReadKey();
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Wrong value entered.");
+                    Console.ReadKey();
+                }
+            }
+            while (!OK);
+            OK = false;
+
+            do
+            {
+                try
+                {
+                    Console.Clear();
+                    Console.WriteLine("Enter number of iterations: ");
+                    enteredValue = Console.ReadLine();
+                    intValue = Convert.ToInt32(enteredValue);
+                    if (intValue > 0)
+                    {
+                        this.iterations = intValue;
+                        OK = true;
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Wrong value entered.");
+                        Console.ReadKey();
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Wrong value entered.");
+                    Console.ReadKey();
+                }
+            }
+            while (!OK);
+
+                Console.Clear();
+                Console.WriteLine("Select crossover operator: ");
+                Console.WriteLine("1. CX");
+                Console.WriteLine("2. OX");
+                Console.WriteLine("3. PMX");
+
+                Console.Clear();
+                Console.WriteLine("Enter crosover probability value: ");
+                enteredValue = Console.ReadLine();
+                doubleValue = Convert.ToDouble(enteredValue);
+                cxOperator = new CxCrossoverOperator(doubleValue);
+                oxOperator = new OxCrossoverOperator(doubleValue);
+                pmxOperator = new PmxCrossoverOperator(doubleValue);
+
+                Console.Clear();
+                Console.WriteLine("Enter mutation probability value: ");
+                enteredValue = Console.ReadLine();
+                doubleValue = Convert.ToDouble(enteredValue);
+                mutOperator = new MutationOperator(doubleValue, this.problemSize);
+                Console.Clear();
+
+                this.isSet = true;
         }
 
         public IPopulation Population { get; set; }
@@ -1156,49 +1282,88 @@ namespace magisterka
 
         public void InitRandomPopulation()
         {
-            this.Population = new Population(this.popSize, this.problemSize);
+            if (isSet) this.Population = new Population(this.popSize, this.problemSize);
+            else Console.WriteLine("Parameters are not set.");
+            Console.ReadKey();
+            Console.Clear();
         }
 
         public void Execute()
         {
-            InitRandomPopulation();
-            //double avarage;
-            GetBestSolution();
-            Console.WriteLine(this.best.Goal);
-            Solution bestSol = new Solution(this.best);
-            for (int i = 1; i < this.iterations; i++)
+            bool exit = false;
+            while (!exit)
             {
-                this.rotOperator.Execute(this.Population, this.best);
+                if (isSet)
+                {
+                    GetBestSolution();
+                    Console.WriteLine(this.best.Goal);
+                    Solution bestSol = new Solution(this.best);
+                    int bestIteration = 0;
+                    double bestCurrentGoal = GetBestSolution().Goal;
+                    for (int i = 1; i < this.iterations; i++)
+                    {
+                        //this.rotOperator.Execute(this.Population, this.best);
 
-                GetBestSolution();
+                        //avarage = 0.0;
+                        //foreach (Solution sol in this.Population) avarage += sol.Goal;
+                        //Console.WriteLine("Srednia wartosc startowa w iteracji nr        " + i + " : " + avarage / this.popSize);
 
-                //avarage = 0.0;
-                //foreach (Solution sol in this.Population) avarage += sol.Goal;
-                //Console.WriteLine("Srednia wartosc startowa w iteracji nr        " + i + " : " + avarage / this.popSize);
+                        this.Population = new Population(this.selOPerator.RouletteMethod(this.Population));
+                        //avarage = 0.0;
+                        //foreach (Solution sol in this.Population) avarage += sol.Goal;
+                        //Console.WriteLine("Srednia wartosc po selekcji w iteracji nr     " + i + " : " + avarage / this.popSize);
 
-                this.Population = new Population(this.selOPerator.RouletteMethod(this.Population));
-                //avarage = 0.0;
-                //foreach (Solution sol in this.Population) avarage += sol.Goal;
-                //Console.WriteLine("Srednia wartosc po selekcji w iteracji nr     " + i + " : " + avarage / this.popSize);
+                        this.Population = new Population(this.pmxOperator.Execute(this.Population));
+                        //avarage = 0.0;
+                        //foreach (Solution sol in this.Population) avarage += sol.Goal;
+                        //Console.WriteLine("Srednia wartosc po krzyzowaniu w iteracji nr  " + i + " : " + avarage / this.popSize);
 
-                this.Population = new Population(this.pmxOperator.Execute(this.Population));
-                //avarage = 0.0;
-                //foreach (Solution sol in this.Population) avarage += sol.Goal;
-                //Console.WriteLine("Srednia wartosc po krzyzowaniu w iteracji nr  " + i + " : " + avarage / this.popSize);
+                        this.mutOperator.Execute(this.Population);
 
-                this.mutOperator.Execute(this.Population);
+                        /*avarage = 0.0;
+                        foreach (Solution sol in this.Population) avarage += sol.Goal;
+                        Console.WriteLine("Srednia wartosc po rotacji w iteracji nr      " + i + " : " + avarage / this.popSize);*/
+                        //Console.WriteLine();
+                        //Console.ReadKey();
+                        GetBestSolution();
+                        if (bestCurrentGoal > this.best.Goal)
+                        {
+                            bestCurrentGoal = this.best.Goal;
+                            bestIteration = i;
+                        }
+                    }
 
-                /*avarage = 0.0;
-                foreach (Solution sol in this.Population) avarage += sol.Goal;
-                Console.WriteLine("Srednia wartosc po rotacji w iteracji nr      " + i + " : " + avarage / this.popSize);*/
-                //Console.WriteLine();
-                //Console.ReadKey();
+                    this.isStopped = true;
+                    GetBestSolution();
+                    this.best.PrintSolution();
+                    Console.WriteLine(this.best.Goal);
+                    Console.WriteLine("Found in " + bestIteration + "th iteration");
+                }
+                else
+                {
+                    ConsoleKeyInfo cki = new ConsoleKeyInfo('1', ConsoleKey.D3, false, false, false);
+                    while (cki.Key != ConsoleKey.D1 && cki.Key != ConsoleKey.D2)
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Do you want to set parameters?");
+                        Console.WriteLine("1. Yes.");
+                        Console.WriteLine("2. No - exit program.");
+                        cki = Console.ReadKey();
+                        if (cki.Key == ConsoleKey.D2) exit = true;
+                        else if (cki.Key == ConsoleKey.D1)
+                        {
+                            SetParameters();
+                            InitRandomPopulation();
+                        }
+                        else
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Wrong value!");
+                            Console.ReadKey();
+                        }
+                    }
+                }
             }
-
-            this.isStopped = true;
-            GetBestSolution();
-            this.best.PrintSolution();
-            Console.WriteLine(this.best.Goal);
         }
 
         public bool Stop()
@@ -1219,5 +1384,16 @@ namespace magisterka
             }
             return this.best;
         }
+    }
+    public enum CrossoverOperatorChosen
+    {
+        CX,
+        OX,
+        PMX
+    }
+    public enum SelectionMethodChosen
+    {
+        Roulette,
+        Ranking
     }
 }
