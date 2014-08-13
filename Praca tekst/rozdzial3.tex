@@ -3,16 +3,16 @@
 
 Złożoność otaczającego nas świata powoduje, że bardzo często występujące problemy, które chcielibyśmy rozwikłać są w rzeczywistości bardzo trudne do rozwiązania. Dotyczy to praktycznie każdej sfery ludzkiego życia. W wielu sytuacjach natura problemu nie pozwala na zastosowanie metod matematycznych, jednakże nawet w przypadku takich trudności, w których matematyka przychodzi z pomocą, można stwierdzić jedynie, że problem ma rozwiązanie i to nawet najlepsze z możliwych, optymalne, lecz znalezienie go jest praktycznie niewykonalne. Używając języka naukowego, wiele z tych problemów można nazwać NP-trudnymi. Złożoność obliczeniowa algorytmów pozwalających na rozwiązanie ich jest zbyt duża, by w ogóle warto było je stosować. Pojawia się więc potrzeba zastosowania czegoś, co pozwoli na znalezienie rozwiązania dobrego, przybliżającego chociaż rozwiązanie optymalne. I faktycznie jest grupa algorytmów, które pozwalają na uzyskanie takiego efektu. Są to algorytmy przybliżone, inaczej zwane aproksymującymi.
 
-W przeciwieństwie do problemów optymalizacji, których rozwiązanie jest możliwe do znalezienia w czasie wielomianowym, problemy NP-trudne nie dają \" punktu wyjścia\" do znalezienia rozwiązania optymalnego. Jednakże, niejednokrotnie istnieje \"punkt wyjścia \", który pozwala na dojście do rozwiązania znajdującego się w pobliżu rozwiązania najlepszego. W tym sensie algorytmy przybliżone podobne są do algorytmów dokładnych: również polegają na uchwyceniu istoty problemu i następnie na znalezieniu algorytmu, która pozwoli na wykorzystanie jej.
+W przeciwieństwie do problemów optymalizacji, których rozwiązanie jest możliwe do znalezienia w czasie wielomianowym, problemy NP-trudne nie dają ,,punktu wyjścia'' do znalezienia rozwiązania optymalnego. Jednakże, niejednokrotnie istnieje ,,punkt wyjścia'', który pozwala na dojście do rozwiązania znajdującego się w pobliżu rozwiązania najlepszego. W tym sensie algorytmy przybliżone podobne są do algorytmów dokładnych: również polegają na uchwyceniu istoty problemu i następnie na znalezieniu algorytmu, która pozwoli na wykorzystanie jej.
 
 Ogromna ilość problemów, dla których nie jesteśmy w stanie znaleźć rozwiązania optymalnego, przyczyniła się do powstania wielu algorytmów aproksymacyjnych.  Przy tworzeniu algorytmów dąży się do tego, by działały one jak najszybciej. W przypadku rozwiązywania przy ich użyciu problemów niejednokrotnie czas ich działania jest dosyć długi. Jednakże, pozwalają one na znalezienie dobrego rozwiązania w sytuacji, gdy użycie algorytmów dokładnych nie pozwoliłoby uzyskać rozwiązania w ogóle.
 
 Ciekawą rzeczą związaną z algorytmami przybliżonymi jest fakt, że wiele z nich powstało na podstawie obserwacji zjawisk występujących w przyrodzie.
 
-Poniżej zostaną przedstawione kilka algorytmów aproksymujących, zostaną przedstawione podstawowe informacje na ich temat, opisany schemat ich działania, a także to, w jaki sposób przy ich pomocy można by próbować rozwiązać problem QAP.
+Poniżej zostanie przedstawione kilka algorytmów aproksymujących, podstawowe informacje na ich temat, opisany schemat ich działania, a także to, w jaki sposób przy ich pomocy można by próbować rozwiązać problem QAP.
 \section{Particle Swarm Optimization}
 \label{sec:PSO}
-\subsection{Geneza i opis algorytmu}
+\subsection{Geneza i opis algorytmu} 
 Algorytm Particle Swarm Optimization (PSO), czyli algorytm optymalizacji rojem cząstek, po raz pierwszy został przedstawiony w pracy Jamesa Kennedy'ego i Russella Eberharta w 1995 roku, jako metoda optymalizacji nieliniowych funkcji ciągłych. Metoda powstała w oparciu o przeprowadzane symulacje uproszczonych modeli zachowań społecznych. Inspiracją dla autorów były przeprowadzane przez naukowców komputerowe symulacje zachowań stad ptaków czy ławic ryb.
 
 Zachowania stad ptaków zawsze interesowały naukowców. Chcieli oni dociec w jaki sposób ptaki potrafią, latając w licznych stadach, lecieć w sposób synchroniczny, często zmieniając kierunek lotu czy też błyskawicznie się przegrupowując. Z czasem powstawały różnego rodzaju modele tychże zachowań, programy pozwalające na symulowanie ich. Również ciekawą rzeczą był fakt, że ptaki potrafią znaleźć sobie pożywienie, ominąć zagrożenie, mimo że nie posiadają początkowo wiedzy na ten temat. Pojawiły się tezy, że potrafią one wykorzystać zdobytą wiedzę przez inne osobniki, czy tez poprzednie pokolenia. Dążenie do znalezienia pokarmu, próby unikania sytuacji niebezpiecznych czy drapieżników są czynnikami decydującymi o poprawie \"sytuacji życiowej\" ptaków. Jest to swego rodzaju optymalizacja dokonywana samoistnie przez naturę. Analiza tych zachowań stała się punktem wyjścia do tworzenia algorytmów pozwalających na rozwiązywanie wielu trudnych problemów.
@@ -207,6 +207,7 @@ Rozwiązaniami problemu przydziału kwadratowego są permutacje określające pr
 \begin{center}
 \includegraphics[scale=0.8]{tabu}
 \end{center}
+\caption{Tablica tabu}
 \end{figure}
 W powyższej tablicy w komórce o indeksie $(i,j)$ wpisuje się liczbę iteracji algorytmu, podczas których zamiana obiektów o wartości (nie indeksie) nie można zamienić miejscami. Po każdej iteracji liczba ta jest zmniejsza o $1$. Wpis dodawany jest, gdy nastąpiła zamiana miejscami obiektów o wartościach $i$ i $j$.
 
@@ -255,15 +256,33 @@ Dzięki tej macierzy zwiększane jest prawdopodobieństwo przypisania do lokaliz
 Obiekty oraz lokalizacja, które zostały już przydzielone, zostają zablokowane dopóki rozwiązanie problemu QAP nie zostanie ukończone.
 
 \subsection{Algorytm MMAS}
-Algorytm MMAS - \textit{max - min ant system} jest modyfikacją systemu mrówkowego z wprowadzeniem minimalnego i maksymalnego poziomu feromonów. W tej wersji algorytmu tylko jedna, najlepsza w ogóle lub w danej iteracji z mrówek zostawia za sobą ślad feromonów. Inicjując algorytm każdy ze śladów feromonowych jest ustawiany na maksymalną wartość $\tau_max$. 
+Algorytm MMAS - \textit{max - min ant system} jest modyfikacją systemu mrówkowego z wprowadzeniem minimalnego i maksymalnego poziomu feromonów. W tej wersji algorytmu tylko jedna, najlepsza globalnie lub w danej iteracji z mrówek zostawia za sobą ślad feromonów. Inicjując algorytm każdy ze śladów feromonowych jest ustawiany na maksymalną wartość $\tau_{max}$. Następnie, podobnie jak w omówionym wcześniej systemie mrówkowym, mrówki przydzielają do nie wybranych jeszcze lokalizacji nieprzydzielone obiekty z pewnym prawdopodobieństwem, które określone jest dla \textit{k-tej} mrówki w następujący sposób:
+\newline
+\begin{equation}
+p_{ij}^k(t)=\frac{\tau_{ij}(t)}{\sum\limits_{l\in N_i^k} \tau_{il}(t)}, \; j \in N_i^k
+\end{equation}
+\newline
+a uaktualnienie śladu feromonów, który jest przez tę mrówkę zostawiany, uzyskiwane jest z równania:
+\newline
+\begin{equation}
+\tau_{ij}(t+1)=\rho \cdot \tau_{ij}(t)+\Delta \tau_{ij}^{best}
+\end{equation}
+\newline
+gdzie
+\newline
+\begin{equation}
+\Delta \tau_{ij}^{best} = \left\{ \begin{array}{ccc} \frac{1}{J^{best}}, \; gdy \; obiekt \; i \; jest \; przypisany \; do \; lokalizacji \; j \\ 0, \; w \; przeciwnym \;  przypadku \end{array} \right.
+\end{equation}
+\newline
 
+Oznaczenia w powyższych wzorach są analogiczne, do tych dla systemu mrówkowego.
 \section{Algorytmy ewolucyjne}
 \label{sec:AE}
 
 Algorytmy ewolucyjne są najogólniej rzecz biorąc algorytmy optymalizacji, które bazują na stopniowym polepszaniu pewnej populacji rozwiązań danego problemu. Z powodzeniem są stosowane od wielu lat do rozwiązywania wielu zarówno praktycznych jak i teoretycznych problemów. Istnieje wiele różnorodnych implementacji algorytmów ewolucyjnych. Należą do nich między innymi[evolutionary PDF]:
 \begin{itemize}
-\item algorytmy genetyczne, stworzone przez Johna Henry'ego Hollanda,
-\item strategie ewolucyjne,opracowane przez Ingo Rechenberga oraz Hansa Paul Schwefela,
+\item algorytmy genetyczne stworzone przez Johna Henry'ego Hollanda,
+\item strategie ewolucyjne opracowane przez Ingo Rechenberga oraz Hansa Paul Schwefela,
 \item programowanie ewolucyjne stworzone przez Lawrence'a Fogela.
 \end{itemize}
 
@@ -282,7 +301,8 @@ Już sam sposób doboru osobników, które posłużą za podstawę dla kolejnego
 \begin{itemize}
 \item metoda ruletki,
 \item metoda rankingowa,
-\item metoda turniejowa.
+\item metoda turniejowa,
+\item metoda progowa.
 \end{itemize}
 
 Metoda ruletki polega na "kręceniu" wirtualną ruletką, na której każde z rozwiązań z aktualnej populacji ma wyznaczony swój wycinek koła. Szerokość wycinka zależy od dopasowania danego rozwiązania. Dla każdego rozwiązania jest liczona wartość funkcji dopasowania, a także liczona jest suma wszystkich wartości dopasowania. Stosunek wartości dopasowania danego osobnika do sumy wszystkich dopasowań wyznacza szerokość wycinka ruletki dla danego rozwiązania. Metoda ta faworyzuje osobniki lepsze, nie pozbawiając jednak szansy wyboru tych gorszych. Jednak może to prowadzić w sytuacji, gdy jedno z rozwiązań jest wyraźnie lepsze od pozostałych, że osobniki wybrane do krzyżowania będą się składać głownie z tego jednego.
@@ -290,6 +310,8 @@ Metoda ruletki polega na "kręceniu" wirtualną ruletką, na której każde z ro
 Metoda bazująca na rankingu rozwiązań nieco zmniejsza rolę dopasowania danego rozwiązania w kontekście jego szans do bycia wybranym na rodzica. W tej metodzie rozwiązania są szeregowane według swojego dopasowania, a o prawdopodobieństwie wyboru decyduje pozycja w rankingu. W oparciu o ranking definiuje się funkcję, która określa ile kopii danego rozwiązania jest brane pod uwagę. W tym sposobie dysproporcje między prawdopodobieństwami wyboru rozwiązań są mniejsze w stosunku do metody ruletkowej.
 
 Metoda turniejowa polega na losowym wyborze dwóch rozwiązań z populacji i rozwiązanie lepsze z tej pary jest brane pod uwagę w dalszych operacjach. Rozwiązania lepsze mają taką samą szansę bycia wybranym do porównania co te słabsze, lecz i tak w przypadku pojedynku, to one wygrają.
+
+Metoda progowa dozwala na losowy wybór rozwiązań z tych, których wartość dopasowania przekracza określony próg. W tej metodzie zawsze pewna pula rozwiązań będzie od razu wykluczona z możliwości do dalszej reprodukcji. Istnieje więc ryzyko, iż pewne rozwiązania, które mogą posiadać obiecujące fragmenty, lecz ogólnie są gorsze od pozostałych rozwiązań w populacji, zostaną odrzucone, a cenna informacja, którą posiadają na drodze poźniejszego krzyżowania nie będzie mogła być wykorzystana.
 
 Należy również wspomnieć, że funkcja dopasowania powinna zwracać liczby nieujemne i dla rozwiązania lepszego jego wartość dopasowania powinna być większa, niż dla gorszego. Nie zawsze da się taką informacje uzyskać bezpośrednio z funkcji celu. Znana jest własność dualności zadań minimalizacji kosztu i maksymalizacji zysku, lecz w przypadku funkcji przystosowania, zwracana wartość zawsze musi być nieujemna. Z tego powodu należy dokonać przekształcenia funkcji celu w funkcję dopasowania. Najczęściej  dokonywane to jest poprzez odejmowanie wartości funkcji celu od pewnej liczby. Jeśli taka różnica jest ujemna, zwracamy 0. Wartość tej liczby może być ustalona w wieloraki sposób. Przykładowo, może to być z góry ustalona liczba, może też być modyfikowana wraz z kolejnymi iteracjami algorytmu, np. może przyjąć wartość największej znalezionej do tej pory wartości funkcji celu.
 
