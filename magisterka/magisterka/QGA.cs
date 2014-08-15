@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using OptimisationClassLibrary;
 using System.Collections;
+using System.IO;
 
 namespace magisterka
 {
@@ -346,6 +347,15 @@ namespace magisterka
                 Console.Write(chr.PermutationValue + "  ");
             }
             Console.WriteLine();
+        }
+
+        public void PrintSolution(System.IO.StreamWriter file)
+        {
+            foreach (Chromosome chr in this.chromosomes)
+            {
+                file.Write(chr.PermutationValue + "  ");
+            }
+            file.WriteLine();
         }
     }
 
@@ -1179,19 +1189,20 @@ namespace magisterka
         int iterations;
         int popSize;
         int problemSize;
+        double crossoverProb;
+        double mutationProb;
         public Solution best = null;
         private bool isSet;
         private bool saveEnabled;
+        private bool rotGateEnabled;
         private string fileName;
+        private string instance;
 
-        public QgAlgorithm(double[,] distance, double[,] flow, int problemSize)
+        public QgAlgorithm()
         {
-            QapData.Instance.setQapData(distance, flow);
             this.isStopped = false;
-            this.problemSize = problemSize;
             this.isSet = false;
             this.saveEnabled = false;
-            this.rotOperator = new RotationGateOperator(this.problemSize);
         }
 
         public void SetParameters()
@@ -1200,6 +1211,93 @@ namespace magisterka
             double doubleValue;
             int intValue;
             bool OK = false;
+
+            do
+            {
+                try
+                {
+                    Console.Clear();
+                    Console.WriteLine("Choose problem instance:");
+                    Console.WriteLine();
+                    string path = Directory.GetCurrentDirectory() + "\\QAPLib";
+                    string[] filePaths = Directory.GetFiles(path, "*.dat");
+                    for (int i = 0; i < filePaths.Length; i++)
+                    {
+                        filePaths[i] = Path.GetFileName(filePaths[i]);
+                        Console.WriteLine((i + 1) + ". " + filePaths[i]);
+                    }
+                    enteredValue = Console.ReadLine();
+                    intValue = Convert.ToInt32(enteredValue);
+                    if (intValue < 1 || intValue > filePaths.Length)
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Wrong value entered!");
+                        Console.ReadKey();
+                    }
+                    else
+                    {
+                        intValue--;
+                        path = path + "\\" + filePaths[intValue];
+                        string[] testData = System.IO.File.ReadAllLines(@path);
+
+                        int length = Convert.ToInt32(testData[0]);
+
+                        double[,] distance = new double[length, length];
+
+                        double[,] flow = new double[length, length];
+
+                        List<string> lines = new List<string>();
+
+                        foreach (string s in testData)
+                        {
+                            string s2 = s.Trim();
+                            if (s2 != string.Empty) lines.Add(s2);
+                        }
+
+                        for (int i = 1; i <= length; i++)
+                        {
+                            int index2;
+                            int j = 0;
+                            while (j < length)
+                            {
+                                index2 = lines[i].IndexOf(" ", 0);
+                                if (index2 < 0) index2 = lines[i].Length;
+                                string number = lines[i].Substring(0, index2);
+                                distance[i - 1, j] = Convert.ToDouble(number);
+                                lines[i] = (lines[i].Substring(index2)).Trim();
+
+                                index2 = lines[lines.Count - i].IndexOf(" ", 0);
+                                if (index2 < 0) index2 = lines[lines.Count - i].Length;
+                                number = lines[lines.Count - i].Substring(0, index2);
+                                flow[length - i, j] = Convert.ToDouble(number);
+                                lines[lines.Count - i] = (lines[lines.Count - i].Substring(index2)).Trim();
+
+                                j++;
+                            }
+                        }
+                        QapData.Instance.setQapData(distance, flow);
+                        this.problemSize = length;
+                        this.rotOperator = new RotationGateOperator(this.problemSize);
+                        this.instance = filePaths[intValue];
+                        OK = true;
+                    }
+                }
+                catch (FormatException e)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Wrong value entered!");
+                    Console.ReadKey();
+                }
+                catch (Exception e)
+                {
+                    Console.Clear();
+                    Console.WriteLine("File could not be opened!");
+                    Console.ReadKey();
+                }
+            }
+            while (!OK);
+
+            OK = false;
             do
             {
                 try
@@ -1322,6 +1420,7 @@ namespace magisterka
                     if (doubleValue >= 0.0 && doubleValue <= 1.0)
                     {
                         crossProb = doubleValue;
+                        this.crossoverProb = crossProb;
                         OK = true;
                     }
                     else
@@ -1387,6 +1486,7 @@ namespace magisterka
                     if (doubleValue >= 0.0 && doubleValue <= 1.0)
                     {
                         this.mutOperator = new MutationOperator(doubleValue, this.problemSize);
+                        this.mutationProb = doubleValue;
                         OK = true;
                     }
                     else
@@ -1405,6 +1505,24 @@ namespace magisterka
             }
             while (!OK);
 
+            cki = new ConsoleKeyInfo('1', ConsoleKey.D3, false, false, false);
+            while (cki.Key != ConsoleKey.D1 && cki.Key != ConsoleKey.D2)
+            {
+                Console.Clear();
+                Console.WriteLine("Do you want to use rotation gate operator?");
+                Console.WriteLine("1. Yes.");
+                Console.WriteLine("2. No.");
+                cki = Console.ReadKey();
+                if (cki.Key == ConsoleKey.D1)
+                {
+                    this.rotGateEnabled = true;
+                }
+                else if (cki.Key == ConsoleKey.D2)
+                {
+                    this.rotGateEnabled = false;
+                }
+            }
+
             OK = false;
             while (!OK)
             {
@@ -1415,7 +1533,6 @@ namespace magisterka
                 cki = Console.ReadKey();
                 if (cki.Key == ConsoleKey.D1)
                 {
-                    this.saveEnabled = true;
                     bool wrongName = true;
                     try
                     {
@@ -1424,17 +1541,10 @@ namespace magisterka
                             Console.Clear();
                             Console.WriteLine("Enter file name:");
                             this.fileName = Console.ReadLine();
-                            if (!fileName.Contains(' ') || !fileName.Contains('\t'))
-                            {
-                                wrongName = false;
-                                OK = true;
-                            }
-                            else
-                            {
-                                Console.Clear();
-                                Console.WriteLine("Wrong characters!");
-                                Console.ReadKey();
-                            }
+                            this.fileName = Directory.GetCurrentDirectory() + "\\Results\\" +this.fileName + ".txt";
+                            this.saveEnabled = true;
+                            wrongName = false;
+                            OK = true;
                         }
                     }
                     catch (Exception e)
@@ -1494,58 +1604,166 @@ namespace magisterka
                     double avarage = 0.0;
                     double previousAvarage = 0.0;
                     foreach (Solution sol in this.Population) avarage += sol.Goal;
+                    avarage /= this.popSize;
                     int cntr = 0;
-                    for (int i = 1; i < this.iterations; i++)
+
+                    if (saveEnabled)
                     {
-                        previousAvarage = avarage;
+                        System.IO.StreamWriter file = new System.IO.StreamWriter(this.fileName);
+                        file.WriteLine("Problem instance:\t" + this.instance);
+                        file.WriteLine("Problem size:\t\t" + this.problemSize);
+                        file.WriteLine("Iterations:\t\t" + this.iterations);
                         if (this.selMethodChosen == SelectionMethodChosen.Roulette)
                         {
-                            this.Population = new Population(this.selOPerator.RouletteMethod(this.Population));
+                            file.WriteLine("Selection method:\tRoulette");
                         }
                         else
                         {
-                            this.Population = new Population(this.selOPerator.RankingMethod(this.Population));
+                            file.WriteLine("Selection method:\tRanking");
+                            file.WriteLine("Eta MAX parameter:\t" + this.selOPerator.EtaMax);
                         }
 
                         if (this.crossOperChosen == CrossoverOperatorChosen.CX)
                         {
-                            this.Population = new Population(this.cxOperator.Execute(this.Population));
+                            file.WriteLine("Crossover method:\tCX");
                         }
                         else if (this.crossOperChosen == CrossoverOperatorChosen.OX)
                         {
-                            this.Population = new Population(this.oxOperator.Execute(this.Population));
+                            file.WriteLine("Crossover method:\tOX");
                         }
                         else
                         {
-                            this.Population = new Population(this.pmxOperator.Execute(this.Population));
+                            file.WriteLine("Crossover method:\tPMX");
+                        }
+                        file.WriteLine("Crossover probability:\t" + this.crossoverProb);
+                        file.WriteLine("Mutation probability:\t" + this.mutationProb);
+                        file.WriteLine();
+                        file.WriteLine("Iteration | Best objective Value | Avarage population objective value");
+                        file.WriteLine();
+                        file.WriteLine("0 " + this.best.Goal + " " + avarage);
+
+                        for (int i = 1; i < this.iterations; i++)
+                        {
+                            previousAvarage = avarage;
+                            if (this.selMethodChosen == SelectionMethodChosen.Roulette)
+                            {
+                                this.Population = new Population(this.selOPerator.RouletteMethod(this.Population));
+                            }
+                            else
+                            {
+                                this.Population = new Population(this.selOPerator.RankingMethod(this.Population));
+                            }
+
+                            if (this.crossOperChosen == CrossoverOperatorChosen.CX)
+                            {
+                                this.Population = new Population(this.cxOperator.Execute(this.Population));
+                            }
+                            else if (this.crossOperChosen == CrossoverOperatorChosen.OX)
+                            {
+                                this.Population = new Population(this.oxOperator.Execute(this.Population));
+                            }
+                            else
+                            {
+                                this.Population = new Population(this.pmxOperator.Execute(this.Population));
+                            }
+
+                            this.mutOperator.Execute(this.Population);
+
+                            if (this.rotGateEnabled) this.rotOperator.Execute(this.Population, this.best);
+
+                            avarage = 0.0;
+                            foreach (Solution sol in this.Population) avarage += sol.Goal;
+                            avarage /= this.popSize;
+
+                            if (avarage > previousAvarage) cntr++;
+
+                            GetBestSolution();
+
+                            if (bestCurrentGoal > this.best.Goal)
+                            {
+                                bestCurrentGoal = this.best.Goal;
+                                bestIteration = i;
+                                globalBest = new Solution(this.best);
+                            }
+                            file.WriteLine(i + " " + this.best.Goal + " " + avarage);
+                        }
+                        file.WriteLine();
+                        file.WriteLine("Solution found:");
+                        this.best.PrintSolution(file);
+
+                        file.WriteLine();
+                        file.WriteLine("Objective function value:");
+                        file.WriteLine(this.best.Goal);
+
+                        file.WriteLine();
+                        file.WriteLine("Best solution found");
+                        globalBest.PrintSolution();
+
+                        file.WriteLine();
+                        file.WriteLine("Best solution objective function value:");
+                        file.WriteLine(globalBest.Goal);
+
+                        file.WriteLine("Found in " + bestIteration + "th iteration");
+
+                        file.WriteLine();
+                        if (this.rotGateEnabled)
+                        {
+                            file.WriteLine("Rotation gate operator used");
+                        }
+                        else
+                        {
+                            file.WriteLine("Rotation gate operator NOT used");
                         }
 
-                        this.mutOperator.Execute(this.Population);
-
-                        this.rotOperator.Execute(this.Population, this.best);
-
-                        avarage = 0.0;
-                        foreach (Solution sol in this.Population) avarage += sol.Goal;
-
-                        if (avarage > previousAvarage) cntr++;
-
-                        GetBestSolution();
-                        if (bestCurrentGoal > this.best.Goal)
+                        file.Close();
+                    }
+                    else
+                    {
+                        for (int i = 1; i < this.iterations; i++)
                         {
-                            bestCurrentGoal = this.best.Goal;
-                            bestIteration = i;
-                            globalBest = new Solution(this.best);
+                            if (this.selMethodChosen == SelectionMethodChosen.Roulette)
+                            {
+                                this.Population = new Population(this.selOPerator.RouletteMethod(this.Population));
+                            }
+                            else
+                            {
+                                this.Population = new Population(this.selOPerator.RankingMethod(this.Population));
+                            }
+
+                            if (this.crossOperChosen == CrossoverOperatorChosen.CX)
+                            {
+                                this.Population = new Population(this.cxOperator.Execute(this.Population));
+                            }
+                            else if (this.crossOperChosen == CrossoverOperatorChosen.OX)
+                            {
+                                this.Population = new Population(this.oxOperator.Execute(this.Population));
+                            }
+                            else
+                            {
+                                this.Population = new Population(this.pmxOperator.Execute(this.Population));
+                            }
+
+                            this.mutOperator.Execute(this.Population);
+
+                            if (this.rotGateEnabled) this.rotOperator.Execute(this.Population, this.best);
+
+                            GetBestSolution();
+
+                            if (bestCurrentGoal > this.best.Goal)
+                            {
+                                bestCurrentGoal = this.best.Goal;
+                                bestIteration = i;
+                                globalBest = new Solution(this.best);
+                            }
                         }
                     }
 
-                    Console.Clear();
-                    Console.WriteLine(cntr);
-                    globalBest.PrintSolution();
-                    Console.WriteLine(globalBest.Goal);
+                    GetBestSolution();
 
                     this.isStopped = true;
-                    GetBestSolution();
-                    Console.WriteLine("Best solution found:");
+
+                    Console.Clear();
+                    Console.WriteLine("Solution found:");
                     this.best.PrintSolution();
 
                     Console.WriteLine();
@@ -1553,6 +1771,13 @@ namespace magisterka
                     Console.WriteLine(this.best.Goal);
 
                     Console.WriteLine();
+                    Console.WriteLine("Best solution found");
+                    globalBest.PrintSolution();
+
+                    Console.WriteLine();
+                    Console.WriteLine("Best solution objective function value:");
+                    Console.WriteLine(globalBest.Goal);
+
                     Console.WriteLine("Found in " + bestIteration + "th iteration");
                     Console.ReadKey();
                     this.isSet = false;
