@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using OptimisationClassLibrary;
 using System.Collections;
@@ -1205,7 +1204,7 @@ namespace magisterka
             this.saveEnabled = false;
         }
 
-        public void SetParameters()
+        public bool SetParameters()
         {
             string enteredValue;
             double doubleValue;
@@ -1221,6 +1220,13 @@ namespace magisterka
                     Console.WriteLine();
                     string path = Directory.GetCurrentDirectory() + "\\QAPLib";
                     string[] filePaths = Directory.GetFiles(path, "*.dat");
+                    if (filePaths.Length == 0)
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Directory is empty!");
+                        Console.ReadKey();
+                        return false;
+                    }
                     for (int i = 0; i < filePaths.Length; i++)
                     {
                         filePaths[i] = Path.GetFileName(filePaths[i]);
@@ -1236,50 +1242,60 @@ namespace magisterka
                     }
                     else
                     {
-                        intValue--;
-                        path = path + "\\" + filePaths[intValue];
-                        string[] testData = System.IO.File.ReadAllLines(@path);
-
-                        int length = Convert.ToInt32(testData[0]);
-
-                        double[,] distance = new double[length, length];
-
-                        double[,] flow = new double[length, length];
-
-                        List<string> lines = new List<string>();
-
-                        foreach (string s in testData)
+                        try
                         {
-                            string s2 = s.Trim();
-                            if (s2 != string.Empty) lines.Add(s2);
-                        }
+                            intValue--;
+                            path = path + "\\" + filePaths[intValue];
+                            string[] testData = System.IO.File.ReadAllLines(@path);
 
-                        for (int i = 1; i <= length; i++)
-                        {
-                            int index2;
-                            int j = 0;
-                            while (j < length)
+                            int length = Convert.ToInt32(testData[0]);
+
+                            double[,] distance = new double[length, length];
+
+                            double[,] flow = new double[length, length];
+
+                            List<string> lines = new List<string>();
+
+                            foreach (string s in testData)
                             {
-                                index2 = lines[i].IndexOf(" ", 0);
-                                if (index2 < 0) index2 = lines[i].Length;
-                                string number = lines[i].Substring(0, index2);
-                                distance[i - 1, j] = Convert.ToDouble(number);
-                                lines[i] = (lines[i].Substring(index2)).Trim();
-
-                                index2 = lines[lines.Count - i].IndexOf(" ", 0);
-                                if (index2 < 0) index2 = lines[lines.Count - i].Length;
-                                number = lines[lines.Count - i].Substring(0, index2);
-                                flow[length - i, j] = Convert.ToDouble(number);
-                                lines[lines.Count - i] = (lines[lines.Count - i].Substring(index2)).Trim();
-
-                                j++;
+                                string s2 = s.Trim();
+                                if (s2 != string.Empty) lines.Add(s2);
                             }
+
+                            for (int i = 1; i <= length; i++)
+                            {
+                                int index2;
+                                int j = 0;
+                                while (j < length)
+                                {
+                                    index2 = lines[i].IndexOf(" ", 0);
+                                    if (index2 < 0) index2 = lines[i].Length;
+                                    string number = lines[i].Substring(0, index2);
+                                    distance[i - 1, j] = Convert.ToDouble(number);
+                                    lines[i] = (lines[i].Substring(index2)).Trim();
+
+                                    index2 = lines[lines.Count - i].IndexOf(" ", 0);
+                                    if (index2 < 0) index2 = lines[lines.Count - i].Length;
+                                    number = lines[lines.Count - i].Substring(0, index2);
+                                    flow[length - i, j] = Convert.ToDouble(number);
+                                    lines[lines.Count - i] = (lines[lines.Count - i].Substring(index2)).Trim();
+
+                                    j++;
+                                }
+                            }
+                            QapData.Instance.setQapData(distance, flow);
+                            this.problemSize = length;
+                            this.rotOperator = new RotationGateOperator(this.problemSize);
+                            this.instance = filePaths[intValue];
+                            OK = true;
                         }
-                        QapData.Instance.setQapData(distance, flow);
-                        this.problemSize = length;
-                        this.rotOperator = new RotationGateOperator(this.problemSize);
-                        this.instance = filePaths[intValue];
-                        OK = true;
+                        catch (Exception e)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("File could not be opened!");
+                            Console.ReadKey();
+                            return false;
+                        }
                     }
                 }
                 catch (FormatException e)
@@ -1293,6 +1309,7 @@ namespace magisterka
                     Console.Clear();
                     Console.WriteLine("File could not be opened!");
                     Console.ReadKey();
+                    return false;
                 }
             }
             while (!OK);
@@ -1566,7 +1583,7 @@ namespace magisterka
             Console.WriteLine("Parameters are set successfully!");
             Console.ReadKey();
 
-            this.isSet = true;
+            return true;
         }
 
         public IPopulation Population { get; set; }
@@ -1795,8 +1812,11 @@ namespace magisterka
                         if (cki.Key == ConsoleKey.D2) exit = true;
                         else if (cki.Key == ConsoleKey.D1)
                         {
-                            SetParameters();
-                            InitRandomPopulation();
+                            this.isSet = SetParameters();
+                            if (this.isSet)
+                            {
+                                InitRandomPopulation();
+                            }
                         }
                     }
                 }

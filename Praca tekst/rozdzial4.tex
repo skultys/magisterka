@@ -1,12 +1,12 @@
 \chapter{Zastosowanie algorytmu quantum EA dla zagadnienia QAP}
 \label{cha:qap_ea}
-Sposób w jaki działają algorytmy genetyczne, otwarty schemat działania, skłania do tworzenia wielu modyfikacji. Zmianom mogą podlegać operatory krzyżowani, mutacji, sposób kodowania rozwiązania. Można dodawać też nowe operatory o działaniu nieobjętym przez tradycyjne operatory. Z tego powodu, na przestrzeni lat, pojawia się wiele publikacji na temat algorytmów genetycznych i nowych sposób podejścia do tego tematu. W jednej z takich publikacji, autorzy Jinwei Gu, Xingsheng Gu i Manzhan Gu zaproponowali algorytm o nazwie \textit{\"a novel parallel quantum genetic algorithm\" - NPQGA} i przedstawili jego wykorzystanie dla problemu szeregowania zadań. Jednakże algorytm ten nadaje się także dla innych zastosowań, do jakich należy na przykład problem QAP i należy do grupy tak zwanych kwantowych algorytmów ewolucyjnych.
+Sposób w jaki działają algorytmy genetyczne, otwarty schemat działania, skłania do tworzenia wielu modyfikacji. Zmianom mogą podlegać operatory krzyżowani, mutacji, sposób kodowania rozwiązania. Można dodawać też nowe operatory o działaniu nieobjętym przez tradycyjne operatory. Z tego powodu, na przestrzeni lat, pojawia się wiele publikacji na temat algorytmów genetycznych i nowych sposób podejścia do tego tematu. W jednej z takich publikacji, autorzy Jinwei Gu, Xingsheng Gu i Manzhan Gu zaproponowali algorytm o nazwie \textit{,,a novel parallel quantum genetic algorithm'' - NPQGA} i przedstawili jego wykorzystanie dla problemu szeregowania zadań.  Algorytm ten należy do grupy tak zwanych kwantowych algorytmów ewolucyjnych i nadaje się także dla innych zastosowań do jakich należy na przykład problem QAP.
 
 \section{Opis algorytmu}
-Główną cechą kwantowych algorytmów ewolucyjnych jest zastosowanie w nich bitów kwantowych - kubitów. Wykorzystywane są one do reprezentacji rozwiązań algorytmów. Kubit w danym momencie może reprezentować teoretycznie nieskończenie wiele stanów będących superpozycją stanu $0$ i $1$. Obserwacja stanu bitu kwantowego pozwala dopiero na jednoznaczną ocenę jego stanu. Stan kubitu może być reprezentowany przez równanie:
+Główną cechą kwantowych algorytmów ewolucyjnych jest zastosowanie w nich bitów kwantowych - kubitów. Wykorzystywane są one do reprezentacji rozwiązań algorytmów. Kubit w danym momencie może reprezentować teoretycznie nieskończenie wiele stanów będących superpozycją stanu $0$ i $1$. Obserwacja bitu kwantowego pozwala dopiero na jednoznaczną ocenę jego stanu. Stan kubitu może być reprezentowany przez równanie:
 \newline
 \begin{equation}
-|\psi>=\alpha|0>+\beta|1>
+|\psi\rangle=\alpha|0\rangle+\beta|1\rangle
 \end{equation}
 \newline
 gdzie $|\alpha|^2$ jest prawdopodobieństwem, że kubit znajduje się w stanie $0$, oraz $|\beta|^2$ jest prawdopodobieństwem, że kubit jest w stanie $1$. $\alpha$ i $\beta$ są liczbami zespolonymi. Obie liczby są znormalizowane, co znaczy, że:
@@ -16,7 +16,7 @@ gdzie $|\alpha|^2$ jest prawdopodobieństwem, że kubit znajduje się w stanie $
 \end{equation}
 \newline 
 
-Kubit jest więc najmniejszą jednostką informacji w tych algorytmach i jest reprezentowany poprzez parę liczb $[{\alpha \atop \beta}$. Podobnie jak w innych algorytmach ewolucyjnych, algorytm NPQGA bazuje na zmieniających się w czasie, dynamicznych populacjach rozwiązań i korzysta z funkcji oceniającej te rozwiązania wykorzystując własności bitów kwantowych. Oprócz stosowania tradycyjnie rozumianych operatorów selekcji, krzyżowania oraz mutacji, autorzy zaproponowali również operator katastrofy, a także operator związany z bramkami kwantowymi, służący do zmiany stanów kubitów.
+Kubit jest więc najmniejszą jednostką informacji w tych algorytmach i jest reprezentowany poprzez parę liczb $[{\alpha \atop \beta}]$. Podobnie jak w innych algorytmach ewolucyjnych, algorytm NPQGA bazuje na zmieniających się w czasie, dynamicznych populacjach rozwiązań i korzysta z funkcji oceniającej te rozwiązania wykorzystując własności bitów kwantowych. Oprócz stosowania tradycyjnie rozumianych operatorów selekcji, krzyżowania oraz mutacji, autorzy zaproponowali również operator katastrofy, a także operator związany z bramkami kwantowymi, służący do zmiany stanów kubitów.
 
 \subsection{Kodowanie rozwiązań}
 W publikacji, został zawarty został przykład obrazujący działanie algorytmu dla problemu szeregowania zadań. Został również przedstawiony sposób kodowania rozwiązań, który nadaje się również dla problemu przydziału kwadratowego. Ogólnie rozwiązanie problemu jest ciągiem kubitów i można je przedstawić w następujący sposób:
@@ -34,19 +34,19 @@ l=([\log_2^n] + 1)\cdot n
 a \textit{n} oznacza rozmiar problemu, czyli ilu elementowa jest permutacja reprezentująca rozwiązanie problemu. Nawiasy kwadratowe oznaczają cechę liczby.
 Niestety z samego ciągu kubitów nie wynika od razu jaką permutację ten ciąg koduje. By uzyskać rozwiązanie permutacyjne, które jest używane dla problemu QAP, należy wykonać następujące kroki:
 \begin{enumerate}
-\item dla każdego kubitu wylosuj liczbę $\ni$ z przedziału \textit{[0,1]},
-\item jeśli $\ni < |\alpha_i|^2$, to określ stan \textit{i-tego} kubitu na 1, w przeciwnym przypadku na \textit{0},
+\item dla każdego kubitu wylosuj liczbę $\eta$ z przedziału \textit{[0,1]},
+\item jeśli $\eta < |\alpha_i|^2$, to określ stan \textit{i-tego} kubitu na 1, w przeciwnym przypadku na \textit{0},
 \item dla utworzonego ciągu bitów, każde $[\log_2^n] + 1$ bitów zamień na postać dziesiętną,
 \item mając ciąg liczb naturalnych posortuj go rosnąco z zapamiętaniem pozycji liczb w ciągu,
-\item jeśli dwie kolejne liczby są różne, to mniejsza z nich reprezentuje przydzielony do placówki o numerze indeksu, obiekt o mniejszym numerze, a jeśli są równe, to liczba z mniejszym indeksem reprezentuje obiekt o niższym numerze.
-\item ustaw rosnąco według indeksów powyższy ciąg liczb naturalnym zastępując te liczby odpowiadającymi im numerami przydzielonych obiektów.
+\item jeśli dwie kolejne liczby są różne, to mniejsza z nich reprezentuje przydzielony do placówki o numerze indeksu obiekt o mniejszym numerze, a jeśli są równe, to liczba z mniejszym indeksem reprezentuje obiekt o niższym numerze.
+\item ustaw rosnąco według indeksów powyższy ciąg liczb naturalnych zastępując te liczby odpowiadającymi im numerami przydzielonych obiektów według zasad z punktu piątego.
 \end{enumerate}
 W ten sposób uzyskana zostaje permutacja, w której pozycja określa numer lokalizacji, a wartość liczby na tej pozycji, określa przedzielony do niej obiekt.
 
 \subsection{Operatory genetyczne}
 Jako, że algorytm NPQGA jest modyfikacją algorytmu genetycznego, w swym działaniu korzysta z typowych operatorów genetycznych. Autorzy algorytmu w  zaprezentowanym przykładzie zaproponowali selekcję ruletkową, operator krzyżowania CX, mutację polegającą na zamianie w losowym kubicie parametrów $\alpha$ i $\beta$ oraz bramkę kwantową do zmiany stanów kubitów o nazwie \textit{rotation gate}.
 
-Pewnym nietypowym rozwiązaniem związanym z krzyżowaniem jest zmiana prawdopodobieństwa zajścia krzyżowania z czasem. Im więcej iteracji algorytmu minęło, tym mniejsza jest prawdopodobieństwo krzyżowania. Należy ustawić jako parametry algorytmu prawdopodobieństwa maksymalne i minimalne zajścia krzyżowania.
+Pewnym nietypowym rozwiązaniem związanym z krzyżowaniem jest zmiana prawdopodobieństwa zajścia krzyżowania z czasem. Im więcej iteracji algorytmu minęło, tym mniejsze jest prawdopodobieństwo krzyżowania. Należy ustawić jako parametry algorytmu prawdopodobieństwa maksymalne i minimalne zajścia krzyżowania.
 \newline
 \begin{equation}
 P_c^+= \left\{ \begin{array}{ccc} \frac{P_{c max}}{1+\frac{t}{t_max}}, \; P_c^+ > P_c min \\ P_{c max}, \; P_c^+ < P_c min \end{array} \right.
@@ -59,7 +59,7 @@ Operator CX działa w następujący sposób:
 \item Znajdywany jest element w pierwszym rodzicu o wartości sprawdzonej w punkcie 2 i dla tego elementu powtarzamy krok 2.
 \item Wykonywane są powyższe kroki, aż do dotarcia w pierwszym rodzicu do punktu startowego.
 \item Uzyskane w ten sposób zestawy punktów w obu rodzicach przenoszone są do rozwiązań potomków z zachowaniem indeksów elementów permutacji w taki sposób, że elementy z rodzica pierwszego umieszczane są w potomku nr 2 i na odwrót.
-\item Powtarzane jest szukanie punktów poczynając od pierwszego niewybranego punktu w rodzicu pierwszym i znalezione grupy punktów są kopiowane do potomków, lecz tym razem elementy z pierwszego rodzica zostają umieszczone w potomku pierwszym. W następnym wyszukiwaniu ponownie elementy z rodzica pierwszego kopiowane są do potomka drugiego.
+\item Powtarzane jest szukanie punktów poczynając od pierwszego niewybranego punktu w rodzicu pierwszym i znalezione grupy punktów są kopiowane do potomków, lecz tym razem elementy z pierwszego rodzica zostają umieszczone w potomku pierwszym. W następnym wyszukiwaniu ponownie elementy z rodzica pierwszego kopiowane są do potomka drugiego itd.
 \item Wyszukiwanie cykli elementów powtarza się aż wszystkie elementy zostaną wybrane.
 \end{enumerate}
 
@@ -74,9 +74,9 @@ Po dokonaniu powyższej zamiany, należy ponownie sprawdzić stan kubitu, co mo�
 Operator bramki kwantowej jest tym elementem algorytmów kwantowych, który ma największy wpływ na zmianę stanów bitów kwantowych. Istnieje wiele różnych odmian bramek kwantowych, takie jak bramka NOT, CNOT, bramka Hadamarda. W algorytmie NPQGA została zaproponowana bramka rotacyjna - \textit{rotation gate}. Uaktualnienie parametrów \textit{$\alpha$} i \textit{$\beta$} następuje w następujący sposób:
 \newline
 \begin{equation}
-\left[ {\alpha_i^\prime \atop \beta_i^\prime} \right] = \begin{array}{ccc}
+\left[ {\alpha_i^\prime \atop \beta_i^\prime} \right] = \begin{bmatrix}
 \cos(\Theta_i) & -\sin(\Theta_i) \\ \sin(\Theta_i) & \cos(\Theta_i)
-\end{array}
+\end{bmatrix}
 \end{equation}
 \newline
 Kąt $\Theta_i$ określony jest poprzez swoją wartość i kierunek obrotu:
@@ -85,7 +85,7 @@ Kąt $\Theta_i$ określony jest poprzez swoją wartość i kierunek obrotu:
 \Theta_i=\Delta_I \cdot s(\alpha_i, \beta_i),
 \end{equation}
 \newline
-gdzie $\Delta_i$ określa o jaki kąt należy dokonać rotacji, a $s(\alpha_i, \beta_i)$ określa kierunek obrotu. Zarówno wartość kąta i jego kierunek  odczytuje się z tablicy \textit{Look Up} i zależą od najlepszego rozwiązania znalezionego w danej populacji i wartości parametrów $\alpha$ i $\beta$. Sprawdzany jest stan każdego kubitu w rozwiązaniu najlepszym i porównywany ze stanem odpowiadającego mu kubitu w poddawanym działaniu bramki kwantowej rozwiązaniu. Poniżej znajduje się tablica  \textit{look up} z zaproponowanymi wartościami przez autorów algorytmu:
+gdzie $\Delta_i$ określa wartość kąta o jaki należy dokonać rotacji, a $s(\alpha_i, \beta_i)$ określa kierunek obrotu. Zarówno wartość kąta i jego kierunek  odczytuje się z tablicy \textit{Look Up} i zależą od najlepszego rozwiązania znalezionego w danej populacji i wartości parametrów $\alpha$ i $\beta$. Sprawdzany jest stan każdego kubitu w rozwiązaniu najlepszym i porównywany ze stanem odpowiadającego mu kubitu w poddawanym działaniu bramki kwantowej rozwiązaniu. Poniżej znajduje się tablica  \textit{look up} z zaproponowanymi wartościami przez autorów algorytmu:
 \begin{table}[h]
 \label{LUT_TAB}
 \begin{tabular}{l l l l l l l l}
@@ -118,7 +118,7 @@ Ciekawym elementem algorytmu jest sposób w jaki dokonywany jest przegląd rozwi
 \item pomiędzy populacjami w danym uniwersum.
 \end{enumerate}
 
-Wymiana informacji w obrębie jednego uniwersum wzorowana jest na osmozie. Informacje o dobrych rozwiązaniach wędrują w jedną stronę populacji, dla której suma dopasowania rozwiązań jest gorsza. Natomiast wymiana informacji pomiędzy uniwersami bazuje na czasowej zmianie wartości, do której dążą rozwiązania w innych uniwersach. Po tej wymianie, rozwiązania z jednego wszechświata jak cel swego rozwoju obierają optymalny kierunek innego i na odwrót.
+Wymiana informacji w obrębie jednego uniwersum wzorowana jest na osmozie. Informacje o dobrych rozwiązaniach wędrują w jedną stronę,w kierunku populacji, dla której suma dopasowania rozwiązań jest gorsza. Natomiast wymiana informacji pomiędzy uniwersami bazuje na czasowej zmianie wartości, do której dążą rozwiązania w innych uniwersach. Po tej wymianie, rozwiązania z jednego uniwersum jako cel swego rozwoju obierają optymalny kierunek innego i na odwrót.
 Obie powyższe strategie zachodzą z ustalaną częstotliwością. Autorzy podają \textit{10\%-20\%} wszystkich iteracji jako typową wartość tego parametru. 
 
 \section{Pseudokod algorytmu NPQGA}
@@ -143,7 +143,7 @@ Poniżej znajduje się pseudokod algorytmu:
   				Użyj bramki kwantowej do wygenerowania następnego pokolenia\;
   			}
   		}
-  		\For{populacji w każdy uniwersum}
+  		\For{dla każdej populacji w każdy uniwersum}
   		{
   			Dokonaj wymiany informacji między populacjami\;
   		}
@@ -155,4 +155,4 @@ Poniżej znajduje się pseudokod algorytmu:
  	\caption{Algorytm NPQGA}
 \end{algorithm}
 
-Powyższy schemat działania odnosi się do wersji algorytmu wykorzystanej przez jego autorów do rozwiązania problemu szeregowania zadań. Jednym z celów niniejszej pracy było stworzenie aplikacji wykorzystującej jakiś algorytm przybliżony do rozwiązywania problemu przydziału kwadratowego. Powyższy algorytm został zaimplementowany, lecz z pewnymi modyfikacji. Zostały one przedstawione w następnym rozdziale
+Powyższy schemat działania odnosi się do wersji algorytmu wykorzystanej przez jego autorów do rozwiązania problemu szeregowania zadań. Jednym z celów niniejszej pracy było stworzenie aplikacji wykorzystującej wybrany algorytm przybliżony do rozwiązywania problemu przydziału kwadratowego. Powyższy algorytm został zaimplementowany, lecz z pewnymi modyfikacji. Zostały one przedstawione w następnym rozdziale
