@@ -1082,12 +1082,14 @@ namespace magisterka
         private static Random rand = new Random();
         private double EtaMin;
         public double EtaMax { get; set; }
+        private double biggestGoal;
 
         public SelectionOperator(double etaMax = 2.0)
         {
             this.EtaMax = etaMax;
             if (this.EtaMax > 2.0 || this.EtaMax < 1.0) this.EtaMax = 2.0;
             this.EtaMin = 2.0 - this.EtaMax;
+            this.biggestGoal = -100000.0;
         }
 
         public Population RouletteMethod(IPopulation population)
@@ -1095,6 +1097,7 @@ namespace magisterka
             population.SortAscending();
             int size = population.Size;
             double bigNumber = population[population.Size - 1].Goal;
+            if (this.biggestGoal == -100000.0 || this.biggestGoal < bigNumber) this.biggestGoal = bigNumber;
             Solution[] chosenSolutions = new Solution[size];
             this.distribution = new List<double>();
 
@@ -1103,12 +1106,12 @@ namespace magisterka
 
             foreach (Solution sol in population)
             {
-                fitSum += (bigNumber - sol.Goal);
+                fitSum += (this.biggestGoal - sol.Goal);
             }
 
             foreach (Solution sol in population)
             {
-                currentFitSum += (bigNumber - sol.Goal);
+                currentFitSum += (this.biggestGoal - sol.Goal);
                 double probability = currentFitSum / fitSum;
                 distribution.Add(probability);
             }
@@ -1188,7 +1191,8 @@ namespace magisterka
         int iterations;
         int popSize;
         int problemSize;
-        double crossoverProb;
+        double crossoverProbMax;
+        double crossoverProbMin;
         double mutationProb;
         public Solution best = null;
         private bool isSet;
@@ -1217,7 +1221,7 @@ namespace magisterka
             {
                 if (newPopulation)
                 {
-                    do
+                    while (!OK)
                     {
                         try
                         {
@@ -1318,11 +1322,10 @@ namespace magisterka
                             return false;
                         }
                     }
-                    while (!OK);
 
 
                     OK = false;
-                    do
+                    while (!OK)
                     {
                         try
                         {
@@ -1350,11 +1353,10 @@ namespace magisterka
                             Console.ReadKey();
                         }
                     }
-                    while (!OK);
                     OK = false;
                 }
 
-                do
+                while (!OK)
                 {
                     try
                     {
@@ -1381,7 +1383,6 @@ namespace magisterka
                         Console.ReadKey();
                     }
                 }
-                while (!OK);
 
                 OK = false;
                 while (!OK)
@@ -1405,7 +1406,7 @@ namespace magisterka
                             try
                             {
                                 Console.Clear();
-                                Console.WriteLine("Podaj parametr eta: ");
+                                Console.WriteLine("Podaj parametr eta (1,0 - 2,0): ");
                                 enteredValue = Console.ReadLine();
                                 doubleValue = Convert.ToDouble(enteredValue);
                                 if (doubleValue >= 1.0 && doubleValue <= 2.0)
@@ -1432,19 +1433,17 @@ namespace magisterka
                 }
 
                 OK = false;
-                double crossProb = 0.0;
-                do
+                while (!OK)
                 {
                     try
                     {
                         Console.Clear();
-                        Console.WriteLine("Podaj prawdopodobienstwo krzyzowania: ");
+                        Console.WriteLine("Podaj maksymalne prawdopodobienstwo krzyzowania (0,0 - 1,0): ");
                         enteredValue = Console.ReadLine();
                         doubleValue = Convert.ToDouble(enteredValue);
                         if (doubleValue >= 0.0 && doubleValue <= 1.0)
                         {
-                            crossProb = doubleValue;
-                            this.crossoverProb = crossProb;
+                            this.crossoverProbMax = doubleValue;
                             OK = true;
                         }
                         else
@@ -1461,7 +1460,35 @@ namespace magisterka
                         Console.ReadKey();
                     }
                 }
-                while (!OK);
+
+                OK = false;
+                while (!OK)
+                {
+                    try
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Podaj minimalne prawdopodobienstwo krzyzowania (0,0 - " + this.crossoverProbMax + "): ");
+                        enteredValue = Console.ReadLine();
+                        doubleValue = Convert.ToDouble(enteredValue);
+                        if (doubleValue >= 0.0 && doubleValue <= 1.0 && doubleValue <= this.crossoverProbMax)
+                        {
+                            this.crossoverProbMin = doubleValue;
+                            OK = true;
+                        }
+                        else
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Zla wartosc.");
+                            Console.ReadKey();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Zla wartosc.");
+                        Console.ReadKey();
+                    }
+                }
 
                 OK = false;
                 while (!OK)
@@ -1475,19 +1502,19 @@ namespace magisterka
                     if (cki.Key == ConsoleKey.D1)
                     {
                         this.crossOperChosen = CrossoverOperatorChosen.CX;
-                        this.cxOperator = new CxCrossoverOperator(crossProb);
+                        this.cxOperator = new CxCrossoverOperator(this.crossoverProbMax);
                         OK = true;
                     }
                     else if (cki.Key == ConsoleKey.D2)
                     {
                         this.crossOperChosen = CrossoverOperatorChosen.OX;
-                        this.oxOperator = new OxCrossoverOperator(crossProb);
+                        this.oxOperator = new OxCrossoverOperator(this.crossoverProbMax);
                         OK = true;
                     }
                     else if (cki.Key == ConsoleKey.D3)
                     {
                         this.crossOperChosen = CrossoverOperatorChosen.PMX;
-                        this.pmxOperator = new PmxCrossoverOperator(crossProb);
+                        this.pmxOperator = new PmxCrossoverOperator(this.crossoverProbMax);
                         OK = true;
                     }
                     else
@@ -1499,12 +1526,12 @@ namespace magisterka
                 }
 
                 OK = false;
-                do
+                while (!OK)
                 {
                     try
                     {
                         Console.Clear();
-                        Console.WriteLine("Podaj prawdopodobienstwo mutacji: ");
+                        Console.WriteLine("Podaj prawdopodobienstwo mutacji (0.0 - 1.0): ");
                         enteredValue = Console.ReadLine();
                         doubleValue = Convert.ToDouble(enteredValue);
                         if (doubleValue >= 0.0 && doubleValue <= 1.0)
@@ -1527,7 +1554,6 @@ namespace magisterka
                         Console.ReadKey();
                     }
                 }
-                while (!OK);
 
                 cki = new ConsoleKeyInfo('1', ConsoleKey.D3, false, false, false);
                 while (cki.Key != ConsoleKey.D1 && cki.Key != ConsoleKey.D2)
@@ -1639,33 +1665,34 @@ namespace magisterka
                     if (saveEnabled)
                     {
                         System.IO.StreamWriter file = new System.IO.StreamWriter(this.fileName);
-                        file.WriteLine("Wybrana instancja testowa:\t" + this.instance);
-                        file.WriteLine("Rozmiar problemu:\t\t" + this.problemSize);
-                        file.WriteLine("Ilosc iteracji:\t\t" + this.iterations);
+                        file.WriteLine("Wybrana instancja testowa:\t\t\t" + this.instance);
+                        file.WriteLine("Rozmiar problemu:\t\t\t\t" + this.problemSize);
+                        file.WriteLine("Ilosc iteracji:\t\t\t\t\t" + this.iterations);
                         if (this.selMethodChosen == SelectionMethodChosen.Roulette)
                         {
-                            file.WriteLine("Metoda selekcji:\tRuletkowa");
+                            file.WriteLine("Metoda selekcji:\t\t\t\tRuletkowa");
                         }
                         else
                         {
-                            file.WriteLine("Metoda selekcji:\tRankingowa");
-                            file.WriteLine("Parametr eta MAX:\t" + this.selOPerator.EtaMax);
+                            file.WriteLine("Metoda selekcji:\t\t\t\tRankingowa");
+                            file.WriteLine("Parametr eta MAX:\t\t\t\t" + this.selOPerator.EtaMax);
                         }
 
                         if (this.crossOperChosen == CrossoverOperatorChosen.CX)
                         {
-                            file.WriteLine("Operator krzyzowania:\tCX");
+                            file.WriteLine("Operator krzyzowania:\t\t\t\tCX");
                         }
                         else if (this.crossOperChosen == CrossoverOperatorChosen.OX)
                         {
-                            file.WriteLine("Operator krzyzowania:\tOX");
+                            file.WriteLine("Operator krzyzowania:\t\t\t\tOX");
                         }
                         else
                         {
-                            file.WriteLine("Operator krzyzowania:\tPMX");
+                            file.WriteLine("Operator krzyzowania:\t\t\t\tPMX");
                         }
-                        file.WriteLine("Prawdopodobienstwo krzyzowania:\t" + this.crossoverProb);
-                        file.WriteLine("Prawdopodobienstwo mutacji:\t" + this.mutationProb);
+                        file.WriteLine("Maksymalne prawdopodobienstwo krzyzowania:\t" + this.crossoverProbMax);
+                        file.WriteLine("Minimalne prawdopodobienstwo krzyzowania:\t" + this.crossoverProbMax);
+                        file.WriteLine("Prawdopodobienstwo mutacji:\t\t\t" + this.mutationProb);
                         file.WriteLine();
                         file.WriteLine("Nr iteracji | Najlepsza wartosc funkcji celu | Srednia wartosc funkcji celu");
                         file.WriteLine();
@@ -1673,6 +1700,8 @@ namespace magisterka
 
                         for (int i = 1; i < this.iterations; i++)
                         {
+                            double crossProb = this.crossoverProbMax / (1.0 + Convert.ToDouble(i)/Convert.ToDouble(this.iterations));
+                            if (crossProb < this.crossoverProbMin) crossProb = this.crossoverProbMin;
                             previousAvarage = avarage;
                             if (this.selMethodChosen == SelectionMethodChosen.Roulette)
                             {
@@ -1685,14 +1714,17 @@ namespace magisterka
 
                             if (this.crossOperChosen == CrossoverOperatorChosen.CX)
                             {
+                                this.cxOperator.CrossoverProbability = crossProb;
                                 this.Population = new Population(this.cxOperator.Execute(this.Population));
                             }
                             else if (this.crossOperChosen == CrossoverOperatorChosen.OX)
                             {
+                                this.oxOperator.CrossoverProbability = crossProb;
                                 this.Population = new Population(this.oxOperator.Execute(this.Population));
                             }
                             else
                             {
+                                this.pmxOperator.CrossoverProbability = crossProb;
                                 this.Population = new Population(this.pmxOperator.Execute(this.Population));
                             }
 
@@ -1726,7 +1758,7 @@ namespace magisterka
 
                         file.WriteLine();
                         file.WriteLine("Najlepsze znalezione rozwiazanie:");
-                        globalBest.PrintSolution();
+                        globalBest.PrintSolution(file);
 
                         file.WriteLine();
                         file.WriteLine("Wartosc funkcji celu najlepszego rozwiazania:");
@@ -1750,6 +1782,8 @@ namespace magisterka
                     {
                         for (int i = 1; i < this.iterations; i++)
                         {
+                            double crossProb = this.crossoverProbMax / (1.0 + Convert.ToDouble(i) / Convert.ToDouble(this.iterations));
+                            if (crossProb < this.crossoverProbMin) crossProb = this.crossoverProbMin;
                             if (this.selMethodChosen == SelectionMethodChosen.Roulette)
                             {
                                 this.Population = new Population(this.selOPerator.RouletteMethod(this.Population));
@@ -1761,14 +1795,17 @@ namespace magisterka
 
                             if (this.crossOperChosen == CrossoverOperatorChosen.CX)
                             {
+                                this.cxOperator.CrossoverProbability = crossProb;
                                 this.Population = new Population(this.cxOperator.Execute(this.Population));
                             }
                             else if (this.crossOperChosen == CrossoverOperatorChosen.OX)
                             {
+                                this.oxOperator.CrossoverProbability = crossProb;
                                 this.Population = new Population(this.oxOperator.Execute(this.Population));
                             }
                             else
                             {
+                                this.pmxOperator.CrossoverProbability = crossProb;
                                 this.Population = new Population(this.pmxOperator.Execute(this.Population));
                             }
 
