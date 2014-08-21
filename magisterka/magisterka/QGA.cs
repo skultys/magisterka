@@ -1128,6 +1128,11 @@ namespace magisterka
             this.isStopped = false;
             this.isSet = false;
             this.saveEnabled = false;
+            string path = Directory.GetCurrentDirectory() + "\\Results";
+            if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+
+            path = Directory.GetCurrentDirectory() + "\\QAPLib";
+            if (!Directory.Exists(path)) Directory.CreateDirectory(path);
         }
 
         public bool SetParameters(bool newPopulation, bool onlyFileName)
@@ -1586,6 +1591,7 @@ namespace magisterka
                     if (saveEnabled)
                     {
                         System.IO.StreamWriter file = new System.IO.StreamWriter(this.fileName);
+                        file.WriteLine("Plik utworzono\t\t\t\t\t" + DateTime.Now);
                         file.WriteLine("Wybrana instancja testowa:\t\t\t" + this.instance);
                         file.WriteLine("Rozmiar problemu:\t\t\t\t" + this.problemSize);
                         file.WriteLine("Ilosc iteracji:\t\t\t\t\t" + this.iterations);
