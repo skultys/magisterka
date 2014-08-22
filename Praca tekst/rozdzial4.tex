@@ -1,6 +1,6 @@
 \chapter{Zastosowanie algorytmu quantum EA dla zagadnienia QAP}
 \label{cha:qap_ea}
-Sposób w jaki działają algorytmy genetyczne, otwarty schemat działania, skłania do tworzenia wielu modyfikacji. Zmianom mogą podlegać operatory krzyżowani, mutacji, sposób kodowania rozwiązania. Można dodawać też nowe operatory o działaniu nieobjętym przez tradycyjne operatory. Z tego powodu, na przestrzeni lat, pojawia się wiele publikacji na temat algorytmów genetycznych i nowych sposób podejścia do tego tematu. W jednej z takich publikacji, autorzy Jinwei Gu, Xingsheng Gu i Manzhan Gu zaproponowali algorytm o nazwie \textit{,,a novel parallel quantum genetic algorithm'' - NPQGA} i przedstawili jego wykorzystanie dla problemu szeregowania zadań.  Algorytm ten należy do grupy tak zwanych kwantowych algorytmów ewolucyjnych i nadaje się także dla innych zastosowań do jakich należy na przykład problem QAP.
+Sposób w jaki działają algorytmy ewolucyjne, otwarty schemat działania, skłania do tworzenia wielu modyfikacji. Przykładowo, w kontekście algorytmów genetycznych, zmianom mogą podlegać operatory krzyżowani, mutacji, sposób kodowania rozwiązania. Można dodawać też nowe operatory o działaniu nieobjętym przez tradycyjne operatory. Z tego powodu, na przestrzeni lat, pojawia się wiele publikacji na temat algorytmów genetycznych i nowych sposób podejścia do tego tematu. W jednej z takich publikacji, autorzy Jinwei Gu, Xingsheng Gu i Manzhan Gu zaproponowali algorytm o nazwie \textit{,,a novel parallel quantum genetic algorithm'' - NPQGA} i przedstawili jego wykorzystanie dla problemu szeregowania zadań.  Algorytm ten należy do grupy tak zwanych kwantowych algorytmów ewolucyjnych i nadaje się także dla innych zastosowań do jakich należy na przykład problem QAP.
 
 \section{Opis algorytmu}
 Główną cechą kwantowych algorytmów ewolucyjnych jest zastosowanie w nich bitów kwantowych - kubitów. Wykorzystywane są one do reprezentacji rozwiązań algorytmów. Kubit w danym momencie może reprezentować teoretycznie nieskończenie wiele stanów będących superpozycją stanu $0$ i $1$. Obserwacja bitu kwantowego pozwala dopiero na jednoznaczną ocenę jego stanu. Stan kubitu może być reprezentowany przez równanie:
@@ -38,7 +38,7 @@ Niestety z samego ciągu kubitów nie wynika od razu jaką permutację ten ciąg
 \item jeśli $\eta < |\alpha_i|^2$, to określ stan \textit{i-tego} kubitu na 1, w przeciwnym przypadku na \textit{0},
 \item dla utworzonego ciągu bitów, każde $[\log_2^n] + 1$ bitów zamień na postać dziesiętną,
 \item mając ciąg liczb naturalnych posortuj go rosnąco z zapamiętaniem pozycji liczb w ciągu,
-\item jeśli dwie kolejne liczby są różne, to mniejsza z nich reprezentuje przydzielony do placówki o numerze indeksu obiekt o mniejszym numerze, a jeśli są równe, to liczba z mniejszym indeksem reprezentuje obiekt o niższym numerze.
+\item jeśli dwie kolejne liczby są różne, to mniejsza z nich reprezentuje przydzielony do placówki o numerze indeksu obiekt o mniejszym numerze, a jeśli są równe, to liczba z mniejszym indeksem reprezentuje obiekt o niższym numerze. Elementowi o najmniejszej wartości przyporządkuj obiekt o pierwszym numerze.
 \item ustaw rosnąco według indeksów powyższy ciąg liczb naturalnych zastępując te liczby odpowiadającymi im numerami przydzielonych obiektów według zasad z punktu piątego.
 \end{enumerate}
 W ten sposób uzyskana zostaje permutacja, w której pozycja określa numer lokalizacji, a wartość liczby na tej pozycji, określa przedzielony do niej obiekt.
@@ -82,10 +82,10 @@ Operator bramki kwantowej jest tym elementem algorytmów kwantowych, który ma n
 Kąt $\Theta_i$ określony jest poprzez swoją wartość i kierunek obrotu:
 \newline
 \begin{equation}
-\Theta_i=\Delta_I \cdot s(\alpha_i, \beta_i),
+\Theta_i=\Delta \Theta_i \cdot s(\alpha_i, \beta_i),
 \end{equation}
 \newline
-gdzie $\Delta_i$ określa wartość kąta o jaki należy dokonać rotacji, a $s(\alpha_i, \beta_i)$ określa kierunek obrotu. Zarówno wartość kąta i jego kierunek  odczytuje się z tablicy \textit{Look Up} i zależą od najlepszego rozwiązania znalezionego w danej populacji i wartości parametrów $\alpha$ i $\beta$. Sprawdzany jest stan każdego kubitu w rozwiązaniu najlepszym i porównywany ze stanem odpowiadającego mu kubitu w poddawanym działaniu bramki kwantowej rozwiązaniu. Poniżej znajduje się tablica  \textit{look up} z zaproponowanymi wartościami przez autorów algorytmu:
+gdzie $\Delta \Theta_i$ określa wartość kąta o jaki należy dokonać rotacji, a $s(\alpha_i, \beta_i)$ określa kierunek obrotu. Zarówno wartość kąta i jego kierunek  odczytuje się z tablicy \textit{Look Up} i zależą od najlepszego rozwiązania znalezionego w danej populacji i wartości parametrów $\alpha$ i $\beta$. Sprawdzany jest stan każdego kubitu w rozwiązaniu najlepszym i porównywany ze stanem odpowiadającego mu kubitu w poddawanym działaniu bramki kwantowej rozwiązaniu. Poniżej znajduje się tablica  \textit{look up} z zaproponowanymi wartościami przez autorów algorytmu:
 \begin{table}[h]
 \label{LUT_TAB}
 \begin{tabular}{l l l l l l l l}
@@ -99,7 +99,7 @@ $r_i$ & $b_i$ & $f(r)<f(b)$ & $\Delta\Theta_i \cdot \pi$ & $s(\alpha_i,\beta_i)$
 0 & 1 & False & $0.5\pi$ & 0 & 0 & 0 & 0\\
 0 & 1 & True  & 0        & -1 & +1 & +1 lub -1 & 0\\
 1 & 0 & False & $0.5\pi$ & -1 & +1 & +1 lub -1 & 0\\
-1 & 0 & True  & 0        & -1 & +1 & +1 lub -1 & 0\\
+1 & 0 & True  & 0        & +1 & -1 & 0 & +1 lub -1\\
 1 & 1 & False & $0.2\pi$ & +1 & -1 & 0 & +1 lub -1\\
 1 & 1 & True  & 0        & +1 & -1 & 0 & +1 lub -1\\
 \hline

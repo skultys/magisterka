@@ -20,12 +20,17 @@ namespace magisterka
             {
                 return this.observedState;
             }
+            set
+            {
+                this.observedState = value;
+            }
         }
 
         public Qbit()
         {
             this.Alpha = 1.0 / Math.Sqrt(2.0);
             this.Beta = 1.0 / Math.Sqrt(2.0);
+            this.observedState = -1;
         }
 
         public Qbit(Qbit anotherQbit)
@@ -39,6 +44,7 @@ namespace magisterka
         {
             this.Alpha = alpha;
             this.Beta = beta;
+            this.observedState = -1;
         }
 
         public int  EvaluateState()
@@ -93,6 +99,7 @@ namespace magisterka
             double tempAlpha = this.Alpha;
             this.Alpha = Math.Cos(theta) * this.Alpha - Math.Sin(theta) * this.Beta;
             this.Beta = Math.Sin(theta) * tempAlpha + Math.Cos(theta) * this.Beta;
+            this.observedState = -1;
             if (theta != 0.0) return true;
             else return false;
         }
@@ -102,6 +109,7 @@ namespace magisterka
             double temp = this.Alpha;
             this.Alpha = this.Beta;
             this.Beta = temp;
+            this.observedState = -1;
         }
     }
 
@@ -147,7 +155,8 @@ namespace magisterka
             int chromosomeValue = 0;
             for (int i = this.genes.Count - 1; i >= 0; i--)
             {
-                chromosomeValue += this[i].EvaluateState() * (int)Math.Pow(2.0, i);
+                if (this[i].ObservedState == -1) this[i].EvaluateState();
+                chromosomeValue += this[i].ObservedState * (int)Math.Pow(2.0, i);
             }
             this.decodedValue = chromosomeValue;
             return chromosomeValue;
@@ -920,13 +929,15 @@ namespace magisterka
 
         private int bitsInSol;
 
+        private static Random rand = new Random();
+
         public RotationGateOperator(int solSize)
         {
             this.solSize = solSize;
             this.bitsInSol = (int)(Math.Log(solSize, 2.0) + 1);
         }
 
-        public void Execute(IPopulation population, Solution best)
+        public void ExecuteOriginal(IPopulation population, Solution best)
         {
             bool changed = false;
             foreach (Solution sol in population)
@@ -954,6 +965,92 @@ namespace magisterka
                 {
                     int a;
                 }
+            }
+        }
+
+        public void ExecuteModified(IPopulation population, Solution best)
+        {
+            double sign = 0.0;
+            double theta = 0.0;
+            double alphaTimesBeta = 0.0;
+            bool change = false;
+            bool actualizeSolution = false;
+            foreach (Solution sol in population)
+            {
+                for (int i = 0; i < this.solSize; i++)
+                {
+                    for (int j = 0; j < this.bitsInSol; j++)
+                    {
+                        alphaTimesBeta = sol[i][j].Alpha * sol[i][j].Beta;
+                        if (sol[i][j].ObservedState == 0 && best[i][j].ObservedState == 1 && sol.Goal > best.Goal)
+                        {
+                            if (alphaTimesBeta > 0) sign = 1.0;
+                            else if (alphaTimesBeta < 0) sign = -1.0;
+                            else if (sol[i][j].Alpha == 0.0) sign = 0.0;
+                            else if (sol[i][j].Beta == 0.0)
+                            {
+                                double d = rand.NextDouble();
+                                if (d >= 0.5) sign = 1.0;
+                                else sign = -1.0;
+                            }
+                            change = true;
+                            theta = 0.08 * Math.PI * sign;
+                        }
+                        else if (sol[i][j].ObservedState == 0 && best[i][j].ObservedState == 1 && sol.Goal < best.Goal)
+                        {
+                            if (alphaTimesBeta > 0) sign = -1.0;
+                            else if (alphaTimesBeta < 0) sign = 1.0;
+                            else if (sol[i][j].Beta == 0.0) sign = 0.0;
+                            else if (sol[i][j].Alpha == 0.0)
+                            {
+                                double d = rand.NextDouble();
+                                if (d >= 0.5) sign = 1.0;
+                                else sign = -1.0;
+                            }
+                            change = true;
+                            theta = 0.001 * Math.PI * sign;
+                        }
+                        else if (sol[i][j].ObservedState == 1 && best[i][j].ObservedState == 0 && sol.Goal > best.Goal)
+                        {
+                            if (alphaTimesBeta > 0) sign = -1.0;
+                            else if (alphaTimesBeta < 0) sign = 1.0;
+                            else if (sol[i][j].Beta == 0.0) sign = 0.0;
+                            else if (sol[i][j].Alpha == 0.0)
+                            {
+                                double d = rand.NextDouble();
+                                if (d >= 0.5) sign = 1.0;
+                                else sign = -1.0;
+                            }
+                            change = true;
+                            theta = 0.08 * Math.PI * sign;
+                        }
+                        else if (sol[i][j].ObservedState == 1 && best[i][j].ObservedState == 0 && sol.Goal < best.Goal)
+                        {
+                            if (alphaTimesBeta > 0) sign = 1.0;
+                            else if (alphaTimesBeta < 0) sign = -1.0;
+                            else if (sol[i][j].Alpha == 0.0) sign = 0.0;
+                            else if (sol[i][j].Beta == 0.0)
+                            {
+                                double d = rand.NextDouble();
+                                if (d >= 0.5) sign = 1.0;
+                                else sign = -1.0;
+                            }
+                            change = true;
+                            theta = 0.001 * Math.PI * sign;
+                        }
+                        if (change)
+                        {
+                            double tempAlpha = sol[i][j].Alpha;
+                            sol[i][j].Alpha = Math.Cos(theta) * tempAlpha - Math.Sin(theta) * sol[i][j].Beta;
+                            sol[i][j].Beta = Math.Sin(theta) * tempAlpha + Math.Cos(theta) * sol[i][j].Beta;
+                            change = false;
+                            actualizeSolution = true;
+                            sol[i][j].ObservedState = -1;
+                        }
+                    }
+                }
+                if (actualizeSolution == true) sol.toPermutation();
+                actualizeSolution = false;
             }
         }
     }
@@ -1119,6 +1216,7 @@ namespace magisterka
         private bool isSet;
         private bool saveEnabled;
         private bool rotGateEnabled;
+        private bool modifiedRotGate;
         private string fileName;
         private string instance;
         private Population initialPopulationCopy;
@@ -1491,6 +1589,24 @@ namespace magisterka
                     cki = Console.ReadKey();
                     if (cki.Key == ConsoleKey.D1)
                     {
+                        OK = false;
+                        while (!OK)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Ktora wersje bramki rotacyjnej chcesz uzyc?");
+                            Console.WriteLine("1. Oryginalna");
+                            Console.WriteLine("2. Zmodyfikowana");
+                            cki = Console.ReadKey();
+                            if (cki.Key == ConsoleKey.D1) {
+                                this.modifiedRotGate = false;
+                                OK = true;
+                            }
+                            else if (cki.Key == ConsoleKey.D2)
+                            {
+                                this.modifiedRotGate = true;
+                                OK = true;
+                            }
+                        }
                         this.rotGateEnabled = true;
                     }
                     else if (cki.Key == ConsoleKey.D2)
@@ -1657,7 +1773,8 @@ namespace magisterka
 
                             this.mutOperator.Execute(this.Population);
 
-                            if (this.rotGateEnabled) this.rotOperator.Execute(this.Population, this.best);
+                            if (this.rotGateEnabled == true && this.modifiedRotGate == true) this.rotOperator.ExecuteModified(this.Population, this.best);
+                            else if (this.rotGateEnabled && this.modifiedRotGate == false) this.rotOperator.ExecuteOriginal(this.Population, this.best);
 
                             avarage = 0.0;
                             foreach (Solution sol in this.Population) avarage += sol.Goal;
@@ -1697,6 +1814,8 @@ namespace magisterka
                         if (this.rotGateEnabled)
                         {
                             file.WriteLine("bramka rotacyjna: WYKORZYSTANA");
+                            if (this.modifiedRotGate == false) file.WriteLine("wersja bramki: oryginalna");
+                            else file.WriteLine("wersja bramki: zmodyfikowana");
                         }
                         else
                         {
@@ -1738,7 +1857,8 @@ namespace magisterka
 
                             this.mutOperator.Execute(this.Population);
 
-                            if (this.rotGateEnabled) this.rotOperator.Execute(this.Population, this.best);
+                            if (this.rotGateEnabled == true && this.modifiedRotGate == true) this.rotOperator.ExecuteModified(this.Population, this.best);
+                            else if (this.rotGateEnabled && this.modifiedRotGate == false) this.rotOperator.ExecuteOriginal(this.Population, this.best);
 
                             GetBestSolution();
 
