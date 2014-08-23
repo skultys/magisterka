@@ -30,6 +30,7 @@ gdzie \textit{n} jest rozmiarem populacji, a parametry $\eta_{min}$ i $\eta_{max
 \eta_{min}=2-\eta_{max},\; 1 \leq \eta_{max} \leq 2.
 \end{equation}
 \newline
+Ustawienie parametru $\eta_{max}$ na 1 powoduje, że prawdopodobieństwo wyboru danego rozwiązania jest takie samo jak dla pozostałych w populacji, natomiast ustawienie na wartość 2 powoduje, że różnice w prawdopodobieństwach są maksymalne z korzyścią na rzecz rozwiązań lepiej dopasowanych
 
 \subsection{Operatory krzyżowania}
 Oprócz proponowanego przez autorów operatora krzyżowania cyklicznego, zostały również wykorzystane operatory PMX oraz OX.
@@ -48,7 +49,27 @@ Podczas działania operatora OX, czyli operatora z zachowaniem porządku, wybier
 \caption{Krzyżowanie OX}
 \end{figure}
 
-Zgodnie z założeniem autorów algorytmu, prawdopodobieństwo zajścia krzyżowania powinno zmniejszać się wraz z rosnącą liczbą iteracji algorytmu. W zmodyfikowanej wersji algorytmu dostępny jest wybór, czy to prawdopodobieństwo jest zmniejszane czy nie. Jeśli spośród wybranych na drodze działania operatora selekcji rozwiązań do krzyżowania zostanie przeznaczone mniej rozwiązań niż wynosi rozmiar populacji, z wybranych rozwiązań losowo dobierane są brakujące osobniki i wstawiane są do listy przeznaczonych do krzyżowania rozwiązań w losowe miejsca. Następnie każde dwa kolejne na liście rodziców rozwiązania poddawane są wybranemu sposobowi krzyżowania i w ten sposób otrzymywane następne pokolenie rozwiązań, zastępując poprzednie.
+Zgodnie z założeniem autorów algorytmu, prawdopodobieństwo zajścia krzyżowania powinno zmniejszać się wraz z rosnącą liczbą iteracji algorytmu. W zmodyfikowanej wersji algorytmu możliwe jest ustawienie maksymalnego i minimalnego prawdopodobieństwa na tę samą wartość, co skutkuje niezmiennym prawdopodobieństwem krzyżowania podczas działania algorytmu. Jeśli spośród wybranych na drodze działania operatora selekcji rozwiązań do krzyżowania zostanie przeznaczone mniej rozwiązań niż wynosi rozmiar populacji, z wybranych rozwiązań losowo dobierane są brakujące osobniki i wstawiane są do listy przeznaczonych do krzyżowania rozwiązań w losowe miejsca. Następnie każde dwa kolejne na liście rodziców rozwiązania poddawane są wybranemu sposobowi krzyżowania i w ten sposób otrzymywane następne pokolenie rozwiązań, zastępując poprzednie.
 
 \subsection{Operator bramki kwantowej}
-Z uwzględnieniem powyższych zmian stosowanie bramki rotacyjnej w zaproponowanej przez autorów algorytmu wersji przynosi dość nieciekawe rezultaty. W większości przypadków zwracane przez algorytm rezultaty mocno odbiegają od optymalnej wartości. Dlatego istnieje możliwość uruchomienia algorytmu z wyłączonym operatorem bramki kwantowej. Jest również opcją wystartowania algorytmu z włączonym tylko operatorem bramki rotacyjnej, bez operatorów selekcji, mutacji i krzyżowania. Nie jest to już wprawdzie algorytm genetyczny, ale dalej jest to algorytm ewolucyjny ze zmieniającą się na przestrzeni działania algorytmu populacją i przeszukujący przestrzeń rozwiązań.
+Oprócz przedstawionych wartości w tabeli \ref{LUT_TAB} zaproponowana została druga wersja tablicy \textit{Look Up}. Kąt zmieniany jest tylko w przypadku, gdy stany porównywanych kubitów są różne. W przypadku, gdy dopasowanie zapamiętanego rozwiązania najlepszego jest mniejsze niż poddawanego działaniu bramki kwantowej, zmiana kąta powoduje zwiększenie prawdopodobieństwa, że dany kubit pozostanie w swoim aktualnym stanie i wartość, o którą zmieniany jest kąt stosunkowo mała. W sytuacji, gdy dopasowanie rozwiązania najlepszego jest rzeczywiście lepsze, wtedy zmiana kąta następuje w kierunku zwiększenia prawdopodobieństwa, że kubit znajdzie się w stanie takim samym jak porównywany z nim odpowiadający mu kubit z rozwiązania najlepszego. W tym przypadku kąt jest zmieniany o wartość dużo większą niż w poprzedniej sytuacji. Zarówno jednak wartości, o które oba kąty są zmieniane są dużo mniejsze niż wartości, które zostały zaproponowane w tabeli \ref{LUT_TAB}. Wartości, które proponują autorzy algorytmu, powodują, że prawdopodobieństwo, że kubit znajdzie się w określonym stanie jest bardzo duże i może powodować zbyt szybką zbieżność algorytmu. Dodatkowo, algorytm może zbiegać się wtedy do minimum lokalnego.
+
+Poniżej znajduje się alternatywna wersja tablicy \textit{Look Up}:
+\begin{table}[h]
+\label{LUT_TAB_MOD}
+\begin{tabular}{l l l l l l l l}
+\hline
+$r_i$ & $b_i$ & $f(r)<f(b)$ & $\Delta\Theta_i \cdot \pi$ & $s(\alpha_i,\beta_i)$ & & & \\
+\cline{5-8} 
+& & & & $\alpha_i \cdot \beta_i > 0$ & $\alpha_i \cdot \beta_i < 0$ & $\alpha_i = 0$ & $\beta_i = 0$ \\
+\hline
+0 & 1 & False & $0.08\pi$  & +1 & -1 & 0         & +1 lub -1\\
+0 & 1 & True  & $0.001\pi$ & -1 & +1 & +1 lub -1 & 0\\
+1 & 0 & False & $0.08\pi$  & -1 & +1 & +1 lub -1 & 0\\
+1 & 0 & True  & $0.001\pi$ & +1 & -1 & 0         & +1 lub -1\\
+\hline
+\end{tabular}
+\caption{Alternatywna LUT dla bramki kwantowej}
+\end{table} 
+
+W nieuwzględnionych przypadkach nie następuje aktualizacja kąta. Dotyczy to sytuacji, gdy zarówno kubit z rozwiązania najlepszego i aktualnie poddawanego działaniu bramki kwantowej, znajdują się w tym samym stanie.

@@ -1,8 +1,19 @@
 \chapter{Metodyka eksperymentów}
 \label{cha:metodyka}
 
+Wprowadzone modyfikacje do algorytmu NPQGA oraz możliwość zmiany wielu parametrów algorytmu i wyboru operatorów selekcji i krzyżowania powodują, że działanie algorytmu należy dogłębnie zweryfikować. Należy sprawdzić również, czy wprowadzone zmiany pozwalają uzyskiwać dobre rezultaty, zgodne z oczekiwaniami. Możliwość zmian parametrów pozwala badać jaki mają one wpływ na efektywność znajdywania rozwiązania problemu, który algorytm ma rozwiązać. Z wymienionych przyczyn zaimplementowany algorytm został poddany serii wielu eksperymentów pozwalających na dokonanie oceny wpływu poszczególnych ustawień na jakość i szybkość znajdywanych rozwiązań.
+ 
 \section{Instancje testowe}
 \label{sec:instancje}
+Popularność problemu QAP powoduje, że istnieje cała gama instancji testowych problemu z podanym optymalnym rozwiązaniem, lub najlepszym znalezionym rozwiązaniem dotychczas. Wykorzystane w eksperymentach instancje testowe pochodzą ze strony [adres] i są w postaci plików \textit{*.dat} zawierających rozmiar problemu i odpowiednio macierze odległości i przepływu. W przypadku, gdy jest inaczej, instancja opatrzona jest stosownym komentarzem. Podawane do instancji rozwiązania są permutacjami, których elementy reprezentują przydzielone obiekty, a pozycja w reprezentuje lokalizację.
+
+Do testów zostały wybrane trzy konkretne instancje o różnym rozmiarze, wszystkie ze znanym optymalnym rozwiązaniem. Wybór instancji ze znanym rozwiązaniem podyktowany był tym, że znajomość optimum pozwala na ocenę znalezionych przez algorytm rozwiązań i i ich ocenę w stosunku do najlepszego możliwego rozwiązania.
+
+Pierwszą wybraną instancją jest instancja \textit{Had12}. Jej autorami są S.W. Hadley, F. Rendl i H. Wolkowicz. Nazwa instancji pochodzi od nazwiska pierwszego z autorów i rozmiaru (12). Macierz odległości reprezentuje odległości pomiędzy połączonymi obiektami na Mahattanie, natomiast macierz przepływu jest wygenerowana na podstawie równomiernego rozkładu na przedziale \textit{[1,12]}. Znane jest optymalne rozwiązanie i jego wartość wynosi 1652, a jego postać wygląda w następujący sposób:
+\newline
+(3, 10, 11, 2, 12, 5, 6, 7, 8, 1, 4, 9)
+
+Kolejną wybraną instancją jest problem o nazwie \textit{}
 
 \section{Scenariusze testowe}
 \label{sec:scenariusze}

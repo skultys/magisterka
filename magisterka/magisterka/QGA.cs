@@ -20,10 +20,6 @@ namespace magisterka
             {
                 return this.observedState;
             }
-            set
-            {
-                this.observedState = value;
-            }
         }
 
         public Qbit()
@@ -63,45 +59,12 @@ namespace magisterka
             }
         }
 
-        public bool ExecuteRotationGate(Qbit best)
+        public void ExecuteRotationGate(double theta)
         {
-            double theta;
-            double alphaTimesBeta = this.Alpha * this.Beta;
-            double angle = 0.0;
-            int sign = 0;
-            if (this.observedState == 1 && best.observedState == 0)
-            {
-                if (alphaTimesBeta > 0) sign = -1;
-                else if (alphaTimesBeta < 0) sign = 1;
-                else if (this.Alpha == 0)
-                {
-                    double d = rand.NextDouble();
-                    if (d > 0.5) sign = 1;
-                    else sign = -1;
-                }
-                angle = 0.5 * Math.PI;
-            }
-            else if (this.observedState == 1 && best.observedState == 1)
-            {
-                if (alphaTimesBeta > 0) sign = 1;
-                else if (alphaTimesBeta < 0) sign = -1;
-                else if (this.Beta == 0)
-                {
-                    double d = rand.NextDouble();
-                    if (d > 0.5) sign = 1;
-                    else sign = -1;
-                }
-                angle = 0.2 * Math.PI;
-            };
-
-            theta = angle * sign;
-
             double tempAlpha = this.Alpha;
             this.Alpha = Math.Cos(theta) * this.Alpha - Math.Sin(theta) * this.Beta;
             this.Beta = Math.Sin(theta) * tempAlpha + Math.Cos(theta) * this.Beta;
             this.observedState = -1;
-            if (theta != 0.0) return true;
-            else return false;
         }
 
         public void ExecuteNotGate()
@@ -299,7 +262,7 @@ namespace magisterka
             double[,] flowM = QapData.Instance.getFlow();
             double[,] distanceM = QapData.Instance.getDistance();
 
-
+            // HAD12
             /*this[0].PermutationValue = 3;
             this[1].PermutationValue = 10;
             this[2].PermutationValue = 11;
@@ -312,6 +275,9 @@ namespace magisterka
             this[9].PermutationValue = 1;
             this[10].PermutationValue = 4;
             this[11].PermutationValue = 9;*/
+
+            //LIPA50b
+            //for (int i = 0; i < this.Size; i++) this[i].PermutationValue = i + 1;
 
             for (int i = 0; i < this.chromosomes.Count; i++)
             {
@@ -939,31 +905,57 @@ namespace magisterka
 
         public void ExecuteOriginal(IPopulation population, Solution best)
         {
-            bool changed = false;
+            double theta;
+            double alphaTimesBeta;
+            double angle = 0.0;
+            double sign = 0.0;
             foreach (Solution sol in population)
             {
-                if (best.Goal < sol.Goal)
+                if (sol.Goal > best.Goal)
                 {
                     for (int i = 0; i < this.solSize; i++)
                     {
                         for (int j = 0; j < this.bitsInSol; j++)
                         {
-                            changed = changed || sol[i][j].ExecuteRotationGate(best[i][j]);
+                            theta = 0.0;
+                            alphaTimesBeta = sol[i][j].Alpha * sol[i][j].Beta;
+                            angle = 0.0;
+                            sign = 0.0;
+                            //if (sol[i][j].ObservedState == 1 && best[i][j].ObservedState == 0)
+                            if (best[i][j].ObservedState == 0)
+                            {
+                                if (alphaTimesBeta > 0.0) sign = -1.0;
+                                else if (alphaTimesBeta < 0.0) sign = 1.0;
+                                else if (sol[i][j].Alpha == 0.0)
+                                {
+                                    double d = rand.NextDouble();
+                                    if (d > 0.5) sign = 1;
+                                    else sign = -1.0;
+                                }
+                                //angle = 0.5 * Math.PI;
+                            }
+                            //else if (sol[i][j].ObservedState == 1 && best[i][j].ObservedState == 1)
+                            else if (best[i][j].ObservedState == 1)
+                            {
+                                if (alphaTimesBeta > 0.0) sign = 1.0;
+                                else if (alphaTimesBeta < 0.0) sign = -1.0;
+                                else if (sol[i][j].Beta == 0.0)
+                                {
+                                    double d = rand.NextDouble();
+                                    if (d > 0.5) sign = 1.0;
+                                    else sign = -1.0;
+                                }
+                                //angle = 0.2 * Math.PI;
+                            };
+                            if (sol[i][j].ObservedState != sol[i][j].ObservedState) angle = 0.5 * Math.PI;
+                            else if (sol[i][j].ObservedState == best[i][j].ObservedState) angle = 0.2 * Math.PI;
+
+                            theta = angle * sign;
+
+                            if (theta != 0.0) sol[i][j].ExecuteRotationGate(theta);
                         }
                     }
-                    if (changed)
-                    {
-                        sol.toPermutation();
-                        changed = false;
-                    }
-                    else
-                    {
-                        int b;
-                    }
-                }
-                else
-                {
-                    int a;
+                    sol.toPermutation(); 
                 }
             }
         }
@@ -973,14 +965,15 @@ namespace magisterka
             double sign = 0.0;
             double theta = 0.0;
             double alphaTimesBeta = 0.0;
-            bool change = false;
-            bool actualizeSolution = false;
+            double smallAngle = 0.1 * Math.PI;
+            double bigAngle = 0.25 * Math.PI;
             foreach (Solution sol in population)
             {
                 for (int i = 0; i < this.solSize; i++)
                 {
                     for (int j = 0; j < this.bitsInSol; j++)
                     {
+                        theta = 0.0;
                         alphaTimesBeta = sol[i][j].Alpha * sol[i][j].Beta;
                         if (sol[i][j].ObservedState == 0 && best[i][j].ObservedState == 1 && sol.Goal > best.Goal)
                         {
@@ -993,8 +986,7 @@ namespace magisterka
                                 if (d >= 0.5) sign = 1.0;
                                 else sign = -1.0;
                             }
-                            change = true;
-                            theta = 0.08 * Math.PI * sign;
+                            theta = bigAngle * sign;
                         }
                         else if (sol[i][j].ObservedState == 0 && best[i][j].ObservedState == 1 && sol.Goal < best.Goal)
                         {
@@ -1007,8 +999,7 @@ namespace magisterka
                                 if (d >= 0.5) sign = 1.0;
                                 else sign = -1.0;
                             }
-                            change = true;
-                            theta = 0.001 * Math.PI * sign;
+                            theta = smallAngle * sign;
                         }
                         else if (sol[i][j].ObservedState == 1 && best[i][j].ObservedState == 0 && sol.Goal > best.Goal)
                         {
@@ -1021,8 +1012,7 @@ namespace magisterka
                                 if (d >= 0.5) sign = 1.0;
                                 else sign = -1.0;
                             }
-                            change = true;
-                            theta = 0.08 * Math.PI * sign;
+                            theta = bigAngle * sign;
                         }
                         else if (sol[i][j].ObservedState == 1 && best[i][j].ObservedState == 0 && sol.Goal < best.Goal)
                         {
@@ -1035,22 +1025,12 @@ namespace magisterka
                                 if (d >= 0.5) sign = 1.0;
                                 else sign = -1.0;
                             }
-                            change = true;
-                            theta = 0.001 * Math.PI * sign;
+                            theta = smallAngle * sign;
                         }
-                        if (change)
-                        {
-                            double tempAlpha = sol[i][j].Alpha;
-                            sol[i][j].Alpha = Math.Cos(theta) * tempAlpha - Math.Sin(theta) * sol[i][j].Beta;
-                            sol[i][j].Beta = Math.Sin(theta) * tempAlpha + Math.Cos(theta) * sol[i][j].Beta;
-                            change = false;
-                            actualizeSolution = true;
-                            sol[i][j].ObservedState = -1;
-                        }
+                        if (theta != 0.0) sol[i][j].ExecuteRotationGate(theta);
                     }
                 }
-                if (actualizeSolution == true) sol.toPermutation();
-                actualizeSolution = false;
+                sol.toPermutation();
             }
         }
     }
@@ -1100,22 +1080,21 @@ namespace magisterka
         private static Random rand = new Random();
         private double EtaMin;
         public double EtaMax { get; set; }
-        private double biggestGoal;
 
         public SelectionOperator(double etaMax = 2.0)
         {
             this.EtaMax = etaMax;
             if (this.EtaMax > 2.0 || this.EtaMax < 1.0) this.EtaMax = 2.0;
             this.EtaMin = 2.0 - this.EtaMax;
-            this.biggestGoal = -100000.0;
         }
 
         public Population RouletteMethod(IPopulation population)
         {
-            population.SortAscending();
             int size = population.Size;
-            double bigNumber = population[population.Size - 1].Goal;
-            if (this.biggestGoal == -100000.0 || this.biggestGoal < bigNumber) this.biggestGoal = bigNumber;
+            List<double> goals = new List<double>();
+            for (int i = 0; i < size; i++) goals.Add(population[i].Goal);
+            goals.Sort();
+            double biggestGoal = goals[size - 1];
             Solution[] chosenSolutions = new Solution[size];
             this.distribution = new List<double>();
 
@@ -1124,12 +1103,12 @@ namespace magisterka
 
             foreach (Solution sol in population)
             {
-                fitSum += (this.biggestGoal - sol.Goal);
+                fitSum += (biggestGoal - sol.Goal);
             }
 
             foreach (Solution sol in population)
             {
-                currentFitSum += (this.biggestGoal - sol.Goal);
+                currentFitSum += (biggestGoal - sol.Goal);
                 double probability = currentFitSum / fitSum;
                 distribution.Add(probability);
             }
@@ -1703,6 +1682,7 @@ namespace magisterka
                     foreach (Solution sol in this.Population) avarage += sol.Goal;
                     avarage /= this.popSize;
                     int cntr = 0;
+                    double crossProb = this.crossoverProbMax;
 
                     if (saveEnabled)
                     {
@@ -1711,6 +1691,7 @@ namespace magisterka
                         file.WriteLine("Wybrana instancja testowa:\t\t\t" + this.instance);
                         file.WriteLine("Rozmiar problemu:\t\t\t\t" + this.problemSize);
                         file.WriteLine("Ilosc iteracji:\t\t\t\t\t" + this.iterations);
+                        file.WriteLine("Rozmiar populacji:\t\t\t\t" + this.popSize);
                         if (this.selMethodChosen == SelectionMethodChosen.Roulette)
                         {
                             file.WriteLine("Metoda selekcji:\t\t\t\tRuletkowa");
@@ -1734,7 +1715,7 @@ namespace magisterka
                             file.WriteLine("Operator krzyzowania:\t\t\t\tPMX");
                         }
                         file.WriteLine("Maksymalne prawdopodobienstwo krzyzowania:\t" + this.crossoverProbMax);
-                        file.WriteLine("Minimalne prawdopodobienstwo krzyzowania:\t" + this.crossoverProbMax);
+                        file.WriteLine("Minimalne prawdopodobienstwo krzyzowania:\t" + this.crossoverProbMin);
                         file.WriteLine("Prawdopodobienstwo mutacji:\t\t\t" + this.mutationProb);
                         file.WriteLine();
                         file.WriteLine("Nr iteracji | Najlepsza wartosc funkcji celu | Srednia wartosc funkcji celu");
@@ -1743,7 +1724,7 @@ namespace magisterka
 
                         for (int i = 1; i < this.iterations; i++)
                         {
-                            double crossProb = this.crossoverProbMax / (1.0 + Convert.ToDouble(i)/Convert.ToDouble(this.iterations));
+                            crossProb = this.crossoverProbMax / (1.0 + Convert.ToDouble(i)/Convert.ToDouble(this.iterations));
                             if (crossProb < this.crossoverProbMin) crossProb = this.crossoverProbMin;
                             previousAvarage = avarage;
                             if (this.selMethodChosen == SelectionMethodChosen.Roulette)
@@ -1828,7 +1809,7 @@ namespace magisterka
                     {
                         for (int i = 1; i < this.iterations; i++)
                         {
-                            double crossProb = this.crossoverProbMax / (1.0 + Convert.ToDouble(i) / Convert.ToDouble(this.iterations));
+                            crossProb = this.crossoverProbMax / (1.0 + Convert.ToDouble(i) / Convert.ToDouble(this.iterations));
                             if (crossProb < this.crossoverProbMin) crossProb = this.crossoverProbMin;
                             if (this.selMethodChosen == SelectionMethodChosen.Roulette)
                             {
