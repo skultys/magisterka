@@ -26,7 +26,7 @@ namespace magisterka
         {
             this.Alpha = 1.0 / Math.Sqrt(2.0);
             this.Beta = 1.0 / Math.Sqrt(2.0);
-            this.observedState = -1;
+            //this.observedState = -1;
         }
 
         public Qbit(Qbit anotherQbit)
@@ -40,14 +40,14 @@ namespace magisterka
         {
             this.Alpha = alpha;
             this.Beta = beta;
-            this.observedState = -1;
+            //this.observedState = -1;
         }
 
         public int  EvaluateState()
         {
             double treshold = rand.NextDouble();
             double alphaSquare = this.Alpha * this.Alpha;
-            if (alphaSquare > treshold)
+            if (treshold > alphaSquare)
             {
                 this.observedState = 1;
                 return 1;
@@ -64,7 +64,7 @@ namespace magisterka
             double tempAlpha = this.Alpha;
             this.Alpha = Math.Cos(theta) * this.Alpha - Math.Sin(theta) * this.Beta;
             this.Beta = Math.Sin(theta) * tempAlpha + Math.Cos(theta) * this.Beta;
-            this.observedState = -1;
+            //this.observedState = -1;
         }
 
         public void ExecuteNotGate()
@@ -72,7 +72,7 @@ namespace magisterka
             double temp = this.Alpha;
             this.Alpha = this.Beta;
             this.Beta = temp;
-            this.observedState = -1;
+            //this.observedState = -1;
         }
     }
 
@@ -118,8 +118,9 @@ namespace magisterka
             int chromosomeValue = 0;
             for (int i = this.genes.Count - 1; i >= 0; i--)
             {
-                if (this[i].ObservedState == -1) this[i].EvaluateState();
-                chromosomeValue += this[i].ObservedState * (int)Math.Pow(2.0, i);
+                //if (this[i].ObservedState == -1) this[i].EvaluateState();
+                //chromosomeValue += this[i].ObservedState * (int)Math.Pow(2.0, i);
+                chromosomeValue += this[i].EvaluateState() * (int)Math.Pow(2.0, i);
             }
             this.decodedValue = chromosomeValue;
             return chromosomeValue;
@@ -921,8 +922,8 @@ namespace magisterka
                             alphaTimesBeta = sol[i][j].Alpha * sol[i][j].Beta;
                             angle = 0.0;
                             sign = 0.0;
-                            //if (sol[i][j].ObservedState == 1 && best[i][j].ObservedState == 0)
-                            if (best[i][j].ObservedState == 0)
+                            if (sol[i][j].ObservedState == 1 && best[i][j].ObservedState == 0)
+                            //if (best[i][j].ObservedState == 0)
                             {
                                 if (alphaTimesBeta > 0.0) sign = -1.0;
                                 else if (alphaTimesBeta < 0.0) sign = 1.0;
@@ -932,10 +933,10 @@ namespace magisterka
                                     if (d > 0.5) sign = 1;
                                     else sign = -1.0;
                                 }
-                                //angle = 0.5 * Math.PI;
+                                angle = 0.5 * Math.PI;
                             }
-                            //else if (sol[i][j].ObservedState == 1 && best[i][j].ObservedState == 1)
-                            else if (best[i][j].ObservedState == 1)
+                            else if (sol[i][j].ObservedState == 1 && best[i][j].ObservedState == 1)
+                            //else if (best[i][j].ObservedState == 1)
                             {
                                 if (alphaTimesBeta > 0.0) sign = 1.0;
                                 else if (alphaTimesBeta < 0.0) sign = -1.0;
@@ -945,10 +946,10 @@ namespace magisterka
                                     if (d > 0.5) sign = 1.0;
                                     else sign = -1.0;
                                 }
-                                //angle = 0.2 * Math.PI;
+                                angle = 0.2 * Math.PI;
                             };
-                            if (sol[i][j].ObservedState != sol[i][j].ObservedState) angle = 0.5 * Math.PI;
-                            else if (sol[i][j].ObservedState == best[i][j].ObservedState) angle = 0.2 * Math.PI;
+                            //if (sol[i][j].ObservedState != sol[i][j].ObservedState) angle = 0.5 * Math.PI;
+                            //else if (sol[i][j].ObservedState == best[i][j].ObservedState) angle = 0.2 * Math.PI;
 
                             theta = angle * sign;
 
@@ -965,8 +966,8 @@ namespace magisterka
             double sign = 0.0;
             double theta = 0.0;
             double alphaTimesBeta = 0.0;
-            double smallAngle = 0.1 * Math.PI;
-            double bigAngle = 0.25 * Math.PI;
+            double smallAngle = 0.001 * Math.PI;
+            double bigAngle = 0.08 * Math.PI;
             foreach (Solution sol in population)
             {
                 for (int i = 0; i < this.solSize; i++)
@@ -1673,15 +1674,12 @@ namespace magisterka
                     Console.Clear();
                     Console.WriteLine("Algorytm rozpoczal dzialanie. Trwa poszukiwanie rozwiazania...");
                     GetBestSolution();
-                    Solution bestSol = new Solution(this.best);
                     int bestIteration = 0;
                     double bestCurrentGoal = GetBestSolution().Goal;
                     Solution globalBest = new Solution(this.best);
                     double avarage = 0.0;
-                    double previousAvarage = 0.0;
                     foreach (Solution sol in this.Population) avarage += sol.Goal;
                     avarage /= this.popSize;
-                    int cntr = 0;
                     double crossProb = this.crossoverProbMax;
 
                     if (saveEnabled)
@@ -1726,7 +1724,7 @@ namespace magisterka
                         {
                             crossProb = this.crossoverProbMax / (1.0 + Convert.ToDouble(i)/Convert.ToDouble(this.iterations));
                             if (crossProb < this.crossoverProbMin) crossProb = this.crossoverProbMin;
-                            previousAvarage = avarage;
+
                             if (this.selMethodChosen == SelectionMethodChosen.Roulette)
                             {
                                 this.Population = new Population(this.selOPerator.RouletteMethod(this.Population));
@@ -1760,8 +1758,6 @@ namespace magisterka
                             avarage = 0.0;
                             foreach (Solution sol in this.Population) avarage += sol.Goal;
                             avarage /= this.popSize;
-
-                            if (avarage > previousAvarage) cntr++;
 
                             GetBestSolution();
 
