@@ -1718,7 +1718,9 @@ namespace magisterka
                         file.WriteLine();
                         file.WriteLine("Nr iteracji | Najlepsza wartosc funkcji celu | Srednia wartosc funkcji celu");
                         file.WriteLine();
-                        file.WriteLine("0\t" + this.best.Goal + "\t" + avarage);
+                        string resultsPath = this.fileName.Insert(this.fileName.Length - 4, "r");
+                        System.IO.StreamWriter resultsFile = new System.IO.StreamWriter(resultsPath);
+                        resultsFile.WriteLine("0\t" + this.best.Goal + "\t" + avarage);
 
                         for (int i = 1; i < this.iterations; i++)
                         {
@@ -1767,8 +1769,9 @@ namespace magisterka
                                 bestIteration = i;
                                 globalBest = new Solution(this.best);
                             }
-                            file.WriteLine(i + "\t" + this.best.Goal + " \t" + avarage);
+                            resultsFile.WriteLine(i + "\t" + this.best.Goal + " \t" + avarage);
                         }
+                        resultsFile.Close();
                         file.WriteLine();
                         file.WriteLine("Znalezione rozwiazanie:");
                         this.best.PrintSolution(file);
