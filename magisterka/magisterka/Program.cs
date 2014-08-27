@@ -10,9 +10,9 @@ namespace magisterka
     {
         static void Main(string[] args)
         {
-            System.Globalization.CultureInfo cultureInfo = new System.Globalization.CultureInfo("en-US");
             QgAlgorithm alg = new QgAlgorithm();
-            alg.Execute();
+            UserInterface.RunInterface(alg);
+            //alg.Execute();
         }
     }
 }
