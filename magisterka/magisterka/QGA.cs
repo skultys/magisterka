@@ -1219,14 +1219,14 @@ namespace magisterka
         private MutationOperator mutOperator = null;
         private RotationGateOperator rotOperator = null;
         private SelectionOperator selOPerator = null;
-        bool isStopped;
-        int iterations;
-        int popSize;
-        int problemSize;
-        double crossoverProbMax;
-        double crossoverProbMin;
-        double mutationProb;
-        public Solution best = null;
+        private bool isStopped;
+        private int iterations;
+        private int popSize;
+        private int problemSize;
+        private double crossoverProbMax;
+        private double crossoverProbMin;
+        private double mutationProb;
+        private Solution best = null;
         private bool saveEnabled;
         private string fileName;
         private string instance;
@@ -1285,7 +1285,6 @@ namespace magisterka
             if (initNew)
             {
                 InitRandomPopulation();
-                this.initialPopulationCopy = new Population(this.Population);
             }
             else this.Population = new Population(this.initialPopulationCopy);
             return true;
@@ -1344,439 +1343,6 @@ namespace magisterka
             }
         }
 
-        /*public bool SetParameters(bool newPopulation, bool onlyFileName)
-        {
-            string enteredValue;
-            double doubleValue;
-            int intValue;
-            bool OK = false;
-            ConsoleKeyInfo cki;
-
-            if (!onlyFileName)
-            {
-                if (newPopulation)
-                {
-                    while (!OK)
-                    {
-                        try
-                        {
-                            Console.Clear();
-                            Console.WriteLine("Wybierz instancje testowa:");
-                            Console.WriteLine();
-                            string path = Directory.GetCurrentDirectory() + "\\QAPLib";
-                            string[] filePaths = Directory.GetFiles(path, "*.dat");
-                            if (filePaths.Length == 0)
-                            {
-                                Console.Clear();
-                                Console.WriteLine("Folder jest pusty!");
-                                Console.ReadKey();
-                                return false;
-                            }
-                            for (int i = 0; i < filePaths.Length; i++)
-                            {
-                                filePaths[i] = Path.GetFileName(filePaths[i]);
-                                Console.WriteLine((i + 1) + ". " + filePaths[i]);
-                            }
-                            enteredValue = Console.ReadLine();
-                            intValue = Convert.ToInt32(enteredValue);
-                            if (intValue < 1 || intValue > filePaths.Length)
-                            {
-                                Console.Clear();
-                                Console.WriteLine("Zla wartosc!");
-                                Console.ReadKey();
-                            }
-                            else
-                            {
-                                try
-                                {
-                                    intValue--;
-                                    path = path + "\\" + filePaths[intValue];
-                                    string[] testData = System.IO.File.ReadAllLines(@path);
-
-                                    int length = Convert.ToInt32(testData[0]);
-
-                                    double[,] distance = new double[length, length];
-
-                                    double[,] flow = new double[length, length];
-
-                                    List<string> lines = new List<string>();
-
-                                    foreach (string s in testData)
-                                    {
-                                        string s2 = s.Trim();
-                                        if (s2 != string.Empty) lines.Add(s2);
-                                    }
-
-                                    for (int i = 1; i <= length; i++)
-                                    {
-                                        int index2;
-                                        int j = 0;
-                                        while (j < length)
-                                        {
-                                            index2 = lines[i].IndexOf(" ", 0);
-                                            if (index2 < 0) index2 = lines[i].Length;
-                                            string number = lines[i].Substring(0, index2);
-                                            distance[i - 1, j] = Convert.ToDouble(number);
-                                            lines[i] = (lines[i].Substring(index2)).Trim();
-
-                                            index2 = lines[lines.Count - i].IndexOf(" ", 0);
-                                            if (index2 < 0) index2 = lines[lines.Count - i].Length;
-                                            number = lines[lines.Count - i].Substring(0, index2);
-                                            flow[length - i, j] = Convert.ToDouble(number);
-                                            lines[lines.Count - i] = (lines[lines.Count - i].Substring(index2)).Trim();
-
-                                            j++;
-                                        }
-                                    }
-                                    QapData.Instance.setQapData(distance, flow, length);
-                                    this.problemSize = length;
-                                    this.rotOperator = new RotationGateOperator(this.problemSize);
-                                    this.instance = filePaths[intValue];
-                                    OK = true;
-                                }
-                                catch (Exception e)
-                                {
-                                    Console.Clear();
-                                    Console.WriteLine("Nie mozna otworzyc pliku!");
-                                    Console.ReadKey();
-                                    return false;
-                                }
-                            }
-                        }
-                        catch (FormatException e)
-                        {
-                            Console.Clear();
-                            Console.WriteLine("Zla wartosc!");
-                            Console.ReadKey();
-                        }
-                        catch (Exception e)
-                        {
-                            Console.Clear();
-                            Console.WriteLine("Nie mozna otworzyc pliku!");
-                            Console.ReadKey();
-                            return false;
-                        }
-                    }
-
-
-                    OK = false;
-                    while (!OK)
-                    {
-                        try
-                        {
-                            Console.Clear();
-                            Console.WriteLine("Podaj rozmiar populacji: ");
-                            enteredValue = Console.ReadLine();
-                            intValue = Convert.ToInt32(enteredValue);
-                            if (intValue > 0)
-                            {
-                                this.popSize = intValue;
-                                if (popSize % 2 != 0) popSize += 1;
-                                OK = true;
-                            }
-                            else
-                            {
-                                Console.Clear();
-                                Console.WriteLine("Zla wartosc.");
-                                Console.ReadKey();
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Console.Clear();
-                            Console.WriteLine("Zla wartosc.");
-                            Console.ReadKey();
-                        }
-                    }
-                    OK = false;
-                }
-
-                while (!OK)
-                {
-                    try
-                    {
-                        Console.Clear();
-                        Console.WriteLine("Podaj ilosc iteracji: ");
-                        enteredValue = Console.ReadLine();
-                        intValue = Convert.ToInt32(enteredValue);
-                        if (intValue > 0)
-                        {
-                            this.iterations = intValue;
-                            OK = true;
-                        }
-                        else
-                        {
-                            Console.Clear();
-                            Console.WriteLine("Zla wartosc.");
-                            Console.ReadKey();
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Console.Clear();
-                        Console.WriteLine("Zla wartosc.");
-                        Console.ReadKey();
-                    }
-                }
-
-                OK = false;
-                while (!OK)
-                {
-                    Console.Clear();
-                    Console.WriteLine("Wybierz metode selekcji: ");
-                    Console.WriteLine("1. Ruletkowa");
-                    Console.WriteLine("2. Rankingowa");
-                    cki = Console.ReadKey();
-                    if (cki.Key == ConsoleKey.D1)
-                    {
-                        this.selMethodChosen = SelectionMethodChosen.Roulette;
-                        this.selOPerator = new SelectionOperator();
-                        OK = true;
-                    }
-                    else if (cki.Key == ConsoleKey.D2)
-                    {
-                        this.selMethodChosen = SelectionMethodChosen.Ranking;
-                        do
-                        {
-                            try
-                            {
-                                Console.Clear();
-                                Console.WriteLine("Podaj parametr eta (1,0 - 2,0): ");
-                                enteredValue = Console.ReadLine();
-                                doubleValue = Convert.ToDouble(enteredValue);
-                                if (doubleValue >= 1.0 && doubleValue <= 2.0)
-                                {
-                                    this.selOPerator = new SelectionOperator(doubleValue);
-                                    OK = true;
-                                }
-                                else
-                                {
-                                    Console.Clear();
-                                    Console.WriteLine("Zla wartosc.");
-                                    Console.ReadKey();
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                Console.Clear();
-                                Console.WriteLine("Zla wartosc.");
-                                Console.ReadKey();
-                            }
-                        }
-                        while (!OK);
-                    }
-                }
-
-                OK = false;
-                while (!OK)
-                {
-                    try
-                    {
-                        Console.Clear();
-                        Console.WriteLine("Podaj maksymalne prawdopodobienstwo krzyzowania (0,0 - 1,0): ");
-                        enteredValue = Console.ReadLine();
-                        doubleValue = Convert.ToDouble(enteredValue);
-                        if (doubleValue >= 0.0 && doubleValue <= 1.0)
-                        {
-                            this.crossoverProbMax = doubleValue;
-                            OK = true;
-                        }
-                        else
-                        {
-                            Console.Clear();
-                            Console.WriteLine("Zla wartosc.");
-                            Console.ReadKey();
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Console.Clear();
-                        Console.WriteLine("Zla wartosc.");
-                        Console.ReadKey();
-                    }
-                }
-
-                OK = false;
-                while (!OK)
-                {
-                    try
-                    {
-                        Console.Clear();
-                        Console.WriteLine("Podaj minimalne prawdopodobienstwo krzyzowania (0,0 - " + this.crossoverProbMax + "): ");
-                        enteredValue = Console.ReadLine();
-                        doubleValue = Convert.ToDouble(enteredValue);
-                        if (doubleValue >= 0.0 && doubleValue <= 1.0 && doubleValue <= this.crossoverProbMax)
-                        {
-                            this.crossoverProbMin = doubleValue;
-                            OK = true;
-                        }
-                        else
-                        {
-                            Console.Clear();
-                            Console.WriteLine("Zla wartosc.");
-                            Console.ReadKey();
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Console.Clear();
-                        Console.WriteLine("Zla wartosc.");
-                        Console.ReadKey();
-                    }
-                }
-
-                OK = false;
-                while (!OK)
-                {
-                    Console.Clear();
-                    Console.WriteLine("Wybierz operator krzyzowania: ");
-                    Console.WriteLine("1. CX");
-                    Console.WriteLine("2. OX");
-                    Console.WriteLine("3. PMX");
-                    cki = Console.ReadKey();
-                    if (cki.Key == ConsoleKey.D1)
-                    {
-                        this.crossOperChosen = CrossoverOperatorChosen.CX;
-                        this.cxOperator = new CxCrossoverOperator(this.crossoverProbMax);
-                        OK = true;
-                    }
-                    else if (cki.Key == ConsoleKey.D2)
-                    {
-                        this.crossOperChosen = CrossoverOperatorChosen.OX;
-                        this.oxOperator = new OxCrossoverOperator(this.crossoverProbMax);
-                        OK = true;
-                    }
-                    else if (cki.Key == ConsoleKey.D3)
-                    {
-                        this.crossOperChosen = CrossoverOperatorChosen.PMX;
-                        this.pmxOperator = new PmxCrossoverOperator(this.crossoverProbMax);
-                        OK = true;
-                    }
-                    else
-                    {
-                        Console.Clear();
-                        Console.WriteLine("Zla wartosc.");
-                        Console.ReadKey();
-                    }
-                }
-
-                OK = false;
-                while (!OK)
-                {
-                    try
-                    {
-                        Console.Clear();
-                        Console.WriteLine("Podaj prawdopodobienstwo mutacji (0.0 - 1.0): ");
-                        enteredValue = Console.ReadLine();
-                        doubleValue = Convert.ToDouble(enteredValue);
-                        if (doubleValue >= 0.0 && doubleValue <= 1.0)
-                        {
-                            this.mutOperator = new MutationOperator(doubleValue, this.problemSize);
-                            this.mutationProb = doubleValue;
-                            OK = true;
-                        }
-                        else
-                        {
-                            Console.Clear();
-                            Console.WriteLine("Zla wartosc.");
-                            Console.ReadKey();
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Console.Clear();
-                        Console.WriteLine("Zla wartosc.");
-                        Console.ReadKey();
-                    }
-                }
-
-                cki = new ConsoleKeyInfo('1', ConsoleKey.D3, false, false, false);
-                while (cki.Key != ConsoleKey.D1 && cki.Key != ConsoleKey.D2)
-                {
-                    Console.Clear();
-                    Console.WriteLine("Czy chcesz uzyc operator bramki rotacyjnej?");
-                    Console.WriteLine("1. Tak.");
-                    Console.WriteLine("2. Nie.");
-                    cki = Console.ReadKey();
-                    if (cki.Key == ConsoleKey.D1)
-                    {
-                        OK = false;
-                        while (!OK)
-                        {
-                            Console.Clear();
-                            Console.WriteLine("Ktora wersje bramki rotacyjnej chcesz uzyc?");
-                            Console.WriteLine("1. Oryginalna");
-                            Console.WriteLine("2. Zmodyfikowana");
-                            cki = Console.ReadKey();
-                            if (cki.Key == ConsoleKey.D1) {
-                                this.modifiedRotGate = false;
-                                OK = true;
-                            }
-                            else if (cki.Key == ConsoleKey.D2)
-                            {
-                                this.modifiedRotGate = true;
-                                OK = true;
-                            }
-                        }
-                        this.rotGateEnabled = true;
-                    }
-                    else if (cki.Key == ConsoleKey.D2)
-                    {
-                        this.rotGateEnabled = false;
-                    }
-                }
-
-            }
-            OK = false;
-            while (!OK)
-            {
-                Console.Clear();
-                Console.WriteLine("Chcesz zapisac rezultaty dzialania algorytmu w pliku?");
-                Console.WriteLine("1. Tak");
-                Console.WriteLine("2. Nie");
-                cki = Console.ReadKey();
-                if (cki.Key == ConsoleKey.D1)
-                {
-                    bool wrongName = true;
-                    try
-                    {
-                        while (wrongName)
-                        {
-                            this.fileName = "";
-                            Console.Clear();
-                            Console.WriteLine("Podaj nazwe pliku:");
-                            this.fileName = Console.ReadLine();
-                            if (this.fileName != "")
-                            {
-                                this.fileName = Directory.GetCurrentDirectory() + "\\Results\\" + this.fileName + ".txt";
-                                this.saveEnabled = true;
-                                wrongName = false;
-                                OK = true;
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Console.Clear();
-                        Console.WriteLine("Zla nazwa pliku!");
-                        Console.ReadKey();
-                    }
-                }
-                else if (cki.Key == ConsoleKey.D2)
-                {
-                    this.saveEnabled = false;
-                    OK = true;
-                }
-            }
-
-
-            Console.Clear();
-            Console.WriteLine("Parametry pomyslnie ustawione!");
-            Console.ReadKey();
-
-            return true;
-        }
-        */
         public IPopulation Population { get; set; }
 
         public double EvaluateSolution(ISolution solution)
@@ -1787,6 +1353,7 @@ namespace magisterka
         public void InitRandomPopulation()
         {
             this.Population = new Population(this.popSize, this.problemSize);
+            this.initialPopulationCopy = new Population(this.Population);
         }
 
         public void Execute()
@@ -2014,7 +1581,7 @@ namespace magisterka
                 }
             }
             return this.best;
-        }
+        }     
     }
     public enum CrossoverOperatorChosen
     {
@@ -2033,6 +1600,15 @@ namespace magisterka
         None,
         Original,
         Modified
+    }
+
+    public enum TestedParameter
+    {
+        selectionOperator,
+        crossoverProb,
+        crossoverOperator,
+        mutationProb,
+        rotationOperator
     }
 
     public class UserInterface
@@ -2055,6 +1631,7 @@ namespace magisterka
             bool skipAll = false;
             bool newPopulation = true;
             bool initNew = true;
+            bool directoryEmpty = false;
 
             string inputString;
 
@@ -2084,6 +1661,7 @@ namespace magisterka
                                     Console.Clear();
                                     Console.WriteLine("Folder jest pusty!");
                                     Console.ReadKey();
+                                    directoryEmpty = true;
                                     break;
                                 }
                                 for (int i = 0; i < filePaths.Length; i++)
@@ -2103,6 +1681,7 @@ namespace magisterka
                             {
                             }
                         }
+                        if (directoryEmpty) break;
 
                         OK = false;
                         while (!OK && newPopulation)
@@ -2402,6 +1981,563 @@ namespace magisterka
                             exit = true;
                         }
                     }
+                }
+            }
+        }
+
+        public static void RunTest(QgAlgorithm algorithm)
+        {
+            ConsoleKeyInfo cki;
+            int popSize;
+            int iterations;
+            int repeatTest;
+            int instances;
+            TestedParameter testedParameter = TestedParameter.selectionOperator;
+            int valuesCount = 0;
+            string inputString;
+            string[] instancePaths = new string[0];
+            SelectionMethodChosen[] selOperArray = new SelectionMethodChosen[0];
+            double[] etaArray = new double[0];
+            double[] maxCrossProbArray = new double[0];
+            double[] minCrossProbArray = new double[0];
+            CrossoverOperatorChosen[] crossOperArray = new CrossoverOperatorChosen[0];
+            double[] mutProbArray = new double[0];
+            RotationGateVersion[] rotOperArray = new RotationGateVersion[0];
+
+
+            bool OK = false;
+
+            string path = Directory.GetCurrentDirectory() + "\\QAPLib";
+            string[] filePaths = Directory.GetFiles(path, "*.dat");
+            if (filePaths.Length == 0)
+            {
+                Console.Clear();
+                Console.WriteLine("Folder z instancjami testowymi jest pusty!");
+                Console.ReadKey();
+                return;
+            }
+
+            while (!OK)
+            {
+                Console.Clear();
+                Console.WriteLine("Wybierz parametr algorytmu, ktory chcesz testowac:");
+                Console.WriteLine("1. Operator selekcji.");
+                Console.WriteLine("2. Prawdopodobieństwo krzyzowania.");
+                Console.WriteLine("3. Operator krzyzowania");
+                Console.WriteLine("4. Prawdopodbienstwo mutacji");
+                Console.WriteLine("5. Bramke kwantowa");
+                cki = Console.ReadKey();
+                if (cki.Key == ConsoleKey.D1)
+                {
+                    testedParameter = TestedParameter.selectionOperator;
+                    OK = true;
+                }
+                else if (cki.Key == ConsoleKey.D2)
+                {
+                    testedParameter = TestedParameter.crossoverProb;
+                    OK = true;
+                }
+                else if (cki.Key == ConsoleKey.D3)
+                {
+                    testedParameter = TestedParameter.crossoverOperator;
+                    OK = true;
+                }
+                else if (cki.Key == ConsoleKey.D4)
+                {
+                    testedParameter = TestedParameter.mutationProb;
+                    OK = true;
+                }
+                else if (cki.Key == ConsoleKey.D5)
+                {
+                    testedParameter = TestedParameter.rotationOperator;
+                    OK = true;
+                }
+            }
+
+            OK = false;
+            while (!OK)
+            {
+                try
+                {
+                    Console.Clear();
+                    Console.WriteLine("Ile razy powtorzyc test dla wybranego parametru?");
+                    inputString = Console.ReadLine();
+                    repeatTest = Convert.ToInt32(inputString);
+                    if (repeatTest > 0)
+                    {
+                        OK = true;
+                    }
+                }
+                catch (Exception e)
+                {
+                }
+            }
+
+            OK = false;
+            while (!OK)
+            {
+                try
+                {
+                    Console.Clear();
+                    Console.WriteLine("Ile razy wybrany parametr ma sie zmieniac?");
+                    inputString = Console.ReadLine();
+                    valuesCount = Convert.ToInt32(inputString);
+                    if (valuesCount > 0)
+                    {
+                        selOperArray = new SelectionMethodChosen[valuesCount];
+                        etaArray = new double[valuesCount];
+                        maxCrossProbArray = new double[valuesCount];
+                        minCrossProbArray = new double[valuesCount];
+                        crossOperArray = new CrossoverOperatorChosen[valuesCount];
+                        mutProbArray = new double[valuesCount];
+                        rotOperArray = new RotationGateVersion[valuesCount];
+                        OK = true;
+                    }
+                }
+                catch (Exception e)
+                {
+                }
+            }
+
+            for (int i = 0; i < valuesCount; i++)
+            {
+                OK = false;
+                try
+                {
+                    while (!OK)
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Podaj operator selekcji nr " + (i + 1) + ":");
+                        if (testedParameter == TestedParameter.selectionOperator)
+                        {
+                            Console.WriteLine("1. Selekcja ruletkowa.");
+                            Console.WriteLine("2. Selekcja rankingowa");
+                            cki = Console.ReadKey();
+                            if (cki.Key == ConsoleKey.D1)
+                            {
+                                selOperArray[i] = SelectionMethodChosen.Roulette;
+                                etaArray[i] = -1.0;
+                                OK = true;
+                            }
+                            else if (cki.Key == ConsoleKey.D2)
+                            {
+                                while (!OK)
+                                {
+                                    try
+                                    {
+                                        Console.Clear();
+                                        Console.WriteLine("Podaj parametr eta (1,0 - 2,0) nr " + (i + 1) + ": ");
+                                        inputString = Console.ReadLine();
+                                        etaArray[i] = Convert.ToDouble(inputString);
+                                        if (etaArray[i] >= 1.0 && etaArray[i] <= 2.0)
+                                        {
+                                            selOperArray[i] = SelectionMethodChosen.Ranking;
+                                            OK = true;
+                                        }
+                                    }
+                                    catch (Exception e)
+                                    {
+                                    }
+                                }
+                            }
+                        }
+                        else if (testedParameter == TestedParameter.crossoverProb)
+                        {
+                            while (!OK)
+                            {
+                                try
+                                {
+                                    Console.Clear();
+                                    Console.WriteLine("Podaj maksymalne prawdopodobienstwo krzyzowania (0,0 - 1,0) nr " + (i + 1) +":");
+                                    inputString = Console.ReadLine();
+                                    maxCrossProbArray[i] = Convert.ToDouble(inputString);
+                                    if (maxCrossProbArray[i] >= 0.0 && maxCrossProbArray[i] <= 1.0)
+                                    {
+                                        while (!OK)
+                                        {
+                                            try
+                                            {
+                                                Console.Clear();
+                                                Console.WriteLine("Podaj minimalne prawdopodobienstwo krzyzowania (0,0 - " + maxCrossProbArray[i] + ") nr " + (i + 1) + ": ");
+                                                inputString = Console.ReadLine();
+                                                minCrossProbArray[i] = Convert.ToDouble(inputString);
+                                                if (minCrossProbArray[i] >= 0.0 && minCrossProbArray[i] <= maxCrossProbArray[i])
+                                                {
+                                                    OK = true;
+                                                }
+                                            }
+                                            catch (Exception e)
+                                            {
+                                            }
+                                        }
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                }
+                            }
+                        }
+                        else if (testedParameter == TestedParameter.crossoverOperator)
+                        {
+                            while (!OK)
+                            {
+                                Console.Clear();
+                                Console.WriteLine("Podaj operator krzyzowania nr " + (i + 1) + ":");
+                                Console.WriteLine("1. CX.");
+                                Console.WriteLine("2. OX.");
+                                Console.WriteLine("3. PMX.");
+                                cki = Console.ReadKey();
+                                if (cki.Key == ConsoleKey.D1)
+                                {
+                                    crossOperArray[i] = CrossoverOperatorChosen.CX;
+                                    OK = true;
+                                }
+                                else if (cki.Key == ConsoleKey.D2)
+                                {
+                                    crossOperArray[i] = CrossoverOperatorChosen.OX;
+                                    OK = true;
+                                }
+                                else if (cki.Key == ConsoleKey.D3)
+                                {
+                                    crossOperArray[i] = CrossoverOperatorChosen.PMX;
+                                    OK = true;
+                                }
+                            }
+                        }
+                        else if (testedParameter == TestedParameter.mutationProb)
+                        {
+                            while (!OK)
+                            {
+                                try
+                                {
+                                    Console.Clear();
+                                    Console.WriteLine("Podaj prawdopodobienstwo mutacji (0,0 - 1,0) nr " + (i + 1) + ": ");
+                                    inputString = Console.ReadLine();
+                                    mutProbArray[i] = Convert.ToDouble(inputString);
+                                    if (mutProbArray[i] >= 0.0 && mutProbArray[i] <= 1.0)
+                                    {
+                                        OK = true;
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                }
+                            }
+                        }
+                        else if (testedParameter == TestedParameter.rotationOperator)
+                        {
+                            while (!OK)
+                            {
+                                Console.Clear();
+                                Console.WriteLine("Podaj wersje operatora bramki kwantowej nr " + (i + 1) + ":");
+                                if (testedParameter == TestedParameter.selectionOperator)
+                                {
+                                    Console.WriteLine("1. Brak operatora.");
+                                    Console.WriteLine("2. Oryginalna.");
+                                    Console.WriteLine("3. Zmodyfikowana.");
+                                    cki = Console.ReadKey();
+                                    if (cki.Key == ConsoleKey.D1)
+                                    {
+                                        rotOperArray[i] = RotationGateVersion.None;
+                                        OK = true;
+                                    }
+                                    else if (cki.Key == ConsoleKey.D2)
+                                    {
+                                        rotOperArray[i] = RotationGateVersion.Original;
+                                        OK = true;
+                                    }
+                                    else if (cki.Key == ConsoleKey.D3)
+                                    {
+                                        rotOperArray[i] = RotationGateVersion.Modified;
+                                        OK = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                }
+            }
+
+            OK = false;
+            while (!OK)
+            {
+                try
+                {
+                    Console.Clear();
+                    Console.WriteLine("Dla ilu instancji testowych przeprowadzic testy?");
+                    inputString = Console.ReadLine();
+                    instances = Convert.ToInt32(inputString);
+                    if (instances > 0)
+                    {
+                        for (int i = 0; i < instances; i++)
+                        {
+                            OK = false;
+                            while (!OK)
+                            {
+                                try
+                                {
+                                    Console.Clear();
+                                    Console.WriteLine("Wybierz instancje testowa nr " + (i + 1) + ":");
+                                    Console.WriteLine();
+                                    for (int j = 0; j < filePaths.Length; j++)
+                                    {
+                                        filePaths[i] = Path.GetFileName(filePaths[j]);
+                                        Console.WriteLine((j + 1) + ". " + filePaths[j]);
+                                    }
+                                    inputString = Console.ReadLine();
+                                    int fileNumber = Convert.ToInt32(inputString);
+                                    if (fileNumber > 0 && fileNumber <= filePaths.Length)
+                                    {
+                                        instancePaths[i] = filePaths[fileNumber - 1];
+                                        OK = true;
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                }
+            }
+
+            Console.Clear();
+            Console.WriteLine("Ustawianie pozostalych parametrow, niezmiennych w kazdym z testow.");
+            Console.ReadKey();
+
+            OK = false;
+            while (!OK)
+            {
+                try
+                {
+                    Console.Clear();
+                    Console.WriteLine("Podaj rozmiar populacji: ");
+                    inputString = Console.ReadLine();
+                    popSize = Convert.ToInt32(inputString);
+                    if (popSize > 0)
+                    {
+                        if (popSize % 2 != 0) popSize += 1;
+                        OK = true;
+                    }
+                }
+                catch (Exception e)
+                {
+                }
+            }
+            OK = false;
+
+            while (!OK)
+            {
+                try
+                {
+                    Console.Clear();
+                    Console.WriteLine("Podaj ilosc iteracji: ");
+                    inputString = Console.ReadLine();
+                    iterations = Convert.ToInt32(inputString);
+                    if (iterations > 0)
+                    {
+                        OK = true;
+                    }
+                }
+                catch (Exception e)
+                {
+                }
+            }
+            OK = false;
+
+            while (!OK && testedParameter != TestedParameter.selectionOperator)
+            {
+                Console.Clear();
+                Console.WriteLine("Wybierz metode selekcji: ");
+                Console.WriteLine("1. Ruletkowa");
+                Console.WriteLine("2. Rankingowa");
+                cki = Console.ReadKey();
+                if (cki.Key == ConsoleKey.D1)
+                {                
+                    for (int i = 0; i < valuesCount; i++)
+                    {
+                        selOperArray[i] = SelectionMethodChosen.Roulette;
+                        etaArray[i] = -1.0;
+                    }
+                    OK = true;
+                }
+                else if (cki.Key == ConsoleKey.D2)
+                {
+                    try
+                    {
+                        while (!OK)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Podaj parametr eta (1,0 - 2,0): ");
+                            inputString = Console.ReadLine();
+                            etaArray[0] = Convert.ToDouble(inputString);
+                            if (etaArray[0] >= 1.0 && etaArray[0] <= 2.0)
+                            {
+                                for(int i = 1; i < valuesCount; i++)
+                                {
+                                    selOperArray[i] = SelectionMethodChosen.Ranking;
+                                    etaArray[i] = etaArray[0];
+                                }
+                                OK = true;
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                    }
+                }
+            }
+            OK = false;
+
+            while (!OK && testedParameter != TestedParameter.crossoverProb)
+            {
+                try
+                {
+                    Console.Clear();
+                    Console.WriteLine("Podaj maksymalne prawdopodobienstwo krzyzowania (0,0 - 1,0): ");
+                    inputString = Console.ReadLine();
+                    maxCrossProbArray[0] = Convert.ToDouble(inputString);
+                    if (maxCrossProbArray[0] >= 0.0 && maxCrossProbArray[0] <= 1.0)
+                    {
+                        for (int i = 1; i < valuesCount; i++)
+                        {
+                            maxCrossProbArray[i] = maxCrossProbArray[0];
+                        }
+                        while (!OK)
+                        {
+                            try
+                            {
+                                Console.Clear();
+                                Console.WriteLine("Podaj minimalne prawdopodobienstwo krzyzowania (0,0 - " + maxCrossProbArray[0] + "): ");
+                                inputString = Console.ReadLine();
+                                minCrossProbArray[0] = Convert.ToDouble(inputString);
+                                if (minCrossProbArray[0] >= 0.0 && minCrossProbArray[0] <= maxCrossProbArray[0])
+                                {
+                                    for (int i = 1; i < valuesCount; i++)
+                                    {
+                                        minCrossProbArray[i] = minCrossProbArray[0];
+                                    }
+                                    OK = true;
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                            }
+                        }
+                        OK = true;
+                    }
+                }
+                catch (Exception e)
+                {
+                }
+            }
+            OK = false;
+
+            while (!OK && testedParameter != TestedParameter.crossoverOperator)
+            {
+                Console.Clear();
+                Console.WriteLine("Wybierz operator krzyzowania: ");
+                Console.WriteLine("1. CX");
+                Console.WriteLine("2. OX");
+                Console.WriteLine("3. PMX");
+                cki = Console.ReadKey();
+                if (cki.Key == ConsoleKey.D1)
+                {
+                    for (int i = 0; i < valuesCount; i++)
+                    {
+                        crossOperArray[i] = CrossoverOperatorChosen.CX;
+                    }
+                    OK = true;
+                }
+                else if (cki.Key == ConsoleKey.D2)
+                {
+                    for (int i = 0; i < valuesCount; i++)
+                    {
+                        crossOperArray[i] = CrossoverOperatorChosen.OX;
+                    }
+                    OK = true;
+                }
+                else if (cki.Key == ConsoleKey.D3)
+                {
+                    for (int i = 0; i < valuesCount; i++)
+                    {
+                        crossOperArray[i] = CrossoverOperatorChosen.PMX;
+                    }
+                    OK = true;
+                }
+            }
+            OK = false;
+
+            while (!OK && testedParameter != TestedParameter.mutationProb)
+            {
+                try
+                {
+                    Console.Clear();
+                    Console.WriteLine("Podaj prawdopodobienstwo mutacji (0.0 - 1.0): ");
+                    inputString = Console.ReadLine();
+                    mutProbArray[0] = Convert.ToDouble(inputString);
+                    if (mutProbArray[0] >= 0.0 && mutProbArray[0] <= 1.0)
+                    {
+                        for (int i = 1; i < valuesCount; i++)
+                        {
+                            mutProbArray[i] = mutProbArray[0];
+                        }
+                        OK = true;
+                    }
+                }
+                catch (Exception e)
+                {
+                }
+            }
+            OK = false;
+
+            while (!OK && testedParameter != TestedParameter.rotationOperator)
+            {
+                Console.Clear();
+                Console.WriteLine("Czy chcesz uzyc operator bramki rotacyjnej?");
+                Console.WriteLine("1. Tak.");
+                Console.WriteLine("2. Nie.");
+                cki = Console.ReadKey();
+                if (cki.Key == ConsoleKey.D1)
+                {
+                    while (!OK)
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Ktora wersje bramki rotacyjnej chcesz uzyc?");
+                        Console.WriteLine("1. Oryginalna");
+                        Console.WriteLine("2. Zmodyfikowana");
+                        cki = Console.ReadKey();
+                        if (cki.Key == ConsoleKey.D1)
+                        {
+                            for (int i = 0; i < valuesCount; i++)
+                            {
+                                rotOperArray[i] = RotationGateVersion.Original;
+                            }
+                            OK = true;
+                        }
+                        else if (cki.Key == ConsoleKey.D2)
+                        {
+                            for (int i = 0; i < valuesCount; i++)
+                            {
+                                rotOperArray[i] = RotationGateVersion.Modified;
+                            }
+                            OK = true;
+                        }
+                    }
+                }
+                else if (cki.Key == ConsoleKey.D2)
+                {
+                    for (int i = 0; i < valuesCount; i++)
+                    {
+                        rotOperArray[i] = RotationGateVersion.None;
+                    }
+                    OK = true;
                 }
             }
         }
