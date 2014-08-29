@@ -16,7 +16,7 @@ Punktem wyjścia do rozpoczęcia prac był zestaw interfejsów klas przygotowany
 
 Interfejs \textit{IEvolutionAlgorithm} dziedziczy po interfejsie \textit{IOptimisationAlgorithm}. Na bazie tych interfejsów powstała klasa \textit{QgAlgorithm} zawierająca metody pozwalające na ustawienie i uruchomienie algorytmu oraz pozwalająca na zwrócenie rezultatów działania algorytmu.
 
-Interfejsy \textit{ICrossoverOperator} i \textit{IMutationOperator} dziedziczące po interfejsie \textit{IEvolutionaryOperator} posłużyły jako podstawa, dla stworzenia klas realizujących zadania operatorów krzyżowania oraz mutacji. Na podstawie interfejsu \textit{ICrossoverOperator} powstała również klasa reprezentują caoperator bramki kwantowej.
+Interfejsy \textit{ICrossoverOperator} i \textit{IMutationOperator} dziedziczące po interfejsie \textit{IEvolutionaryOperator} posłużyły jako podstawa, dla stworzenia klas realizujących zadania operatorów krzyżowania oraz mutacji. Na podstawie interfejsu \textit{ICrossoverOperator} powstała również klasa reprezentująca operator bramki kwantowej.
 
 Interfejsy \textit{IPopulation} i \textit{ISolution} posłużyły do napisania klas reprezentujących odpowiednio pojedyncze rozwiązanie algorytmu i populację algorytmu.
 
@@ -49,6 +49,8 @@ Po uruchomieniu aplikacji użytkownik ma możliwość ustawienia kilku parametr�
 
 W przypadku operatora selekcji do wyboru są dwie metody: ruletkowa oraz rankingowa. Spośród metod krzyżowania dostępne są trzy opcje: CX, OX i PMX. Wersje bramki kwantowej zostały opisane w rozdziałach 4 i 5.
 
+Aplikacja została napisana w sposób niepozwalający na przyjęcie nieprawidłowych danych.
+
 Po zakończeniu zwracane są rezultaty działania algorytmu i możliwy jest ponowne uruchomienie algorytmu. Użytkownik ma możliwość wyboru spośród trzech opcji:
 \begin{enumerate}
 \item ponowne uruchomienie dla tych samych parametrów i tej samej populacji początkowej,
@@ -62,14 +64,23 @@ Druga opcja pozwala na porównanie wpływu różnych wartości konkretnych param
 
 Opcja trzecia po prostu pozwala na ponowne uruchomienie algorytmu.
 
+\section{Funkcja testująca parametry}
+Oprócz opisanego wyżej interfejsu użytkownika została napisana również funkcja pozwalająca na przetestowanie zmieniającej się wartości wybranego parametru przy ustalonych pozostałych parametrach. Użytkownik podaje, który parametr chce przetestować, określa dla ilu jego wartości chce przeprowadzić testy oraz ile razy powtórzyć dany test, a także podaje, dla których instancji testowych przeprowadzić eksperymenty. Następnie należy określić wartości pozostałych parametrów, które będą stałe dla każdego z testów. Wymagane jest również podanie szablonu nazwy plików, w których zapisane są rezultaty eksperymentów. Cała nazwa pliku tworzona jest w następujący sposób sposób:
+\newline
+[szablon]\_[parametr testowany]\_[wartość parametru]\_[instancja testowa]\_[nr testu].
+
 \section{Rezultaty działania aplikacji}
 Po wykonaniu wszystkich iteracji algorytmu, program zwraca najlepsze znalezione rozwiązanie wraz z wartością funkcji celu oraz informację o tym, w której iteracji zostało zwrócone rozwiązanie. Zwracane jest również najlepsze rozwiązanie wraz jego wartością funkcji celu uzyskane w ostatniej iteracji algorytmu.
 
-Jeśli została wybrana opcja zapisu do pliku, zapisane w nim zostają ustawione parametry algorytmu wraz z datą uruchomienia algorytmu, a także wartość najlepszego rozwiązania w każdej iteracji z informacją o średniej wartości rozwiązań w tej iteracji. W pliku zostaje też zawarta informacja o wartości najlepszego rozwiązania w ogóle wraz z numerem iteracji, w której zostało znalezione, a także jego postać. Podobnie, zawarta jest również informacja o najlepszym rozwiązaniu znalezionym w ostatniej iteracji. Zapis danych w formacie: nr iteracji, wartość średnia, wartość najlepszego rozwiązania w populacji pozwala potem na łatwy import danych do innych aplikacji pozwalających np. na utworzenie wykresów.
+Jeśli została wybrana opcja zapisu do pliku, tworzone są dwa pliki: w pierwszym z nich zapisane są ustawione parametry algorytmu wraz z datą uruchomienia algorytmu. W pliku zostaje też zawarta informacja o wartości najlepszego rozwiązania w ogóle wraz z numerem iteracji, w której zostało znalezione, a także jego postać. Podobnie, zawarta jest również informacja o najlepszym rozwiązaniu znalezionym w ostatniej iteracji. Drugi zawiera 3 kolumny danych zawierających odpowiednio nr iteracji, wartość najlepszego rozwiązania w danej iteracji i średnią wartość wszystkich rozwiązań w populacji. Zapis w tym formacie pozwala na późniejszy łatwy import danych do innych aplikacji pozwalających np. na utworzenie wykresów.
 
 \section{Szczegóły związane z implementacją poszczególnych elementów algorytmu}
-Kilka szczegółów związanych z działaniem algorytmu nie zostało poruszonych w publikacji[ref]. jednakże , by algorytm mógł działać, należało arbitralnie przyjąć pewne założenia. Jednym z takich założeń jest moment aktualizacji stanu kubitów. Zostało przyjęte w aplikacji, że należy ocenić w którym ze stanów 1 lub 0 znajduje się bit kwantowy, gdy aktualnie jego stan jest ustawiony na wartość -1. Wartość ta jest ustawiana w momencie, gdy zmienił się któryś z parametrów $\alpha$ i $\beta$ lub dopiero został utworzony obiekt klasy \textit{QBit}. Zmiana parametrów następuje zaś, gdy został spełniony warunek na zajście mutacji bądź kubit został poddany działaniu operatora bramki kwantowej. Zostało także przyjęte założenie, że efektem działania operatorów krzyżowania jest kombinacja dwóch rozwiązań z zachowaniem stanów kodujących ich kubitów. Wynika to z faktu, że operacje krzyżowania przeprowadzana jest dla wybranych na podstawie operacji selekcji rozwiązań w oparciu o ich funkcję celu, której wartość wynika z postaci tych rozwiązań i ocena stanów kubitów rozwiązań po krzyżowaniu powodowałaby, że otrzymane rozwiązania mogłyby nie mieć nic wspólnego z rozwiązaniami rodzicami.
+Kilka szczegółów związanych z działaniem algorytmu nie zostało poruszonych w publikacji[ref]. jednakże , by algorytm mógł działać, należało arbitralnie przyjąć pewne założenia. Jednym z takich założeń jest moment aktualizacji stanu kubitów. Zostało przyjęte, że należy ocenić w którym ze stanów 1 lub 0 znajduje się bit kwantowy, gdy wiadome jest, że rozwiązanie, w którym dany kubit się znajduje, poddane zostało zmianom wynikającym z działania operatora bramki kwantowej, lub dla tego rozwiązania zostały spełnione warunki na zajście mutacji. Natomiast po dokonaniu operacji krzyżowania, nie jest oceniany stan kubitów rozwiązań potomnych. Taka ocena, szczególnie w początkowych iteracjach algorytmu powodowałaby, że rozwiązania otrzymane na drodze krzyżowania mogłyby tracić informację uzyskaną z rozwiązań rodziców. Ideą krzyżowania jest wymiana informacji.
 
 W przypadku, gdy użytkownik programu postanowi, że algorytm ma znajdywać rozwiązanie bez wykorzystania bramki kwantowej, kwantowa idea algorytmu przejawia się wtedy jedynie podczas tworzenia populacji początkowej oraz operacji mutacji, która dalej polega na zamianie wartości parametrów $\alpha$ i $\beta$.
 
 Rozwiązanie, które jest podstawą do działania bramki kwantowej i nazywane jest najlepszym, jest faktycznie najlepszym rozwiązaniem, ale uzyskanym w poprzedniej iteracji. Operator bramki kwantowej używany jest dopiero na populacji poddanej już działaniu operatorów krzyżowania i mutacji. Z tego powodu istnieje możliwość, że dopasowanie zapamiętanego rozwiązania będzie gorsze niż dopasowanie niektórych rozwiązań poddawanych działaniu bramki kwantowej. Dlatego rozważane są w tablicach \textit{Look Up} przypadki dla których warunek $f(x)>f(best)$ może być prawdą.
+
+Foldery rezultatami działania algorytmu - \textit{Results}i instancjami testowymi - \textit{QAPLib} znajdują się w tym samym folderze co plik wykonywalny aplikacji. Podczas tworzenia obiektu klasy \textit{QgAlgorithm} sprawdzane jest czy te foldery istnieją i jeśli nie, to są tworzone.
+
+Próba przeprowadzenia testów, gdy folder z instancjami testowymi jest pusty, kończy się zakończeniem działania funkcji interfejsu użytkownika i testującej parametry wraz z pojawieniem się na ekranie krótkiej informacji informującej, że folder jest pusty.

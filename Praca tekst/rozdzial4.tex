@@ -1,6 +1,6 @@
 \chapter{Zastosowanie algorytmu quantum EA dla zagadnienia QAP}
 \label{cha:qap_ea}
-Sposób w jaki działają algorytmy ewolucyjne, otwarty schemat działania, skłania do tworzenia wielu modyfikacji. Przykładowo, w kontekście algorytmów genetycznych, zmianom mogą podlegać operatory krzyżowani, mutacji, sposób kodowania rozwiązania. Można dodawać też nowe operatory o działaniu nieobjętym przez tradycyjne operatory. Z tego powodu, na przestrzeni lat, pojawia się wiele publikacji na temat algorytmów genetycznych i nowych sposób podejścia do tego tematu. W jednej z takich publikacji, autorzy Jinwei Gu, Xingsheng Gu i Manzhan Gu zaproponowali algorytm o nazwie \textit{,,a novel parallel quantum genetic algorithm'' - NPQGA} i przedstawili jego wykorzystanie dla problemu szeregowania zadań.  Algorytm ten należy do grupy tak zwanych kwantowych algorytmów ewolucyjnych i nadaje się także dla innych zastosowań do jakich należy na przykład problem QAP.
+Sposób w jaki działają algorytmy ewolucyjne, ich otwarty schemat działania, skłania do tworzenia wielu modyfikacji. Przykładowo, w kontekście algorytmów genetycznych, zmianom mogą podlegać operatory krzyżowani, mutacji, sposób kodowania rozwiązania. Można dodawać też nowe operatory o działaniu nieobjętym przez tradycyjne operatory. Z tego powodu, na przestrzeni lat, pojawia się wiele publikacji na temat algorytmów ewolucyjnych i nowych sposób podejścia do tego tematu. W jednej z takich publikacji, autorzy Jinwei Gu, Xingsheng Gu i Manzhan Gu zaproponowali algorytm o nazwie \textit{,,a novel parallel quantum genetic algorithm'' - NPQGA} i przedstawili jego wykorzystanie dla problemu szeregowania zadań.  Algorytm ten należy do grupy tak zwanych kwantowych algorytmów ewolucyjnych i nadaje się także dla innych zastosowań do jakich należy na przykład problem QAP.
 
 \section{Opis algorytmu}
 Główną cechą kwantowych algorytmów ewolucyjnych jest zastosowanie w nich bitów kwantowych - kubitów. Wykorzystywane są one do reprezentacji rozwiązań algorytmów. Kubit w danym momencie może reprezentować teoretycznie nieskończenie wiele stanów będących superpozycją stanu $0$ i $1$. Obserwacja bitu kwantowego pozwala dopiero na jednoznaczną ocenę jego stanu. Stan kubitu może być reprezentowany przez równanie:
@@ -19,7 +19,7 @@ gdzie $|\alpha|^2$ jest prawdopodobieństwem, że kubit znajduje się w stanie $
 Kubit jest więc najmniejszą jednostką informacji w tych algorytmach i jest reprezentowany poprzez parę liczb $[{\alpha \atop \beta}]$. Podobnie jak w innych algorytmach ewolucyjnych, algorytm NPQGA bazuje na zmieniających się w czasie, dynamicznych populacjach rozwiązań i korzysta z funkcji oceniającej te rozwiązania wykorzystując własności bitów kwantowych. Oprócz stosowania tradycyjnie rozumianych operatorów selekcji, krzyżowania oraz mutacji, autorzy zaproponowali również operator katastrofy, a także operator związany z bramkami kwantowymi, służący do zmiany stanów kubitów.
 
 \subsection{Kodowanie rozwiązań}
-W publikacji, został zawarty został przykład obrazujący działanie algorytmu dla problemu szeregowania zadań. Został również przedstawiony sposób kodowania rozwiązań, który nadaje się również dla problemu przydziału kwadratowego. Ogólnie rozwiązanie problemu jest ciągiem kubitów i można je przedstawić w następujący sposób:
+W publikacji, został zawarty przykład obrazujący działanie algorytmu dla problemu szeregowania zadań. Został również przedstawiony sposób kodowania rozwiązań, który nadaje się także dla problemu przydziału kwadratowego. Ogólnie, rozwiązanie problemu jest ciągiem kubitów i można je przedstawić w następujący sposób:
 \newline
 \begin{equation}
 \left[ \begin{array}{ccc} \alpha_1 \\ \beta_1 \end{array} \right| \left. \begin{array}{ccc} \alpha_2 \\ \beta_2 \end{array}  \right| \left. \begin{array}{ccc} ... \\ ... \end{array}  \right| \left. \begin{array}{ccc} \alpha_l \\ \beta_l \end{array}  \right]
@@ -32,10 +32,10 @@ l=([\log_2^n] + 1)\cdot n
 \end{equation}
 \newline
 a \textit{n} oznacza rozmiar problemu, czyli ilu elementowa jest permutacja reprezentująca rozwiązanie problemu. Nawiasy kwadratowe oznaczają cechę liczby.
-Niestety z samego ciągu kubitów nie wynika od razu jaką permutację ten ciąg koduje. By uzyskać rozwiązanie permutacyjne, które jest używane dla problemu QAP, należy wykonać następujące kroki:
+Niestety, z samego ciągu kubitów nie wynika od razu jaką permutację ten ciąg koduje. By uzyskać rozwiązanie permutacyjne, które jest używane dla problemu QAP, należy wykonać następujące kroki:
 \begin{enumerate}
 \item dla każdego kubitu wylosuj liczbę $\eta$ z przedziału \textit{[0,1]},
-\item jeśli $\eta < |\alpha_i|^2$, to określ stan \textit{i-tego} kubitu na 1, w przeciwnym przypadku na \textit{0},
+\item jeśli $\eta < |\alpha_i|^2$, to określ stan \textit{i-tego} kubitu na 0, w przeciwnym przypadku na 1,
 \item dla utworzonego ciągu bitów, każde $[\log_2^n] + 1$ bitów zamień na postać dziesiętną,
 \item mając ciąg liczb naturalnych posortuj go rosnąco z zapamiętaniem pozycji liczb w ciągu,
 \item jeśli dwie kolejne liczby są różne, to mniejsza z nich reprezentuje przydzielony do placówki o numerze indeksu obiekt o mniejszym numerze, a jeśli są równe, to liczba z mniejszym indeksem reprezentuje obiekt o niższym numerze. Elementowi o najmniejszej wartości przyporządkuj obiekt o pierwszym numerze.
@@ -44,12 +44,12 @@ Niestety z samego ciągu kubitów nie wynika od razu jaką permutację ten ciąg
 W ten sposób uzyskana zostaje permutacja, w której pozycja określa numer lokalizacji, a wartość liczby na tej pozycji, określa przedzielony do niej obiekt.
 
 \subsection{Operatory genetyczne}
-Jako, że algorytm NPQGA jest modyfikacją algorytmu genetycznego, w swym działaniu korzysta z typowych operatorów genetycznych. Autorzy algorytmu w  zaprezentowanym przykładzie zaproponowali selekcję ruletkową, operator krzyżowania CX, mutację polegającą na zamianie w losowym kubicie parametrów $\alpha$ i $\beta$ oraz bramkę kwantową do zmiany stanów kubitów o nazwie \textit{rotation gate}.
+Jako, że algorytm NPQGA jest modyfikacją algorytmu genetycznego, w swym działaniu korzysta z typowych operatorów genetycznych. Autorzy algorytmu w zaprezentowanym przykładzie zaproponowali selekcję ruletkową, operator krzyżowania CX, mutację polegającą na zamianie w losowym kubicie parametrów $\alpha$ i $\beta$ oraz bramkę kwantową do zmiany stanów kubitów o nazwie \textit{rotation gate}.
 
 Pewnym nietypowym rozwiązaniem związanym z krzyżowaniem jest zmiana prawdopodobieństwa zajścia krzyżowania z czasem. Im więcej iteracji algorytmu minęło, tym mniejsze jest prawdopodobieństwo krzyżowania. Należy ustawić jako parametry algorytmu prawdopodobieństwa maksymalne i minimalne zajścia krzyżowania.
 \newline
 \begin{equation}
-P_c^+= \left\{ \begin{array}{ccc} \frac{P_{c max}}{1+\frac{t}{t_max}}, \; P_c^+ > P_c min \\ P_{c max}, \; P_c^+ < P_c min \end{array} \right.
+P_c^+= \left\{ \begin{array}{ccc} \frac{P_{c max}}{1+\frac{t}{t_{max}}}, \; P_c^+ > P_c min \\ P_{c max}, \; P_c^+ < P_c min \end{array} \right.
 \end{equation}
 \newline
 Operator CX działa w następujący sposób:
@@ -126,7 +126,7 @@ Poniżej znajduje się pseudokod algorytmu:
 \newpage
 \begin{algorithm}[H]
 	Wczytaj parametry algorytmu\;
-	Zainicjuj populacje, wyznacz ich permutacyjna postać, policz ich dopasowanie, zapisz najlepszy rezultat
+	Zainicjuj populacje, wyznacz ich permutacyjna postać, policz ich dopasowanie, zapisz najlepszy rezultat\;
  	\While{nie wystąpił warunek stopu}
  	{
  		$t\leftarrow t+1$\;
