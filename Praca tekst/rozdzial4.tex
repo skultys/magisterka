@@ -1,6 +1,6 @@
 \chapter{Zastosowanie algorytmu quantum EA dla zagadnienia QAP}
 \label{cha:qap_ea}
-Sposób w jaki działają algorytmy ewolucyjne, ich otwarty schemat działania, skłania do tworzenia wielu modyfikacji. Przykładowo, w kontekście algorytmów genetycznych, zmianom mogą podlegać operatory krzyżowani, mutacji, sposób kodowania rozwiązania. Można dodawać też nowe operatory o działaniu nieobjętym przez tradycyjne operatory. Z tego powodu, na przestrzeni lat, pojawia się wiele publikacji na temat algorytmów ewolucyjnych i nowych sposób podejścia do tego tematu. W jednej z takich publikacji, autorzy Jinwei Gu, Xingsheng Gu i Manzhan Gu zaproponowali algorytm o nazwie \textit{,,a novel parallel quantum genetic algorithm'' - NPQGA} i przedstawili jego wykorzystanie dla problemu szeregowania zadań.  Algorytm ten należy do grupy tak zwanych kwantowych algorytmów ewolucyjnych i nadaje się także dla innych zastosowań do jakich należy na przykład problem QAP.
+Sposób w jaki działają algorytmy ewolucyjne, ich otwarty schemat działania, skłania do tworzenia wielu modyfikacji. Przykładowo, w kontekście algorytmów genetycznych, zmianom mogą podlegać operatory krzyżowania, mutacji, sposób kodowania rozwiązania. Można dodawać też nowe operatory o działaniu nieobjętym przez tradycyjne operatory. Z tego powodu, na przestrzeni lat, pojawia się wiele publikacji na temat algorytmów ewolucyjnych i nowych sposób podejścia do tego tematu. W jednej z takich publikacji \cite{NPQGA}, autorzy Jinwei Gu, Xingsheng Gu i Manzhan Gu zaproponowali algorytm o nazwie \textit{,,a novel parallel quantum genetic algorithm'' - NPQGA} i przedstawili jego wykorzystanie dla problemu szeregowania zadań.  Algorytm ten należy do grupy tak zwanych kwantowych algorytmów ewolucyjnych i nadaje się także dla innych zastosowań do jakich należy na przykład problem QAP.
 
 \section{Opis algorytmu}
 Główną cechą kwantowych algorytmów ewolucyjnych jest zastosowanie w nich bitów kwantowych - kubitów. Wykorzystywane są one do reprezentacji rozwiązań algorytmów. Kubit w danym momencie może reprezentować teoretycznie nieskończenie wiele stanów będących superpozycją stanu $0$ i $1$. Obserwacja bitu kwantowego pozwala dopiero na jednoznaczną ocenę jego stanu. Stan kubitu może być reprezentowany przez równanie:
@@ -31,7 +31,7 @@ gdzie
 l=([\log_2^n] + 1)\cdot n
 \end{equation}
 \newline
-a \textit{n} oznacza rozmiar problemu, czyli ilu elementowa jest permutacja reprezentująca rozwiązanie problemu. Nawiasy kwadratowe oznaczają cechę liczby.
+a \textit{n} oznacza rozmiar problemu, czyli iluelementowa jest permutacja reprezentująca rozwiązanie problemu. Nawiasy kwadratowe oznaczają cechę liczby.
 Niestety, z samego ciągu kubitów nie wynika od razu jaką permutację ten ciąg koduje. By uzyskać rozwiązanie permutacyjne, które jest używane dla problemu QAP, należy wykonać następujące kroki:
 \begin{enumerate}
 \item dla każdego kubitu wylosuj liczbę $\eta$ z przedziału \textit{[0,1]},
@@ -41,7 +41,7 @@ Niestety, z samego ciągu kubitów nie wynika od razu jaką permutację ten cią
 \item jeśli dwie kolejne liczby są różne, to mniejsza z nich reprezentuje przydzielony do placówki o numerze indeksu obiekt o mniejszym numerze, a jeśli są równe, to liczba z mniejszym indeksem reprezentuje obiekt o niższym numerze. Elementowi o najmniejszej wartości przyporządkuj obiekt o pierwszym numerze.
 \item ustaw rosnąco według indeksów powyższy ciąg liczb naturalnych zastępując te liczby odpowiadającymi im numerami przydzielonych obiektów według zasad z punktu piątego.
 \end{enumerate}
-W ten sposób uzyskana zostaje permutacja, w której pozycja określa numer lokalizacji, a wartość liczby na tej pozycji, określa przedzielony do niej obiekt.
+W ten sposób uzyskana zostaje permutacja, w której pozycja określa numer lokalizacji, a wartość liczby na tej pozycji, określa przydzielony do niej obiekt.
 
 \subsection{Operatory genetyczne}
 Jako, że algorytm NPQGA jest modyfikacją algorytmu genetycznego, w swym działaniu korzysta z typowych operatorów genetycznych. Autorzy algorytmu w zaprezentowanym przykładzie zaproponowali selekcję ruletkową, operator krzyżowania CX, mutację polegającą na zamianie w losowym kubicie parametrów $\alpha$ i $\beta$ oraz bramkę kwantową do zmiany stanów kubitów o nazwie \textit{rotation gate}.
@@ -55,7 +55,7 @@ P_c^+= \left\{ \begin{array}{ccc} \frac{P_{c max}}{1+\frac{t}{t_{max}}}, \; P_c^
 Operator CX działa w następujący sposób:
 \begin{enumerate}
 \item Wybierany jest dowolny element z pierwszego z rodziców, najczęściej jest to pierwszy element permutacji.
-\item Sprawdzana jest wartość elementu w drugim rodzicu na pozycji tej samej co wybrany element w pierwszym rodzicu.
+\item Sprawdzana jest wartość elementu w drugim rodzicu na pozycji tej samej, co wybrany element w pierwszym rodzicu.
 \item Znajdywany jest element w pierwszym rodzicu o wartości sprawdzonej w punkcie 2 i dla tego elementu powtarzamy krok 2.
 \item Wykonywane są powyższe kroki, aż do dotarcia w pierwszym rodzicu do punktu startowego.
 \item Uzyskane w ten sposób zestawy punktów w obu rodzicach przenoszone są do rozwiązań potomków z zachowaniem indeksów elementów permutacji w taki sposób, że elementy z rodzica pierwszego umieszczane są w potomku nr 2 i na odwrót.
@@ -85,7 +85,7 @@ Kąt $\Theta_i$ określony jest poprzez swoją wartość i kierunek obrotu:
 \Theta_i=\Delta \Theta_i \cdot s(\alpha_i, \beta_i),
 \end{equation}
 \newline
-gdzie $\Delta \Theta_i$ określa wartość kąta o jaki należy dokonać rotacji, a $s(\alpha_i, \beta_i)$ określa kierunek obrotu. Zarówno wartość kąta i jego kierunek  odczytuje się z tablicy \textit{Look Up} i zależą od najlepszego rozwiązania znalezionego w danej populacji i wartości parametrów $\alpha$ i $\beta$. Sprawdzany jest stan każdego kubitu w rozwiązaniu najlepszym i porównywany ze stanem odpowiadającego mu kubitu w poddawanym działaniu bramki kwantowej rozwiązaniu. Poniżej znajduje się tablica  \textit{look up} z zaproponowanymi wartościami przez autorów algorytmu:
+gdzie $\Delta \Theta_i$ określa wartość kąta o jaki należy dokonać rotacji, a $s(\alpha_i, \beta_i)$ określa kierunek obrotu. Zarówno wartość kąta jak i jego kierunek  odczytuje się z tablicy \textit{Look Up} i zależą one od najlepszego rozwiązania znalezionego w danej populacji i wartości parametrów $\alpha$ i $\beta$. Sprawdzany jest stan każdego kubitu w rozwiązaniu najlepszym i porównywany ze stanem odpowiadającego mu kubitu w poddawanym działaniu bramki kwantowej rozwiązaniu. Poniżej znajduje się tablica  \textit{look up} z wartościami zaproponowanymi przez autorów algorytmu:
 \begin{table}[h]
 \label{LUT_TAB}
 \begin{tabular}{l l l l l l l l}
@@ -107,7 +107,7 @@ $r_i$ & $b_i$ & $f(r)<f(b)$ & $\Delta\Theta_i \cdot \pi$ & $s(\alpha_i,\beta_i)$
 \caption{LUT dla bramki kwantowej}
 \end{table}
 
-W przypadku gdy stan porównywanych kubitów stany są różne i wybrane rozwiązanie jest gorsze niż najlepsze dotychczas, proponowana jest zmiana o większy kąt, a gdy mają taką samą wartość, to zaleca się kąt o mniejszej wartości. Kierunek obrotu zależy od iloczynu prawdopodobieństw, że kubit znajduje się w stanie \textit{0} i \textit{1}. W przypadku problemu szeregowania zadań z minimalizacją czasu wykonań wszystkich z nich, rozwiązanie lepsze ma mniejszą wartość funkcji celu, dlatego kąt zmieniany jest, gdy w w trzeciej kolumnie tabeli znajduje się wartość \textit{False}. Celem działania operatora \textit{rotation gate} jest  modyfikacja rozwiązań w danym pokoleniu, dzięki której będą one bardziej podobne do rozwiązania najlepszego. Rozwiązanie poddane działaniu tego operatora z większym prawdopodobieństwem będzie podobne do osobnika najlepszego.
+W przypadku gdy stany porównywanych kubitów są różne i wybrane rozwiązanie jest gorsze niż najlepsze dotychczas, proponowana jest zmiana o większy kąt, a gdy mają taką samą wartość, to zaleca się kąt o mniejszej wartości. Kierunek obrotu zależy od iloczynu prawdopodobieństw, że kubit znajduje się w stanie \textit{0} i \textit{1}. W przypadku problemu szeregowania zadań z minimalizacją czasu wykonań wszystkich z nich, rozwiązanie lepsze ma mniejszą wartość funkcji celu, dlatego kąt zmieniany jest, gdy w trzeciej kolumnie tabeli znajduje się wartość \textit{False}. Celem działania operatora \textit{rotation gate} jest  modyfikacja rozwiązań w danym pokoleniu, dzięki której będą one bardziej podobne do rozwiązania najlepszego. Rozwiązanie poddane działaniu tego operatora z większym prawdopodobieństwem będzie podobne do osobnika najlepszego.
 
 Autorzy algorytmu zaproponowali również tak zwany operator katastrofy. Jest on wykorzystywany w sytuacji, w której nie uzyskiwana jest poprawa rozwiązania podczas określonej liczby iteracji algorytmu i skutkuje ponownym zainicjowaniem populacji. Zakłada się, że zdarzenie to spowodowane jest znalezieniem ekstremum lokalnego.
 
@@ -155,4 +155,4 @@ Poniżej znajduje się pseudokod algorytmu:
  	\caption{Algorytm NPQGA}
 \end{algorithm}
 
-Powyższy schemat działania odnosi się do wersji algorytmu wykorzystanej przez jego autorów do rozwiązania problemu szeregowania zadań. Jednym z celów niniejszej pracy było stworzenie aplikacji wykorzystującej wybrany algorytm przybliżony do rozwiązywania problemu przydziału kwadratowego. Powyższy algorytm został zaimplementowany, lecz z pewnymi modyfikacji. Zostały one przedstawione w następnym rozdziale
+Powyższy schemat działania odnosi się do wersji algorytmu wykorzystanej przez jego autorów do rozwiązania problemu szeregowania zadań. Jednym z celów niniejszej pracy było stworzenie aplikacji wykorzystującej wybrany algorytm przybliżony do rozwiązywania problemu przydziału kwadratowego. Powyższy algorytm został zaimplementowany, lecz z pewnymi modyfikacjami. Zostały one przedstawione w następnym rozdziale.
