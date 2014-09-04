@@ -3,7 +3,7 @@
 
 Złożoność otaczającego nas świata powoduje, że bardzo często występujące problemy bardzo trudne do rozwiązania. Dotyczy to praktycznie każdej sfery ludzkiego życia. W wielu sytuacjach natura problemu nie pozwala na zastosowanie metod matematycznych, jednakże nawet w przypadku takich trudności, w których matematyka przychodzi z pomocą, można stwierdzić jedynie, że problem ma rozwiązanie i to nawet najlepsze z możliwych, optymalne, lecz znalezienie go jest praktycznie niewykonalne. Złożoność obliczeniowa algorytmów pozwalających na ich  rozwiązanie jest zbyt duża, by w ogóle warto było je stosować. Pojawia się więc potrzeba zastosowania czegoś, co pozwoli na znalezienie rozwiązania dobrego, przybliżającego chociaż rozwiązanie optymalne. I faktycznie jest grupa algorytmów, które pozwalają na uzyskanie takiego efektu. Są to algorytmy przybliżone, inaczej zwane aproksymacyjnymi.
 
-W przeciwieństwie do problemów optymalizacji, których rozwiązanie można znaleźć w czasie wielomianowym, problemy NP-trudne nie dają ,,punktu wyjścia'' do znalezienia rozwiązania optymalnego. Jednakże, niejednokrotnie istnieje ,,punkt wyjścia'', który pozwala na dojście do rozwiązania znajdującego się w pobliżu rozwiązania najlepszego. W tym sensie algorytmy przybliżone podobne są do algorytmów dokładnych: również polegają na uchwyceniu istoty problemu i następnie na znalezieniu algorytmu, który pozwoli na jej  wykorzystanie \cite{APPROX}.
+W przeciwieństwie do problemów optymalizacji, których rozwiązanie można znaleźć w czasie wielomianowym, problemy NP-trudne nie dają ,,punktu wyjścia'' do znalezienia rozwiązania optymalnego. Jednakże, niejednokrotnie istnieje ,,punkt wyjścia'', który pozwala na dojście do rozwiązania znajdującego się w pobliżu rozwiązania najlepszego. W tym sensie algorytmy przybliżone podobne są do algorytmów dokładnych: również polegają na uchwyceniu istoty problemu i następnie na znalezieniu algorytmu, który pozwoli na jej  wykorzystanie \cite{APROX}.
 
 Ogromna ilość problemów, dla których nie jesteśmy w stanie znaleźć rozwiązania optymalnego, przyczyniła się do powstania wielu algorytmów aproksymacyjnych.  Przy tworzeniu algorytmów dąży się do tego, by działały one jak najszybciej i~algorytmy przybliżone nie są w tym przypadku wyjątkiem. Niestety, w~przypadku rozwiązywania przy ich użyciu wielu problemów czas ich działania jest dosyć długi. Jednakże, należy podkreślić, że~pozwalają one na znalezienie dobrego rozwiązania w sytuacji, gdy użycie algorytmów dokładnych nie pozwoliłoby uzyskać rozwiązania w ogóle.
 
@@ -23,7 +23,7 @@ Algorytm PSO w pewien sposób przypomina wspomniane wcześniej symulacje, lecz z
 Algorytm PSO posiada wiele zalet. Przede wszystkim jest bardzo prosty i wydajny, oraz pozwala na optymalizację wielu różnych funkcji. Aktualizacja prędkości i położenia cząstek wymaga jedynie podstawowych operacji matematycznych. Algorytm nie wymaga również zapamiętywania dużej ilości danych, dlatego jest wydajny z punktu widzenia szybkości działania i nie wymaga wielu zasobów pamięci. Ważną cechą jest również to, że jest on bardzo odporny na wpadnięcie do minimum lokalnego.
 
 \subsection{Model matematyczny algorytmu}
-Model matematyczny algorytmu PSO może być przedstawiony w następujący sposób:
+Model matematyczny algorytmu PSO może być przedstawiony w następujący sposób \cite{PSO2}:
 \newline
 \textit{Mamy dany rój, który składa się z n cząstek. Każda z nich porusza się w d-wymiarowej przestrzeni i każda z nich opisana jest przez dwa wektory:}
 
