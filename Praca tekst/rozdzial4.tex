@@ -31,7 +31,7 @@ gdzie
 l=([\log_2^n] + 1)\cdot n
 \end{equation}
 \newline
-a \textit{n} oznacza rozmiar problemu, czyli iluelementowa jest permutacja reprezentująca rozwiązanie problemu. Nawiasy kwadratowe oznaczają cechę liczby.
+a \textit{n} oznacza rozmiar problemu, czyli z ilu elementów składa się permutacja reprezentująca rozwiązanie problemu. Nawiasy kwadratowe oznaczają cechę liczby.
 Niestety, z samego ciągu kubitów nie wynika od razu jaką permutację ten ciąg koduje. By uzyskać rozwiązanie permutacyjne, które jest używane dla problemu QAP, należy wykonać następujące kroki:
 \begin{enumerate}
 \item dla każdego kubitu wylosuj liczbę $\eta$ z przedziału \textit{[0,1]},
@@ -41,7 +41,7 @@ Niestety, z samego ciągu kubitów nie wynika od razu jaką permutację ten cią
 \item jeśli dwie kolejne liczby są różne, to mniejsza z nich reprezentuje przydzielony do placówki o numerze indeksu obiekt o mniejszym numerze, a jeśli są równe, to liczba z mniejszym indeksem reprezentuje obiekt o niższym numerze. Elementowi o najmniejszej wartości przyporządkuj obiekt o pierwszym numerze.
 \item ustaw rosnąco według indeksów powyższy ciąg liczb naturalnych zastępując te liczby odpowiadającymi im numerami przydzielonych obiektów według zasad z punktu piątego.
 \end{enumerate}
-W ten sposób uzyskana zostaje permutacja, w której pozycja określa numer lokalizacji, a wartość liczby na tej pozycji, określa przydzielony do niej obiekt.
+W ten sposób uzyskana zostaje permutacja, w której pozycja określa numer lokalizacji, a wartość liczby na tej pozycji, określa przydzielony do niej obiekt. Przykładowo, zdekodowany do postaci dziesiętnej ciąg liczb \textit{5, 3, 7, 1, 1, 2, 1} po uszeregowaniu rosnąco wygląda w następujący sposób: \textit{1, 1, 1, 2, 3, 5, 7}, co reprezentuje następujący przydział obiektów: \textit{1, 2, 3, 4, 5, 6, 7}. Po uwzględnieniu, która liczba z ciągu reprezentuje który obiekt, otrzymuje się ostatecznie następującą permutację, reprezentującą rozwiązanie problemu QAP: \textit{6, 5, 7, 1, 2, 4, 3}.
 
 \subsection{Operatory genetyczne}
 Jako, że algorytm NPQGA jest modyfikacją algorytmu genetycznego, w swym działaniu korzysta z typowych operatorów genetycznych. Autorzy algorytmu w zaprezentowanym przykładzie zaproponowali selekcję ruletkową, operator krzyżowania CX, mutację polegającą na zamianie w losowym kubicie parametrów $\alpha$ i $\beta$ oraz bramkę kwantową do zmiany stanów kubitów o nazwie \textit{rotation gate}.
@@ -69,7 +69,7 @@ Mutacja zachodzi wtedy dla danego osobnika, gdy wylosowana dla niego liczba z pr
 \left[ {\alpha_i^\prime \atop \beta_i^\prime} \right] = \left[ {\beta_i \atop \alpha_i} \right]
 \end{equation}
 \newline
-Po dokonaniu powyższej zamiany, należy ponownie sprawdzić stan kubitu, co może się wiązać ze zmianą liczby dziesiętnej, w której skład wchodzi zmodyfikowany kubit, co dalej może pociągać za sobą zmianę całej permutacji.
+Po dokonaniu powyższej zamiany, należy ponownie sprawdzić stan kubitu, co może się wiązać ze zmianą cyfry dziesiętnej, w której skład wchodzi zmodyfikowany kubit, co dalej może pociągać za sobą zmianę całej permutacji.
 
 Operator bramki kwantowej jest tym elementem algorytmów kwantowych, który ma największy wpływ na zmianę stanów bitów kwantowych. Istnieje wiele różnych odmian bramek kwantowych, takie jak bramka NOT, CNOT, bramka Hadamarda. W algorytmie NPQGA została zaproponowana bramka rotacyjna - \textit{rotation gate}. Uaktualnienie parametrów \textit{$\alpha$} i \textit{$\beta$} następuje w następujący sposób:
 \newline
@@ -85,7 +85,7 @@ Kąt $\Theta_i$ określony jest poprzez swoją wartość i kierunek obrotu:
 \Theta_i=\Delta \Theta_i \cdot s(\alpha_i, \beta_i),
 \end{equation}
 \newline
-gdzie $\Delta \Theta_i$ określa wartość kąta o jaki należy dokonać rotacji, a $s(\alpha_i, \beta_i)$ określa kierunek obrotu. Zarówno wartość kąta jak i jego kierunek  odczytuje się z tablicy \textit{Look Up} i zależą one od najlepszego rozwiązania znalezionego w danej populacji i wartości parametrów $\alpha$ i $\beta$. Sprawdzany jest stan każdego kubitu w rozwiązaniu najlepszym i porównywany ze stanem odpowiadającego mu kubitu w poddawanym działaniu bramki kwantowej rozwiązaniu. Poniżej znajduje się tablica  \textit{look up} z wartościami zaproponowanymi przez autorów algorytmu:
+gdzie $\Delta \Theta_i$ określa wartość kąta o jaki należy dokonać rotacji, a $s(\alpha_i, \beta_i)$ określa kierunek obrotu. Zarówno wartość kąta jak i jego kierunek  odczytuje się z tablicy \textit{Look Up} i zależą one od najlepszego rozwiązania znalezionego w danej populacji i wartości parametrów $\alpha$ i $\beta$. Sprawdzany jest stan każdego kubitu w rozwiązaniu najlepszym i porównywany ze stanem odpowiadającego mu kubitu w poddawanym działaniu bramki kwantowej rozwiązaniu. Poniżej znajduje się tablica  \textit{Look Up} z wartościami zaproponowanymi przez autorów algorytmu:
 \begin{table}[h]
 \label{LUT_TAB}
 \begin{tabular}{l l l l l l l l}

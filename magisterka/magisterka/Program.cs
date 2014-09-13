@@ -11,7 +11,6 @@ namespace magisterka
         static void Main(string[] args)
         {
             QgAlgorithm alg = new QgAlgorithm();
-            //UserInterface.RunInterface(alg);
             UserInterface.RunTest(alg);
         }
     }

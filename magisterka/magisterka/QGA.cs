@@ -540,16 +540,19 @@ namespace magisterka
         public Solution[] Execute(Solution parentOne, Solution parentTwo)
         {
             int size = parentOne.Size;
-
-            int leftBound = rand.Next(size - 1);
-            int rightBound = rand.Next(size - 1);
             Solution[] childrenArray = new Solution[2];
-            if (leftBound > rightBound)
+
+            int leftBound = rand.Next(Convert.ToInt32(0.6 * size));
+            int rightBound = leftBound + Convert.ToInt32(0.4 * size);
+            if (rightBound < size - 1)
             {
-                int temp = rightBound;
-                rightBound = leftBound;
-                leftBound = temp;
+                rightBound = rand.Next(rightBound, size - 1);
             }
+            else if (rightBound >= size)
+            {
+                rightBound = size - 1;
+            }
+
 
             Chromosome[] childOne = new Chromosome[size];
             Chromosome[] childTwo = new Chromosome[size];
@@ -607,9 +610,34 @@ namespace magisterka
                     currentIndex = (currentIndex + 1) % size;
                 }
             }
+            /*Console.Clear();
+            Console.WriteLine(leftBound);
+            Console.WriteLine(rightBound);
+            Console.WriteLine();
+            for (int i = 0; i < size; i++)
+            {
+                Console.Write(parentOne[i].PermutationValue + " ");
+            }
+            Console.WriteLine();
+            for (int i = 0; i < size; i++)
+            {
+                Console.Write(parentTwo[i].PermutationValue + " ");
+            }*/
 
             childrenArray[0] = new Solution(childOne);
             childrenArray[1] = new Solution(childTwo);
+
+            /*Console.WriteLine();
+            for (int i = 0; i < size; i++)
+            {
+                Console.Write(childrenArray[0][i].PermutationValue + " ");
+            }
+            Console.WriteLine();
+            for (int i = 0; i < size; i++)
+            {
+                Console.Write(childrenArray[1][i].PermutationValue + " ");
+            }
+            Console.ReadKey();*/
             return childrenArray;
         }
     }
@@ -675,8 +703,16 @@ namespace magisterka
         {
             int size = parentOne.Size;
 
-            int leftBound = rand.Next(size - 1);
-            int rightBound = rand.Next(size - 1);
+            int leftBound = rand.Next(Convert.ToInt32(0.6 * size));
+            int rightBound = leftBound + Convert.ToInt32(0.4 * size);
+            if (rightBound < size - 1)
+            {
+                rightBound = rand.Next(rightBound, size - 1);
+            }
+            else if (rightBound >= size)
+            {
+                rightBound = size - 1;
+            }
             Solution[] childrenArray = new Solution[2];
             List<Tuple<int, int>> MappingArray = new List<Tuple<int, int>>();
 
@@ -787,9 +823,34 @@ namespace magisterka
                 }
                 mappingFound = false;
             }
+            /*Console.Clear();
+            Console.WriteLine(leftBound);
+            Console.WriteLine(rightBound);
+            Console.WriteLine();
+            for (int i = 0; i < size; i++)
+            {
+                Console.Write(parentOne[i].PermutationValue + " ");
+            }
+            Console.WriteLine();
+            for (int i = 0; i < size; i++)
+            {
+                Console.Write(parentTwo[i].PermutationValue + " ");
+            }*/
 
             childrenArray[0] = new Solution(childOne);
             childrenArray[1] = new Solution(childTwo);
+
+            /*Console.WriteLine();
+            for (int i = 0; i < size; i++)
+            {
+                Console.Write(childrenArray[0][i].PermutationValue + " ");
+            }
+            Console.WriteLine();
+            for (int i = 0; i < size; i++)
+            {
+                Console.Write(childrenArray[1][i].PermutationValue + " ");
+            }
+            Console.ReadKey();*/
             return childrenArray;
         }
     }
@@ -1224,13 +1285,12 @@ namespace magisterka
         private int iterations;
         private int popSize;
         private int problemSize;
+        private int bestIeration;
         private double crossoverProbMax;
         private double crossoverProbMin;
         private double mutationProb;
         private Solution best = null;
-        //private bool saveEnabled;
-        //private string fileName;
-        private string instance;
+        private Solution initialBest = null;
         private Population initialPopulationCopy;
 
         public QgAlgorithm()
@@ -1259,6 +1319,7 @@ namespace magisterka
             this.problemSize = QapData.Instance.getSize();
             this.popSize = popSize;
             this.iterations = iterations;
+            this.bestIeration = 0;
             this.selMethodChosen = selMethod;
             if (eta != -1.0) this.selOPerator.EtaMax = eta;
             this.crossOperChosen = crossMethod;
@@ -1290,8 +1351,11 @@ namespace magisterka
 
         public void Execute()
         {
-            GetBestSolution();
+            this.bestIeration = 0;
             double crossProb = this.crossoverProbMax;
+            this.best = new Solution(GetBestFromPopulation());
+            Solution popBest = new Solution(this.best);
+            this.initialBest = new Solution(this.best);
             for (int i = 1; i < this.iterations; i++)
             {
                 crossProb = this.crossoverProbMax / (1.0 + Convert.ToDouble(i) / Convert.ToDouble(this.iterations));
@@ -1324,157 +1388,18 @@ namespace magisterka
 
                 this.mutOperator.Execute(this.Population);
 
-                if (this.rotVersion == RotationGateVersion.Modified) this.rotOperator.ExecuteModified(this.Population, this.best);
-                else if (this.rotVersion == RotationGateVersion.Original) this.rotOperator.ExecuteOriginal(this.Population, this.best);
+                if (this.rotVersion == RotationGateVersion.Modified) this.rotOperator.ExecuteModified(this.Population, popBest);
+                else if (this.rotVersion == RotationGateVersion.Original) this.rotOperator.ExecuteOriginal(this.Population, popBest);
 
-                GetBestSolution();
+                popBest = new Solution(GetBestFromPopulation());
+                if (this.best.Goal > popBest.Goal)
+                {
+                    this.best = new Solution(popBest);
+                    this.bestIeration = i;
+                }
             }
 
             this.isStopped = true;
-        }
-
-        public bool ExecuteToExcel(Worksheet ws)
-        {
-            double average = 0.0;
-            int bestIeration = 0;
-            Solution bestSolution;
-
-            ws.Cells[1, 4] = "pop size";
-            ws.Cells[1, 5] = this.popSize;
-            ws.Cells[2, 4] = "iter";
-            ws.Cells[2, 5] = this.iterations;
-            ws.Cells[3, 4] = "cross oper";
-            if(crossOperChosen == CrossoverOperatorChosen.CX)
-            {
-                ws.Cells[3, 5] = "CX";
-            }
-            else if(crossOperChosen == CrossoverOperatorChosen.OX)
-            {
-                ws.Cells[3, 5] = "OX";
-            }
-            else if(crossOperChosen == CrossoverOperatorChosen.PMX)
-            {
-                ws.Cells[3, 5] = "PMX";
-            }
-            ws.Cells[4, 4] = "max cross prob";
-            ws.Cells[4, 5] = this.crossoverProbMax;
-            ws.Cells[5, 4] = "min cross prob";
-            ws.Cells[5, 5] = this.crossoverProbMin;
-            ws.Cells[6, 4] = "mut prob";
-            ws.Cells[6, 5] = this.mutationProb;
-            ws.Cells[7, 4] = "rot gate oper";
-            if(rotVersion == RotationGateVersion.None)
-            {
-                ws.Cells[7, 5] = "NONE";
-            }
-            if(rotVersion == RotationGateVersion.Original)
-            {
-                ws.Cells[7, 5] = "ORIG";
-            }
-            if(rotVersion == RotationGateVersion.Modified)
-            {
-                ws.Cells[7, 5] = "MOD";
-            }
-            ws.Cells[8, 4] = "sel oper";
-            if (selMethodChosen == SelectionMethodChosen.Roulette)
-            {
-                ws.Cells[8, 5] = "ROUL";
-            }
-            else if (selMethodChosen == SelectionMethodChosen.Ranking)
-            {
-                ws.Cells[8, 5] = "RANK";
-                ws.Cells[9, 4] = "eta";
-                ws.Cells[9, 5] = this.selOPerator.EtaMax;
-            }
-            
-            
-            GetBestSolution();
-            bestSolution = new Solution(this.best);
-
-            foreach (Solution sol in this.Population) average += sol.Goal;
-            average /= this.popSize;
-
-            ws.Cells[1, 1] = this.best.Goal;
-            ws.Cells[1, 2] = average;
-
-            double crossProb = this.crossoverProbMax;
-            for (int i = 1; i < this.iterations; i++)
-            {
-                average = 0.0;
-                crossProb = this.crossoverProbMax / (1.0 + Convert.ToDouble(i) / Convert.ToDouble(this.iterations));
-                if (crossProb < this.crossoverProbMin) crossProb = this.crossoverProbMin;
-
-                if (this.selMethodChosen == SelectionMethodChosen.Roulette)
-                {
-                    this.Population = new Population(this.selOPerator.RouletteMethod(this.Population));
-                }
-                else
-                {
-                    this.Population = new Population(this.selOPerator.RankingMethod(this.Population));
-                }
-
-                if (this.crossOperChosen == CrossoverOperatorChosen.CX)
-                {
-                    this.cxOperator.CrossoverProbability = crossProb;
-                    this.Population = new Population(this.cxOperator.Execute(this.Population));
-                }
-                else if (this.crossOperChosen == CrossoverOperatorChosen.OX)
-                {
-                    this.oxOperator.CrossoverProbability = crossProb;
-                    this.Population = new Population(this.oxOperator.Execute(this.Population));
-                }
-                else
-                {
-                    this.pmxOperator.CrossoverProbability = crossProb;
-                    this.Population = new Population(this.pmxOperator.Execute(this.Population));
-                }
-
-                this.mutOperator.Execute(this.Population);
-
-                if (this.rotVersion == RotationGateVersion.Modified) this.rotOperator.ExecuteModified(this.Population, this.best);
-                else if (this.rotVersion == RotationGateVersion.Original) this.rotOperator.ExecuteOriginal(this.Population, this.best);
-
-                GetBestSolution();
-
-                if (this.best.Goal < bestSolution.Goal)
-                {
-                    bestSolution = new Solution(this.best);
-                    bestIeration = i;
-                }
-
-                foreach (Solution sol in this.Population) average += sol.Goal;
-                average /= this.popSize;
-                try
-                {
-                    ws.Cells[i + 1, 1] = this.best.Goal;
-                    ws.Cells[i + 1, 2] = average;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-
-            ws.Cells[10, 4] = "best iter";
-            ws.Cells[10, 5] = bestIeration;
-            ws.Cells[11, 4] = "best value";
-            ws.Cells[11, 5] = bestSolution.Goal;
-            ws.Cells[13, 4] = "sol returned value";
-            ws.Cells[13, 5] = this.best.Goal;
-            ws.Cells[1, 7] = "BEST";
-            for (int i = 0; i < this.problemSize; i++)
-            {
-                ws.Cells[i + 2, 7] = bestSolution[i].PermutationValue;
-            }
-
-            ws.Cells[1, 9] = "SOL RETURNED";
-            for (int i = 0; i < this.problemSize; i++)
-            {
-                ws.Cells[i + 2, 9] = this.best[i].PermutationValue;
-            }
-
-            this.isStopped = true;
-            return true;
         }
 
         public bool Stop()
@@ -1484,17 +1409,33 @@ namespace magisterka
 
         public ISolution GetBestSolution()
         {
+            return this.best;
+        }
+
+        public Solution GetBestInitialSoultion()
+        {
+            return this.initialBest;
+        }
+
+        public int GetBestIteration()
+        {
+            return this.bestIeration;
+        }
+
+        private Solution GetBestFromPopulation()
+        {
+            Solution bestSol = null;
             double currentGoal = -1.0;
             foreach (Solution sol in this.Population)
             {
                 if (currentGoal == -1 || sol.Goal < currentGoal)
                 {
                     currentGoal = sol.Goal;
-                    this.best = new Solution(sol);
+                    bestSol = new Solution(sol);
                 }
             }
-            return this.best;
-        }     
+            return bestSol;
+        }
     }
     public enum CrossoverOperatorChosen
     {
@@ -1526,387 +1467,9 @@ namespace magisterka
 
     public class UserInterface
     {
-        public static void RunInterface(QgAlgorithm algorithm)
-        {
-            string path = Directory.GetCurrentDirectory() + "\\Results";
-            if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-
-            path = Directory.GetCurrentDirectory() + "\\QAPLib";
-            if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-
-            ConsoleKeyInfo cki;
-            string qapFilePath = null;
-            int popSize = 0;
-            int iterations = 0;
-            SelectionMethodChosen selMethod = SelectionMethodChosen.Roulette;
-            double eta = 0;
-            CrossoverOperatorChosen crossMethod = CrossoverOperatorChosen.CX;
-            double crossMax = -1.0;
-            double crossMin = 0;
-            double mutProb = 0;
-            RotationGateVersion rotVersion = RotationGateVersion.None;
-            string resultsPath = null;
-            bool OK = false;
-            bool skipAll = false;
-            bool newPopulation = true;
-            bool initNew = true;
-            bool directoryEmpty = false;
-
-            string inputString;
-
-            Console.Clear();
-            Console.WriteLine("Czy chcesz ustawic parametru algorytmu?");
-            Console.WriteLine("1. Tak.");
-            Console.WriteLine("2. Nie. Wyjdz z programu.");
-            cki = Console.ReadKey();
-            if (cki.Key == ConsoleKey.D1)
-            {
-                bool exit = false;
-                while(!exit)
-                {
-                    if (!skipAll)
-                    {
-                        while (!OK && newPopulation)
-                        {
-                            try
-                            {
-                                Console.Clear();
-                                Console.WriteLine("Wybierz instancje testowa:");
-                                Console.WriteLine();
-                                path = Directory.GetCurrentDirectory() + "\\QAPLib";
-                                string[] filePaths = Directory.GetFiles(path, "*.dat");
-                                if (filePaths.Length == 0)
-                                {
-                                    Console.Clear();
-                                    Console.WriteLine("Folder jest pusty!");
-                                    Console.ReadKey();
-                                    directoryEmpty = true;
-                                    break;
-                                }
-                                for (int i = 0; i < filePaths.Length; i++)
-                                {
-                                    filePaths[i] = Path.GetFileName(filePaths[i]);
-                                    Console.WriteLine((i + 1) + ". " + filePaths[i]);
-                                }
-                                inputString = Console.ReadLine();
-                                int fileNumber = Convert.ToInt32(inputString);
-                                if (fileNumber > 0 && fileNumber <= filePaths.Length)
-                                {
-                                    qapFilePath = filePaths[fileNumber - 1];
-                                    OK = true;
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                            }
-                        }
-                        if (directoryEmpty) break;
-
-                        OK = false;
-                        while (!OK && newPopulation)
-                        {
-                            try
-                            {
-                                Console.Clear();
-                                Console.WriteLine("Podaj rozmiar populacji: ");
-                                inputString = Console.ReadLine();
-                                popSize = Convert.ToInt32(inputString);
-                                if (popSize > 0)
-                                {
-                                    if (popSize % 2 != 0) popSize += 1;
-                                    OK = true;
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                            }
-                        }
-                        OK = false;
-
-                        while (!OK)
-                        {
-                            try
-                            {
-                                Console.Clear();
-                                Console.WriteLine("Podaj ilosc iteracji: ");
-                                inputString = Console.ReadLine();
-                                iterations = Convert.ToInt32(inputString);
-                                if (iterations > 0)
-                                {
-                                    OK = true;
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                            }
-                        }
-                        OK = false;
-
-                        while (!OK)
-                        {
-                            Console.Clear();
-                            Console.WriteLine("Wybierz metode selekcji: ");
-                            Console.WriteLine("1. Ruletkowa");
-                            Console.WriteLine("2. Rankingowa");
-                            cki = Console.ReadKey();
-                            if (cki.Key == ConsoleKey.D1)
-                            {
-                                selMethod = SelectionMethodChosen.Roulette;
-                                eta = -1.0;
-                                OK = true;
-                            }
-                            else if (cki.Key == ConsoleKey.D2)
-                            {
-                                do
-                                {
-                                    try
-                                    {
-                                        Console.Clear();
-                                        Console.WriteLine("Podaj parametr eta (1,0 - 2,0): ");
-                                        inputString = Console.ReadLine();
-                                        eta = Convert.ToDouble(inputString);
-                                        if (eta >= 1.0 && eta <= 2.0)
-                                        {
-                                            selMethod = SelectionMethodChosen.Ranking;
-                                            OK = true;
-                                        }
-                                    }
-                                    catch (Exception e)
-                                    {
-                                    }
-                                }
-                                while (!OK);
-                            }
-                        }
-                        OK = false;
-
-                        while (!OK)
-                        {
-                            try
-                            {
-                                Console.Clear();
-                                Console.WriteLine("Podaj maksymalne prawdopodobienstwo krzyzowania (0,0 - 1,0): ");
-                                inputString = Console.ReadLine();
-                                crossMax = Convert.ToDouble(inputString);
-                                if (crossMax >= 0.0 && crossMax <= 1.0)
-                                {
-                                    OK = true;
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                            }
-                        }
-                        OK = false;
-
-                        while (!OK)
-                        {
-                            try
-                            {
-                                Console.Clear();
-                                Console.WriteLine("Podaj minimalne prawdopodobienstwo krzyzowania (0,0 - " + crossMax + "): ");
-                                inputString = Console.ReadLine();
-                                crossMin = Convert.ToDouble(inputString);
-                                if (crossMin >= 0.0 && crossMin <= 1.0 && crossMin <= crossMax)
-                                {
-                                    OK = true;
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                            }
-                        }
-                        OK = false;
-
-                        while (!OK)
-                        {
-                            Console.Clear();
-                            Console.WriteLine("Wybierz operator krzyzowania: ");
-                            Console.WriteLine("1. CX");
-                            Console.WriteLine("2. OX");
-                            Console.WriteLine("3. PMX");
-                            cki = Console.ReadKey();
-                            if (cki.Key == ConsoleKey.D1)
-                            {
-                                crossMethod = CrossoverOperatorChosen.CX;
-                                OK = true;
-                            }
-                            else if (cki.Key == ConsoleKey.D2)
-                            {
-                                crossMethod = CrossoverOperatorChosen.OX;
-                                OK = true;
-                            }
-                            else if (cki.Key == ConsoleKey.D3)
-                            {
-                                crossMethod = CrossoverOperatorChosen.PMX;
-                                OK = true;
-                            }
-                        }
-                        OK = false;
-
-                        while (!OK)
-                        {
-                            try
-                            {
-                                Console.Clear();
-                                Console.WriteLine("Podaj prawdopodobienstwo mutacji (0.0 - 1.0): ");
-                                inputString = Console.ReadLine();
-                                mutProb = Convert.ToDouble(inputString);
-                                if (mutProb >= 0.0 && mutProb <= 1.0)
-                                {
-                                    OK = true;
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                            }
-                        }
-                        OK = false;
-
-                        while (!OK)
-                        {
-                            Console.Clear();
-                            Console.WriteLine("Czy chcesz uzyc operator bramki rotacyjnej?");
-                            Console.WriteLine("1. Tak.");
-                            Console.WriteLine("2. Nie.");
-                            cki = Console.ReadKey();
-                            if (cki.Key == ConsoleKey.D1)
-                            {
-                                while (!OK)
-                                {
-                                    Console.Clear();
-                                    Console.WriteLine("Ktora wersje bramki rotacyjnej chcesz uzyc?");
-                                    Console.WriteLine("1. Oryginalna");
-                                    Console.WriteLine("2. Zmodyfikowana");
-                                    cki = Console.ReadKey();
-                                    if (cki.Key == ConsoleKey.D1)
-                                    {
-                                        rotVersion = RotationGateVersion.Original;
-                                        OK = true;
-                                    }
-                                    else if (cki.Key == ConsoleKey.D2)
-                                    {
-                                        rotVersion = RotationGateVersion.Modified;
-                                        OK = true;
-                                    }
-                                }
-                            }
-                            else if (cki.Key == ConsoleKey.D2)
-                            {
-                                rotVersion = RotationGateVersion.None;
-                                OK = true;
-                            }
-                        }
-                    }
-                    OK = false;
-
-                    while (!OK)
-                    {
-                        Console.Clear();
-                        Console.WriteLine("Chcesz zapisac rezultaty dzialania algorytmu w pliku?");
-                        Console.WriteLine("1. Tak");
-                        Console.WriteLine("2. Nie");
-                        cki = Console.ReadKey();
-                        if (cki.Key == ConsoleKey.D1)
-                        {
-                            try
-                            {
-                                while (!OK)
-                                {
-                                    Console.Clear();
-                                    Console.WriteLine("Podaj nazwe pliku:");
-                                    resultsPath = Console.ReadLine();
-                                    if (resultsPath != "")
-                                    {
-                                        resultsPath = Directory.GetCurrentDirectory() + "\\Results\\" +  resultsPath + ".txt";
-                                        OK = true;
-                                    }
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                            }
-                        }
-                        else if (cki.Key == ConsoleKey.D2)
-                        {
-                            resultsPath = null;
-                            OK = true;
-                        }
-                    }
-                    if (algorithm.setParameters(popSize, iterations, selMethod, eta, crossMethod, crossMax, crossMin, mutProb, rotVersion, initNew))
-                    {
-                        OK = false;
-                        algorithm.Execute();
-                        while (!OK)
-                        {
-                            Console.Clear();
-                            Console.WriteLine("Czy chcesz uruchomic algorytm ponownie?");
-                            Console.WriteLine("1. Tak.");
-                            Console.WriteLine("2. Nie. Wyjdz z programu.");
-                            cki = Console.ReadKey();
-                            if (cki.Key == ConsoleKey.D1)
-                            {
-                                OK = false;
-                                while (!OK)
-                                {
-                                    Console.Clear();
-                                    Console.WriteLine("1. Uruchom dla tej samej populacji poczatkowej i tych samych parametrow.");
-                                    Console.WriteLine("2. Ustaw nowe parametry i uruchom dla tej samej populacji poczatkowej.");
-                                    Console.WriteLine("3. Ustaw nowe parametry i wygeneruj nowa populacje poczatkowa.");
-                                    cki = Console.ReadKey();
-                                    if (cki.Key == ConsoleKey.D1)
-                                    {
-                                        skipAll = true;
-                                        newPopulation = false;
-                                        initNew = false;
-                                        OK = true;
-                                    }
-                                    else if (cki.Key == ConsoleKey.D2)
-                                    {
-                                        skipAll = false;
-                                        newPopulation = false;
-                                        initNew = false;
-                                        OK = true;
-                                    }
-                                    else if (cki.Key == ConsoleKey.D3)
-                                    {
-                                        skipAll = false;
-                                        newPopulation = true;
-                                        initNew = true;
-                                        OK = true;
-                                    }
-                                }
-                            }
-                            else if (cki.Key == ConsoleKey.D2)
-                            {
-                                exit = true;
-                                OK = true;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        OK = false;
-                        while(!OK)
-                        Console.Clear();
-                        Console.WriteLine("Nie udalo sie ustawic parametrow! Chcesz ustawic ponownie parametry algorytmu?");
-                        Console.WriteLine("1. Tak.");
-                        Console.WriteLine("2. Nie. Wyjdz z programu.");
-                        cki = Console.ReadKey();
-                        if (cki.Key == ConsoleKey.D1) OK = true;
-                        else if (cki.Key == ConsoleKey.D2)
-                        {
-                            OK = true;
-                            exit = true;
-                        }
-                    }
-                }
-            }
-        }
-
         public static void RunTest(QgAlgorithm algorithm)
         {
-            Application excelApp = excelApp = new Application();
+            Application excelApp = null;
             Workbook wb = null;
             Worksheet ws = null;
             string path = Directory.GetCurrentDirectory() + "\\Results";
@@ -1920,11 +1483,15 @@ namespace magisterka
                 Console.WriteLine("Utworzono folder z instancjami testowymi");
                 Console.WriteLine("Umiesc w nim instancje testowe i uruchom program ponownie.");
                 Console.ReadKey();
-                System.Runtime.InteropServices.Marshal.ReleaseComObject(excelApp);
                 return;
             }
 
             ConsoleKeyInfo cki;
+            double bestInitialGoal = 0.0;
+            double bestGoal = 0.0;
+            double avGoal = 0.0;
+            double avIter = 0.0;
+            int bestIter = 0;
             int popSize = 0;
             int iterations = 0;
             int repeatTest = 0;
@@ -1952,12 +1519,11 @@ namespace magisterka
                 Console.Clear();
                 Console.WriteLine("Folder z instancjami testowymi jest pusty!");
                 Console.ReadKey();
-                System.Runtime.InteropServices.Marshal.ReleaseComObject(excelApp);
                 return;
             }
 
             bool exit = false;
-
+            excelApp = new Application();
             while (!exit)
             {
                 while (!OK)
@@ -2488,7 +2054,7 @@ namespace magisterka
                 {
                     Console.Clear();
                     Console.WriteLine("Podaj szablon nazwy pliku, do ktorego beda zapisane dane.");
-                    Console.WriteLine("Zostana utworzone pliki o nastepujacej nazwie: {szablon}_{parametr testowany}_{wartosc parametru}_{instancja testowa}_{nr testu}");
+                    Console.WriteLine("Zostana utworzone pliki o nastepujacej nazwie: {szablon}_{parametr testowany}");
                     templatePath = Console.ReadLine();
                     if (templatePath.Length != 0)
                     {
@@ -2501,113 +2067,166 @@ namespace magisterka
                 Console.WriteLine("Rozpoczeto testy...");
                 string resultsPath = "";
                 bool initNew;
+                excelApp.SheetsInNewWorkbook = valuesCount;
                 for (int i = 0; i < instances; i++)
                 {
-                    initNew = true;
                     UserInterface.ReadQapFile(instancePaths[i]);
+
+                    if (testedParameter == TestedParameter.selectionOperator)
+                    {
+                        resultsPath = templatePath + "_" + instancePaths[i].Substring(0, instancePaths[i].Length - 4) + "_selOper";
+                    }
+                    else if (testedParameter == TestedParameter.crossoverProb)
+                    {
+                        resultsPath = templatePath + "_" + instancePaths[i].Substring(0, instancePaths[i].Length - 4) + "_crossProb";
+                    }
+                    else if (testedParameter == TestedParameter.crossoverOperator)
+                    {
+                        resultsPath = templatePath + "_" + instancePaths[i].Substring(0, instancePaths[i].Length - 4) + "_crossOper";
+                    }
+                    else if (testedParameter == TestedParameter.mutationProb)
+                    {
+                        resultsPath = templatePath + "_" + instancePaths[i].Substring(0, instancePaths[i].Length - 4) + "_mutProb";
+                    }
+                    else if (testedParameter == TestedParameter.rotationOperator)
+                    {
+                        resultsPath = templatePath + "_" + instancePaths[i].Substring(0, instancePaths[i].Length - 4) + "_rotOper";
+                    }
+
+                    resultsPath = Directory.GetCurrentDirectory() + "\\Results\\" + resultsPath;
+                    if (File.Exists(resultsPath + ".xlsx"))
+                    {
+                        File.Delete(resultsPath + ".xlsx");
+                    }
+                    else if (File.Exists(resultsPath + ".xls"))
+                    {
+                        File.Delete(resultsPath + ".xls");
+                    }
+                    wb = excelApp.Workbooks.Add();
+                    wb.SaveAs(resultsPath);
+                    System.IO.FileInfo fileInfo = new System.IO.FileInfo(wb.FullName);
+                    fileInfo.IsReadOnly = false;
+
                     for (int j = 0; j < valuesCount; j++)
                     {
-                        if (j == 0)
-                        {
-                            initNew = true;
-                        }
-                        else
-                        {
-                            initNew = false;
-                        }
+                        ws = wb.Worksheets[j + 1];
+
                         if (testedParameter == TestedParameter.selectionOperator)
                         {
                             if (selOperArray[j] == SelectionMethodChosen.Ranking)
                             {
-                                resultsPath = templatePath + "_ranking" + etaArray[j] + "_" + instancePaths[i];
+                                ws.Name = "rank_eta_" + etaArray[j];
                             }
                             else
                             {
-                                resultsPath = templatePath + "_roulette_" + instancePaths[i];
+                                ws.Name = "roull";
                             }
                         }
                         else if (testedParameter == TestedParameter.crossoverProb)
                         {
-                            resultsPath = templatePath + "_crossProb_MAX_" + "_" + maxCrossProbArray[j] + "_MIN_" + minCrossProbArray[j] + "_" + instancePaths[i];
+                            ws.Name = "min_" + minCrossProbArray[j] + "_max_" + maxCrossProbArray[j];
                         }
                         else if (testedParameter == TestedParameter.crossoverOperator)
                         {
                             if (crossOperArray[j] == CrossoverOperatorChosen.CX)
                             {
-                                resultsPath = templatePath + "_crossOper_CX_" + instancePaths[i];
+                                ws.Name = "CX";
                             }
                             else if (crossOperArray[j] == CrossoverOperatorChosen.OX)
                             {
-                                resultsPath = templatePath + "_crossOper_OX_" + instancePaths[i];
+                                ws.Name = "OX";
                             }
-                            else if (crossOperArray[j] == CrossoverOperatorChosen.PMX)
+                            else
                             {
-                                resultsPath = templatePath + "_crossOper_PMX_" + instancePaths[i];
+                                ws.Name = "PMX";
                             }
                         }
                         else if (testedParameter == TestedParameter.mutationProb)
                         {
-                            resultsPath = templatePath + "_mutProb_" + mutProbArray[j] + "_" + instancePaths[i];
+                            ws.Name = mutProbArray[j].ToString();
                         }
                         else if (testedParameter == TestedParameter.rotationOperator)
                         {
-                            if (rotOperArray[j] == RotationGateVersion.None)
+                            if (rotOperArray[j] == RotationGateVersion.Modified)
                             {
-                                resultsPath = templatePath + "_rotGate_NONE_" + instancePaths[i];
+                                ws.Name = "mod";
                             }
                             else if (rotOperArray[j] == RotationGateVersion.Original)
                             {
-                                resultsPath = templatePath + "_rotGate_ORG_" + "_" + instancePaths[i];
+                                ws.Name = "orig";
                             }
-                            else if (rotOperArray[j] == RotationGateVersion.Modified)
+                            else
                             {
-                                resultsPath = templatePath + "_rotGate_MOD_" + instancePaths[i];
+                                ws.Name = "none";
                             }
                         }
-                        excelApp.SheetsInNewWorkbook = repeatTest;
-                        wb = excelApp.Workbooks.Add();
-                        ws = null;
+
+                        bestInitialGoal = 0.0;
+                        bestGoal = 0.0;
+                        avGoal = 0.0;
+                        bestIter = 0;
+                        avIter = 0;
                         for (int k = 0; k < repeatTest; k++)
                         {
+                            if (j == 0 && k == 0)
+                            {
+                                initNew = true;
+                            }
+                            else
+                            {
+                                initNew = false;
+                            }
                             if (algorithm.setParameters(popSize, iterations, selOperArray[j], etaArray[j], crossOperArray[j], maxCrossProbArray[j], minCrossProbArray[j], mutProbArray[j], rotOperArray[j], initNew))
                             {
                                 initNew = false;
                                 Console.Write("Instancja nr {0}, wartosc parametru nr {1}, test nr {2}...", (i + 1), (j + 1), (k + 1));
-                                ws = wb.Worksheets[k + 1];
-                                ws.Name = "test" + (k + 1);
-                                if (!algorithm.ExecuteToExcel(ws))
+                                algorithm.Execute();
+                                avGoal += algorithm.GetBestSolution().Goal;
+                                avIter += algorithm.GetBestIteration();
+                                if (k == 0)
                                 {
-                                    Console.Clear();
-                                    Console.WriteLine("Wystapil blad!");
-                                    Console.WriteLine("Program zostanie zamkniety");
-                                    Console.ReadKey();
-                                    System.Runtime.InteropServices.Marshal.ReleaseComObject(excelApp);
+                                    bestIter = algorithm.GetBestIteration();
+                                    bestInitialGoal = algorithm.GetBestInitialSoultion().Goal;
+                                    bestGoal = algorithm.GetBestSolution().Goal;
+                                }
+                                else
+                                {
+                                    if (bestIter > algorithm.GetBestIteration())
+                                    {
+                                        bestIter = algorithm.GetBestIteration();
+                                    }
+                                    if (bestGoal > algorithm.GetBestSolution().Goal)
+                                    {
+                                        bestGoal = algorithm.GetBestSolution().Goal;
+                                    }
                                 }
                                 Console.Write("OK");
                                 Console.WriteLine();
                             }
                             else
                             {
+                                wb.Save();
+                                wb.Close();
+                                excelApp.Quit();
                                 Console.Clear();
                                 Console.WriteLine("Blad podczas testu");
-                                System.Runtime.InteropServices.Marshal.ReleaseComObject(excelApp);
+                                while (System.Runtime.InteropServices.Marshal.ReleaseComObject(excelApp) != 0);
+                                ws = null;
+                                wb = null;
+                                excelApp = null;
                                 return;
                             }
                         }
-                        resultsPath = Directory.GetCurrentDirectory() + "\\Results\\" + resultsPath.Substring(0, resultsPath.Length - 4);
-                        if (File.Exists(resultsPath + ".xlsx"))
-                        {
-                            File.Delete(resultsPath + ".xlsx");
-                        }
-                        else if (File.Exists(resultsPath + ".xls"))
-                        {
-                            File.Delete(resultsPath + ".xls");
-                        }
-                        wb.SaveAs(resultsPath);
-                        System.IO.FileInfo fileInfo = new System.IO.FileInfo(wb.FullName);
-                        fileInfo.IsReadOnly = false;
-                        wb.Close();
+                        avGoal /= Convert.ToDouble(repeatTest);
+                        avIter /= Convert.ToDouble(repeatTest);
+                        ws.Cells[1, 1] = bestInitialGoal;
+                        ws.Cells[1, 2] = bestGoal;
+                        ws.Cells[1, 3] = avGoal;
+                        ws.Cells[1, 4] = bestIter;
+                        ws.Cells[1, 5] = avIter;
+                        wb.Save();
                     }
+                    wb.Close();
                 }
                 OK = false;
                 Console.Clear();
@@ -2619,9 +2238,13 @@ namespace magisterka
                 if (cki.Key == ConsoleKey.D2)
                 {
                     exit = true;
+                    excelApp.Quit();
+                    while (System.Runtime.InteropServices.Marshal.ReleaseComObject(excelApp) != 0) ;
+                    ws = null;
+                    wb = null;
+                    excelApp = null;
                 }
             }
-            System.Runtime.InteropServices.Marshal.ReleaseComObject(excelApp);
         }
 
         public static bool ReadQapFile(string path)
@@ -2674,6 +2297,21 @@ namespace magisterka
             {
                 return false;
             }
+        }
+    }
+
+    public class CtrlcEvent
+    {
+        private Application excelApp;
+        //private Workbook wb;
+        public CtrlcEvent(Application app)
+        {
+            this.excelApp = app;
+        }
+        public void myHandler(object sender, ConsoleCancelEventArgs args)
+        {
+            this.excelApp.Quit();
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(excelApp);
         }
     }
 }
