@@ -1,2 +1,345 @@
 \chapter{Eksperymenty obliczeniowe}
 \label{cha:eksperymenty}
+\section{Bramka kwantowa}
+W testach, których rezultaty znajdują się poniżej zmianie ulegała wersja bramki kwantowej, pozostałe parametry algorytmu były stałe i ich wartości znajdują się w tableli \ref{T1_params}:
+
+\begin{table}[H]
+\label{T1_params}
+\begin{tabular}{l l l l l l l l}
+\hline
+liczba & rozmiar & min. prawd. & maks. prawd & operator & prawd. & selekcja & liczba \\
+iteracji & populacji & krzyżowania & krzyżowania & krzyżowania & mutacji & & testów \\
+\hline
+300 & 50 & 0,8 & 0,8 & CX & 0,05 & ruletkowa & 5 \\
+\hline
+\end{tabular}
+\caption{Stałe parametry eksperymentu związanego z bramka kwantową}
+\end{table}
+
+Poniżej znajdują się tabele z rezultatami otrzymany dla każdej z instancji testowej. Oznaczenia w pierwszym wierszu tabeli oznaczają odpowiednio: wartość funkcji celu najlepszego rozwiązania z populacji początkowej, wartość funkcji celu najlepszego z rozwiązań znalezionego w ogóle podczas wszystkich testów, średnią wartość funkcji celu dla najlepszych rozwiązań w każdym z testów, numer iteracji, w której znaleziono najlepsze rozwiązanie, średnią wartość numerów iteracji najlepszych rozwiązań w każdym z testów oraz błąd względny najlepszego z rozwiązań w stosunku do rozwiązania optymalnego.
+
+\begin{table}[H]
+\label{T1_bur26a}
+\begin{tabular}{l l l l l l l}
+\hline
+ & $f_{init}$ & $f_{best}$ & $\overline{f_{best}}$ & n & $\overline{n}$ & $\delta$ \\
+\hline
+brak & 5684727 & 5571084 & 5576314,667 & 12 & 17,66666667 & 0,0266119 \\
+oryginalna & 5684727 & 5531474 & 5552662,333 & 12 & 102,6666667 & 0,019312765 \\
+zmodyfikowana & 5684727 & 5496454 & 5509412 & 116 & 171,3333333 & 0,012859452 \\
+\hline
+\end{tabular}
+\caption{Rezultaty dla instancji bur26a}
+\end{table}
+
+\begin{table}[H]
+\label{T1_chr15b}
+\begin{tabular}{l l l l l l l}
+\hline
+ & $f_{init}$ & $f_{best}$ & $\overline{f_{best}}$ & n & $\overline{n}$ & $\delta$ \\
+\hline
+brak & 37898 & 24242 & 25478,66667 & 3 & 55 & 2,034042553\\
+oryginalna & 37898 & 14828 & 16308 & 111 & 146,3333333 & 0,855819775\\
+zmodyfikowana & 37898 & 15174 & 17303,33333 & 43 & 51 & 0,899123905\\
+\hline
+\end{tabular}
+\caption{Rezultaty dla instancji chr15b}
+\end{table}
+
+\begin{table}[H]
+\label{T1_chr18b}
+\begin{tabular}{l l l l l l l}
+\hline
+ & $f_{init}$ & $f_{best}$ & $\overline{f_{best}}$ & n & $\overline{n}$ & $\delta$ \\
+\hline
+brak & 2950 & 2522 & 2671,333333 & 3 & 5,333333333 & 0,644067797\\
+oryginalna & 2950 & 1882 & 1964 & 14 & 157 & 0,226857888\\
+zmodyfikowana & 2950 & 1672 & 1777,333333 & 43 & 61,33333333 & 0,089960887\\
+\hline
+\end{tabular}
+\caption{Rezultaty dla instancji chr18b}
+\end{table}
+
+\begin{table}[H]
+\label{T1_chr25a}
+\begin{tabular}{l l l l l l l}
+\hline
+ & $f_{init}$ & $f_{best}$ & $\overline{f_{best}}$ & n & $\overline{n}$ & $\delta$ \\
+\hline
+brak & 16356 & 11828 & 12355,33333 & 5 & 103,6666667 & 2,115911486\\
+oryginalna & 16356 & 11054 & 11379,33333 & 114 & 162,6666667 & 1,912012645\\
+zmodyfikowana & 16356 & 7716 & 8720,666667 & 75 & 95,66666667 & 1,032665964\\
+\hline
+\end{tabular}
+\caption{Rezultaty dla instancji chr25a}
+\end{table}
+
+\begin{table}[H]
+\label{T1_esc64a}
+\begin{tabular}{l l l l l l l}
+\hline
+ & $f_{init}$ & $f_{best}$ & $\overline{f_{best}}$ & n & $\overline{n}$ & $\delta$ \\
+\hline
+brak & 228 & 148 & 173,3333333 & 15 & 17,66666667 & 0,275862069\\
+oryginalna & 228 & 138 & 150,6666667 & 32 & 121,6666667 & 0,189655172\\
+zmodyfikowana & 228 & 116 & 118,6666667 & 78 & 125,6666667 & 0\\
+\hline
+\end{tabular}
+\caption{Rezultaty dla instancji esc64a}
+\end{table}
+
+\begin{table}[H]
+\label{T1_had12}
+\begin{tabular}{l l l l l l l}
+\hline
+ & $f_{init}$ & $f_{best}$ & $\overline{f_{best}}$ & n & $\overline{n}$ & $\delta$ \\
+\hline
+brak & 1768 & 1702 & 1724 & 1 & 6,333333333 & 0,030266344\\
+oryginalna & 1768 & 1684 & 1688,666667 & 18 & 45 & 0,01937046\\
+zmodyfikowana & 1768 & 1684 & 1700 & 28 & 35,33333333 & 0,01937046\\
+\hline
+\end{tabular}
+\caption{Rezultaty dla instancji had12}
+\end{table}
+
+\begin{table}[H]
+\label{T1_kra32}
+\begin{tabular}{l l l l l l l}
+\hline
+ & $f_{init}$ & $f_{best}$ & $\overline{f_{best}}$ & n & $\overline{n}$ & $\delta$ \\
+\hline
+brak & 127190 & 113420 & 116506,6667 & 8 & 13,66666667 & 0,278692221\\
+oryginalna & 127190 & 110950 & 112093,3333 & 96 & 211 & 0,250845547\\
+zmodyfikowana & 127190 & 99100 & 102046,6667 & 112 & 180 & 0,117249154\\
+\hline
+\end{tabular}
+\caption{Rezultaty dla instancji kra32}
+\end{table}
+
+\begin{table}[H]
+\label{T1_lipa20a}
+\begin{tabular}{l l l l l l l}
+\hline
+ & $f_{init}$ & $f_{best}$ & $\overline{f_{best}}$ & n & $\overline{n}$ & $\delta$ \\
+\hline
+brak & 3865 & 3853 & 3859,666667 & 0 & 3,666666667 & 0,046158023\\
+oryginalna & 3865 & 3831 & 3840,333333 & 23 & 30,33333333 & 0,040184632\\
+zmodyfikowana & 3865 & 3803 & 3819 & 43 & 62,66666667 & 0,032582134\\
+\hline
+\end{tabular}
+\caption{Rezultaty dla instancji lipa20a}
+\end{table}
+
+\begin{table}[H]
+\label{T1_lipa50b}
+\begin{tabular}{l l l l l l l}
+\hline
+ & $f_{init}$ & $f_{best}$ & $\overline{f_{best}}$ & n & $\overline{n}$ & $\delta$ \\
+\hline
+brak & 1541214 & 1512985 & 1519929 & 19 & 63 & 0,25014873\\
+oryginalna & 1541214 & 1510388 & 1512682,667 & 96 & 176,3333333 & 0,248002882\\
+zmodyfikowana & 1541214 & 1486615 & 1490356,667 & 151 & 199 & 0,228359736\\
+\hline
+\end{tabular}
+\caption{Rezultaty dla instancji lipa50b}
+\end{table}
+
+\begin{table}[H]
+\label{T1_lipa80a}
+\begin{tabular}{l l l l l l l}
+\hline
+ & $f_{init}$ & $f_{best}$ & $\overline{f_{best}}$ & n & $\overline{n}$ & $\delta$ \\
+\hline
+brak & 258029 & 257445 & 257612,6667 & 9 & 18,33333333 & 0,016785482\\
+oryginalna & 258029 & 257363 & 257495,6667 & 34 & 180 & 0,01646162\\
+zmodyfikowana & 258029 & 256700 & 256796 & 259 & 273,6666667 & 0,013843085\\
+\hline
+\end{tabular}
+\caption{Rezultaty dla instancji lipa80a}
+\end{table}
+
+\begin{table}[H]
+\label{T1_lipa90a}
+\begin{tabular}{l l l l l l l}
+\hline
+ & $f_{init}$ & $f_{best}$ & $\overline{f_{best}}$ & n & $\overline{n}$ & $\delta$ \\
+\hline
+brak & 366925 & 366249 & 366354 & 21 & 23,33333333 & 0,015581066\\
+oryginalna & 366925 & 366271 & 366355,6667 & 50 & 140,6666667 & 0,015642071\\
+zmodyfikowana & 366925 & 365195 & 365309,6667 & 266 & 280,6666667 & 0,012658403\\
+\hline
+\end{tabular}
+\caption{Rezultaty dla instancji lipa90a}
+\end{table}
+
+\section{Operator krzyżowania}
+W eksperymencie dotyczącym operatora krzyżowania porównywane były rezultaty otrzymane przy użyciu różnych operatorów krzyżowania. Niezmienne parametry algorytmu ustawione były na te same wartości przedstawione w poniższej tabeli:
+
+\begin{table}[H]
+\label{T2_params}
+\begin{tabular}{l l l l l l l l}
+\hline
+liczba & rozmiar & min. prawd. & maks. prawd & bramka & prawd. & selekcja & liczba \\
+iteracji & populacji & krzyżowania & krzyżowania & kwantowa & mutacji & & testów \\
+\hline
+300 & 50 & 0,8 & 0,8 & zmodyfikowana & 0,05 & ruletkowa & 5 \\
+\hline
+\end{tabular}
+\caption{Stałe parametry eksperymentu związanego z operatorem krzyżowania}
+\end{table}
+
+W poniższych tabelach znajdują się rezultaty testów dla poszczególnych instancji testowych:
+
+\begin{table}[H]
+\label{T2_bur26a}
+\begin{tabular}{l l l l l l l}
+\hline
+ & $f_{init}$ & $f_{best}$ & $\overline{f_{best}}$ & n & $\overline{n}$ & $\delta$ \\
+\hline
+CX & 5717454 & 5509912 & 5512025,667 & 63 & 184,6666667 & 0,015339425\\
+OX & 5717454 & 5545330 & 5575050 & 9 & 158 & 0,02186608\\
+PMX	& 5717454 & 5499264 & 5536580,333 & 95 & 183,6666667 & 0,013377265\\
+\hline
+\end{tabular}
+\caption{Rezultaty dla instancji bur26a}
+\end{table}
+
+\begin{table}[H]
+\label{T2_chr15b}
+\begin{tabular}{l l l l l l l}
+\hline
+ & $f_{init}$ & $f_{best}$ & $\overline{f_{best}}$ & n & $\overline{n}$ & $\delta$ \\
+\hline
+CX & 31212 & 17554 & 18410,66667 & 55 & 100 & 1,196996245\\
+OX & 31212 & 17304 & 20116,66667 & 66 & 148,3333333 & 1,165707134\\
+PMX & 31212 & 19892 & 21148 & 118 & 175,6666667 & 1,489612015\\
+\hline
+\end{tabular}
+\caption{Rezultaty dla instancji chr15b}
+\end{table}
+
+\begin{table}[H]
+\label{T2_chr18b}
+\begin{tabular}{l l l l l l l}
+\hline
+ & $f_{init}$ & $f_{best}$ & $\overline{f_{best}}$ & n & $\overline{n}$ & $\delta$ \\
+\hline
+CX & 3550 & 1808 & 1865,333333 & 59 & 108,3333333 & 0,178617992\\
+OX & 3550 & 2216 & 2262 & 53 & 117,6666667 & 0,444589309\\
+PMX & 3550 & 1668 & 1840,666667 & 231 & 263,6666667 & 0,087353325\\
+\hline
+\end{tabular}
+\caption{Rezultaty dla instancji chr18b}
+\end{table}
+
+\begin{table}[H]
+\label{T2_chr25a}
+\begin{tabular}{l l l l l l l}
+\hline
+ & $f_{init}$ & $f_{best}$ & $\overline{f_{best}}$ & n & $\overline{n}$ & $\delta$ \\
+\hline
+CX & 14380 & 9124 & 9658,666667 & 84 & 102 & 1,403582719\\
+OX & 14380 & 11790 & 12020 & 151 & 208 & 2,105900948\\
+PMX & 14380 & 11288 & 11499,33333 & 43 & 68,66666667 & 1,973656481\\
+\hline
+\end{tabular}
+\caption{Rezultaty dla instancji chr25a}
+\end{table}
+
+\begin{table}[H]
+\label{T2_esc64a}
+\begin{tabular}{l l l l l l l}
+\hline
+ & $f_{init}$ & $f_{best}$ & $\overline{f_{best}}$ & n & $\overline{n}$ & $\delta$ \\
+\hline
+CX & 244 & 124 & 126 & 119 & 155 & 0,068965517\\
+OX & 244 & 186 & 192 & 30 & 128 & 0,603448276\\
+PMX & 244 & 162 & 164,6666667 & 58 & 186,3333333 & 0,396551724\\
+\hline
+\end{tabular}
+\caption{Rezultaty dla instancji esc64a}
+\end{table}
+
+\begin{table}[H]
+\label{T2_had12}
+\begin{tabular}{l l l l l l l}
+\hline
+ & $f_{init}$ & $f_{best}$ & $\overline{f_{best}}$ & n & $\overline{n}$ & $\delta$ \\
+\hline
+CX & 1812 & 1678 & 1685,333333 & 32 & 43,33333333 & 0,015738499\\
+OX & 1812 & 1686 & 1690,666667 & 30 & 118,6666667 & 0,020581114\\
+PMX	& 1812 & 1690 & 1693,333333 & 69 & 150,6666667 & 0,023002421\\
+\hline
+\end{tabular}
+\caption{Rezultaty dla instancji had12}
+\end{table}
+
+\begin{table}[H]
+\label{T1_kra32}
+\begin{tabular}{l l l l l l l}
+\hline
+ & $f_{init}$ & $f_{best}$ & $\overline{f_{best}}$ & n & $\overline{n}$ & $\delta$ \\
+\hline
+CX & 126660 & 96620 & 97800 & 109 & 209 & 0,089289741\\
+OX & 126660 & 114210 & 116090 & 99 & 167 & 0,287598647\\
+PMX & 126660 & 111780 & 112970 & 258 & 274,3333333 & 0,260202931\\
+\hline
+\end{tabular}
+\caption{Rezultaty dla instancji kra32}
+\end{table}
+
+\begin{table}[H]
+\label{T2_lipa20a}
+\begin{tabular}{l l l l l l l}
+\hline
+ & $f_{init}$ & $f_{best}$ & $\overline{f_{best}}$ & n & $\overline{n}$ & $\delta$ \\
+\hline
+CX & 3877 & 3831 & 3843 & 48 & 72 & 0,040184632\\
+OX & 3877 & 3841 & 3847 & 75 & 143,6666667 & 0,04289981\\
+PMX & 3877 & 3844 & 3845 & 38 & 51,33333333 & 0,043714363\\
+\hline
+\end{tabular}
+\caption{Rezultaty dla instancji lipa20a}
+\end{table}
+
+\begin{table}[H]
+\label{T2_lipa50b}
+\begin{tabular}{l l l l l l l}
+\hline
+ & $f_{init}$ & $f_{best}$ & $\overline{f_{best}}$ & n & $\overline{n}$ & $\delta$ \\
+\hline
+CX & 1543705 & 1487038 & 1493044,333 & 212 & 257 & 0,228709252\\
+OX & 1543705 & 1520666 & 1522054,333 & 20 & 52 & 0,256495384\\
+PMX & 1543705 & 1519178 & 1520194,667 & 16 & 122 & 0,25526588\\
+\hline
+\end{tabular}
+\caption{Rezultaty dla instancji lipa50b}
+\end{table}
+
+\begin{table}[H]
+\label{T2_lipa80a}
+\begin{tabular}{l l l l l l l}
+\hline
+ & $f_{init}$ & $f_{best}$ & $\overline{f_{best}}$ & n & $\overline{n}$ & $\delta$ \\
+\hline
+CX & 258140 & 256810 & 256962,3333 & 256 & 277 & 0,014277533\\
+OX & 258140 & 257752 & 257764,3333 & 180 & 211 & 0,017997986\\
+PMX & 258140 & 257697 & 257705,6667 & 67 & 167 & 0,017780762\\
+\hline
+\end{tabular}
+\caption{Rezultaty dla instancji lipa80a}
+\end{table}
+
+\begin{table}[H]
+\label{T2_lipa90a}
+\begin{tabular}{l l l l l l l}
+\hline
+ & $f_{init}$ & $f_{best}$ & $\overline{f_{best}}$ & n & $\overline{n}$ & $\delta$ \\
+\hline
+CX & 366995 & 365281 & 365551,6667 & 278 & 288 & 0,012896875\\
+OX & 366995 & 366456 & 366485,3333 & 7 & 191,6666667 & 0,016155062\\
+PMX	& 366995 & 366474 & 366554,3333 & 31 & 167,6666667 & 0,016204975\\
+\hline
+\end{tabular}
+\caption{Rezultaty dla instancji lipa90a}
+\end{table}

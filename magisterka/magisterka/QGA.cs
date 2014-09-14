@@ -1496,6 +1496,7 @@ namespace magisterka
             int iterations = 0;
             int repeatTest = 0;
             int instances = 0;
+            Solution bestSol = null;
             TestedParameter testedParameter = TestedParameter.selectionOperator;
             int valuesCount = 0;
             string inputString;
@@ -2067,97 +2068,190 @@ namespace magisterka
                 Console.WriteLine("Rozpoczeto testy...");
                 string resultsPath = "";
                 bool initNew;
-                excelApp.SheetsInNewWorkbook = valuesCount;
+                excelApp.SheetsInNewWorkbook = instances;
+                if (testedParameter == TestedParameter.selectionOperator)
+                {
+                    resultsPath = templatePath + "_selOper";
+                }
+                else if (testedParameter == TestedParameter.crossoverProb)
+                {
+                    resultsPath = templatePath + "_crossProb";
+                }
+                else if (testedParameter == TestedParameter.crossoverOperator)
+                {
+                    resultsPath = templatePath + "_crossOper";
+                }
+                else if (testedParameter == TestedParameter.mutationProb)
+                {
+                    resultsPath = templatePath + "_mutProb";
+                }
+                else if (testedParameter == TestedParameter.rotationOperator)
+                {
+                    resultsPath = templatePath + "_rotOper";
+                }
+
+                resultsPath = Directory.GetCurrentDirectory() + "\\Results\\" + resultsPath;
+                if (File.Exists(resultsPath + ".xlsx"))
+                {
+                    File.Delete(resultsPath + ".xlsx");
+                }
+                else if (File.Exists(resultsPath + ".xls"))
+                {
+                    File.Delete(resultsPath + ".xls");
+                }
+                wb = excelApp.Workbooks.Add();
+                wb.SaveAs(resultsPath);
+                System.IO.FileInfo fileInfo = new System.IO.FileInfo(wb.FullName);
+                fileInfo.IsReadOnly = false;
+                int skip = 0;
+                double[] bestvalues = {5426670, 7990, 1534, 3796, 116, 1652, 88700, 3683, 1210244, 253195, 360630};
                 for (int i = 0; i < instances; i++)
                 {
+                    skip = 0;
+                    ws = wb.Worksheets[i + 1];
+                    ws.Name = instancePaths[i].Substring(0, instancePaths[i].Length - 4);
+                    ws.Cells[1, 2] = "best init";
+                    ws.Cells[1, 3] = "best";
+                    ws.Cells[1, 4] = "av best";
+                    ws.Cells[1, 5] = "best iter";
+                    ws.Cells[1, 6] = "av iter";
+                    ws.Cells[1, 7] = bestvalues[i];
                     UserInterface.ReadQapFile(instancePaths[i]);
 
+                    ws.Cells[valuesCount + 3, 1] = "iter";
+                    ws.Cells[valuesCount + 4, 1] = iterations;
+                    ws.Cells[valuesCount + 3, 2] = "pop size";
+                    ws.Cells[valuesCount + 4, 2] = popSize;
+                    if (testedParameter == TestedParameter.crossoverProb)
+                    {
+                        skip = 2;
+                    }
+                    else
+                    {
+                        ws.Cells[valuesCount + 3, 3] = "min cross prob";
+                        ws.Cells[valuesCount + 4, 3] = minCrossProbArray[0];
+                        ws.Cells[valuesCount + 3, 4] = "max cross prob";
+                        ws.Cells[valuesCount + 4, 4] = maxCrossProbArray[0];
+                    }
+                    if (testedParameter == TestedParameter.crossoverOperator)
+                    {
+                        skip = 1;
+                    }
+                    else
+                    {
+                        ws.Cells[valuesCount + 3, 5 - skip] = "cross oper";
+                        if (crossOperArray[0] == CrossoverOperatorChosen.CX)
+                        {
+                            ws.Cells[valuesCount + 4, 5 - skip] = "CX";
+                        }
+                        else if (crossOperArray[0] == CrossoverOperatorChosen.OX)
+                        {
+                            ws.Cells[valuesCount + 4, 5 - skip] = "OX";
+                        }
+                        else
+                        {
+                            ws.Cells[valuesCount + 4, 5 - skip] = "PMX";
+                        }
+                    }
+                    if (testedParameter == TestedParameter.mutationProb)
+                    {
+                        skip = 1;
+                    }
+                    else
+                    {
+                        ws.Cells[valuesCount + 3, 6 - skip] = "mut prob";
+                        ws.Cells[valuesCount + 4, 6 - skip] = mutProbArray[0];
+                    }
+                    if (testedParameter == TestedParameter.rotationOperator)
+                    {
+                        skip = 1;
+                    }
+                    else
+                    {
+                        ws.Cells[valuesCount + 3, 7 - skip] = "rot gate";
+                        if (rotOperArray[0] == RotationGateVersion.Modified)
+                        {
+                            ws.Cells[valuesCount + 4, 7 - skip] = "mod";
+                        }
+                        else if (rotOperArray[0] == RotationGateVersion.Original)
+                        {
+                            ws.Cells[valuesCount + 4, 7 - skip] = "orig";
+                        }
+                        else
+                        {
+                            ws.Cells[valuesCount + 4, 7 - skip] = "none";
+                        }
+                    }
                     if (testedParameter == TestedParameter.selectionOperator)
                     {
-                        resultsPath = templatePath + "_" + instancePaths[i].Substring(0, instancePaths[i].Length - 4) + "_selOper";
+                        skip = 1;
                     }
-                    else if (testedParameter == TestedParameter.crossoverProb)
+                    else
                     {
-                        resultsPath = templatePath + "_" + instancePaths[i].Substring(0, instancePaths[i].Length - 4) + "_crossProb";
+                        ws.Cells[valuesCount + 3, 8 - skip] = "sel oper";
+                        if (selOperArray[0] == SelectionMethodChosen.Ranking)
+                        {
+                            skip = -1;
+                            ws.Cells[valuesCount + 4, 8 - skip] = "rank";
+                            ws.Cells[valuesCount + 3, 9 - skip] = "eta";
+                            ws.Cells[valuesCount + 4, 9 - skip] = etaArray[0];
+                        }
+                        else
+                        {
+                            ws.Cells[valuesCount + 4, 8 - skip] = "roull";
+                        }
                     }
-                    else if (testedParameter == TestedParameter.crossoverOperator)
-                    {
-                        resultsPath = templatePath + "_" + instancePaths[i].Substring(0, instancePaths[i].Length - 4) + "_crossOper";
-                    }
-                    else if (testedParameter == TestedParameter.mutationProb)
-                    {
-                        resultsPath = templatePath + "_" + instancePaths[i].Substring(0, instancePaths[i].Length - 4) + "_mutProb";
-                    }
-                    else if (testedParameter == TestedParameter.rotationOperator)
-                    {
-                        resultsPath = templatePath + "_" + instancePaths[i].Substring(0, instancePaths[i].Length - 4) + "_rotOper";
-                    }
-
-                    resultsPath = Directory.GetCurrentDirectory() + "\\Results\\" + resultsPath;
-                    if (File.Exists(resultsPath + ".xlsx"))
-                    {
-                        File.Delete(resultsPath + ".xlsx");
-                    }
-                    else if (File.Exists(resultsPath + ".xls"))
-                    {
-                        File.Delete(resultsPath + ".xls");
-                    }
-                    wb = excelApp.Workbooks.Add();
-                    wb.SaveAs(resultsPath);
-                    System.IO.FileInfo fileInfo = new System.IO.FileInfo(wb.FullName);
-                    fileInfo.IsReadOnly = false;
-
+                    ws.Cells[valuesCount + 3, 9 - skip] = "test count";
+                    ws.Cells[valuesCount + 4, 9 - skip] = repeatTest;
                     for (int j = 0; j < valuesCount; j++)
                     {
-                        ws = wb.Worksheets[j + 1];
-
                         if (testedParameter == TestedParameter.selectionOperator)
                         {
                             if (selOperArray[j] == SelectionMethodChosen.Ranking)
                             {
-                                ws.Name = "rank_eta_" + etaArray[j];
+                                ws.Cells[j + 2, 1] = "rank_eta_" + etaArray[j];
                             }
                             else
                             {
-                                ws.Name = "roull";
+                                ws.Cells[j + 2, 1] = "roull";
                             }
                         }
                         else if (testedParameter == TestedParameter.crossoverProb)
                         {
-                            ws.Name = "min_" + minCrossProbArray[j] + "_max_" + maxCrossProbArray[j];
+                            ws.Cells[j + 2, 1] = "min_" + minCrossProbArray[j] + "_max_" + maxCrossProbArray[j];
                         }
                         else if (testedParameter == TestedParameter.crossoverOperator)
                         {
                             if (crossOperArray[j] == CrossoverOperatorChosen.CX)
                             {
-                                ws.Name = "CX";
+                                ws.Cells[j + 2, 1] = "CX";
                             }
                             else if (crossOperArray[j] == CrossoverOperatorChosen.OX)
                             {
-                                ws.Name = "OX";
+                                ws.Cells[j + 2, 1] = "OX";
                             }
                             else
                             {
-                                ws.Name = "PMX";
+                                ws.Cells[j + 2, 1] = "PMX";
                             }
                         }
                         else if (testedParameter == TestedParameter.mutationProb)
                         {
-                            ws.Name = mutProbArray[j].ToString();
+                            ws.Cells[j + 2, 1] = mutProbArray[j].ToString();
                         }
                         else if (testedParameter == TestedParameter.rotationOperator)
                         {
                             if (rotOperArray[j] == RotationGateVersion.Modified)
                             {
-                                ws.Name = "mod";
+                                ws.Cells[j + 2, 1] = "mod";
                             }
                             else if (rotOperArray[j] == RotationGateVersion.Original)
                             {
-                                ws.Name = "orig";
+                                ws.Cells[j + 2, 1] = "orig";
                             }
                             else
                             {
-                                ws.Name = "none";
+                                ws.Cells[j + 2, 1] = "none";
                             }
                         }
 
@@ -2188,6 +2282,7 @@ namespace magisterka
                                     bestIter = algorithm.GetBestIteration();
                                     bestInitialGoal = algorithm.GetBestInitialSoultion().Goal;
                                     bestGoal = algorithm.GetBestSolution().Goal;
+                                    bestSol = new Solution((Solution)algorithm.GetBestSolution());
                                 }
                                 else
                                 {
@@ -2198,6 +2293,7 @@ namespace magisterka
                                     if (bestGoal > algorithm.GetBestSolution().Goal)
                                     {
                                         bestGoal = algorithm.GetBestSolution().Goal;
+                                        bestSol = new Solution((Solution)algorithm.GetBestSolution());
                                     }
                                 }
                                 Console.Write("OK");
@@ -2219,14 +2315,18 @@ namespace magisterka
                         }
                         avGoal /= Convert.ToDouble(repeatTest);
                         avIter /= Convert.ToDouble(repeatTest);
-                        ws.Cells[1, 1] = bestInitialGoal;
-                        ws.Cells[1, 2] = bestGoal;
-                        ws.Cells[1, 3] = avGoal;
-                        ws.Cells[1, 4] = bestIter;
-                        ws.Cells[1, 5] = avIter;
+                        ws.Cells[j + 2, 2] = bestInitialGoal;
+                        ws.Cells[j + 2, 3] = bestGoal;
+                        ws.Cells[j + 2, 4] = avGoal;
+                        ws.Cells[j + 2, 5] = bestIter;
+                        ws.Cells[j + 2, 6] = avIter;
+                        ws.Cells[j + 2, 7] = (bestGoal - bestvalues[i]) / bestvalues[i];
+                        for (int k = 0; k < bestSol.Size; k++)
+                        {
+                            ws.Cells[j + 2, k + 8] = bestSol[k].PermutationValue;
+                        }
                         wb.Save();
                     }
-                    wb.Close();
                 }
                 OK = false;
                 Console.Clear();
@@ -2238,6 +2338,7 @@ namespace magisterka
                 if (cki.Key == ConsoleKey.D2)
                 {
                     exit = true;
+                    wb.Close();
                     excelApp.Quit();
                     while (System.Runtime.InteropServices.Marshal.ReleaseComObject(excelApp) != 0) ;
                     ws = null;
