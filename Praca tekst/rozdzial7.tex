@@ -33,9 +33,6 @@ Jeszcze w trakcie pisania aplikacji, pojawiło się wiele wątpliwości związan
 \item z wykorzystaniem bramki kwantowej w wersji proponowanej przez autora niniejszej pracy. 
 \end{enumerate}
 
-\subsection{Operator selekcji}
-Każda z dwóch zaimplementowanych metod selekcji ma swoje dobre i złe strony. Należało jednak sprawdzić, która z metod bardziej przydatna jest w przypadku postawionego problemu. Dodatkowo metoda rankingowa pozwala na ustawienie parametru $\eta$, dodatkowo więc należało sprawdzić wpływ tego parametru na uzyskiwane wyniki. Przeprowadzona została więc seria testów porównujących działania obu operatorów oraz seria eksperymentów porównujących działanie operatora selekcji rankingowej z różnymi wartościami parametru $\eta$: wartością minimalną, maksymalną i pośrednią. 
-
 \subsection{Operator krzyżowania}
 Każdy z trzech zaimplementowanych operatorów krzyżowania (CX, OX, PMX) ma inne działanie. W związku z tym krzyżowanie przeprowadzone przy wykorzystaniu jednego z operatorów powinno dać rezultaty inne niż dla innego operatora. Przebieg działania algorytmu genetycznego, uruchomionego dla tych samym parametrów przeważnie wygląda inaczej, nawet jeśli zwracane jest to samo rozwiązanie. W związku z tym, ciężko jest wprost porównać, który z operatorów krzyżowania działa lepiej lub gorzej. Jednakże w przypadku wielokrotnego powtórzenia tego samego testu z wykorzystaniem jednego operatora krzyżowania i uśrednienia wyników, może pozwolić na dostrzeżenie pewnych różnic pomiędzy rezultatami analogicznych testów z wykorzystaniem innego operatora. Z tego powodu testy dotyczące porównania działania operatorów krzyżowania polegały na wielokrotnym uruchamianiu algorytmu dla tych samych parametrów, populacji początkowej i z różnymi wybranymi operatorami krzyżowania.
 
@@ -49,6 +46,9 @@ Przyjęło się mówić, że operator mutacji ma drugorzędne znaczenie w kwesti
 \item wartość prawdopodobieństwa mała (w stosunku do prawdopodobieństwa krzyżowania),
 \item wartość prawdopodobieństwa duża (rząd wielkości prawdopodobieństwa krzyżowania).
 \end{enumerate}
+
+\subsection{Operator selekcji}
+Każda z dwóch zaimplementowanych metod selekcji ma swoje dobre i złe strony. Należało jednak sprawdzić, która z metod bardziej przydatna jest w przypadku postawionego problemu. Dodatkowo metoda rankingowa pozwala na ustawienie parametru $\eta$, dodatkowo więc należało sprawdzić wpływ tego parametru na uzyskiwane wyniki. Przeprowadzona została więc seria testów porównujących działania obu operatorów oraz seria eksperymentów porównujących działanie operatora selekcji rankingowej z różnymi wartościami parametru $\eta$: wartością minimalną, maksymalną i pośrednią. 
 
 \subsection{Najlepsze parametry}
 Ostatni ze scenariuszy testowych jest niejako podsumowaniem scenariuszy wcześniejszych. Polegał on na poszukiwaniu rozwiązania problemu dla parametrów ustawionych na wartości, które na podstawie poprzednich testów uznane zostały za najlepsze (spośród wartości testowanych) i porównaniu otrzymanych wyników z wynikami uzyskanymi na podstawie działania algorytmu z ustawieniami najgorszymi. Test ten pozwala na sprawdzenie, czy najlepsze znalezione w testach poprzednich wartości parametrów algorytmu ustawione razem również pozwalają na uzyskiwanie dobrych rozwiązań.
