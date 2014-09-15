@@ -363,21 +363,6 @@ iteracji & populacji & kwantowa & krzyżowania & mutacji & & testów \\
 W tabelach znajdujących się poniżej zamieszczone są rezultaty testów związanych z prawdopodobieństwem krzyżowania. Wartości prawdopodobieństwa krzyżowania opisane są w formacie wartość min/max:
 
 \begin{table}[H]
-\label{T3_params}
-\begin{tabular}{l l l l l l l l}
-\hline
-liczba & rozmiar & min. prawd. & maks. prawd & bramka & prawd. & selekcja & liczba \\
-iteracji & populacji & krzyżowania & krzyżowania & kwantowa & mutacji & & testów \\
-\hline
-300 & 50 & 0,8 & 0,8 & zmodyfikowana & 0,05 & ruletkowa & 3 \\
-\hline
-\end{tabular}
-\caption{Stałe parametry eksperymentu związanego z prawdopodobieństwem krzyżowania}
-\end{table}
-
-W poniższych tabelach znajdują się rezultaty testów dla poszczególnych instancji testowych:
-
-\begin{table}[H]
 \label{T3_bur26a}
 \begin{tabular}{l l l l l l l}
 \hline
@@ -452,7 +437,7 @@ W poniższych tabelach znajdują się rezultaty testów dla poszczególnych inst
  & $f_{init}$ & $f_{best}$ & $\overline{f_{best}}$ & n & $\overline{n}$ & $\delta$ \\
 \hline
 0,8/0,8 & 250 & 120 & 126,6666667 & 90 & 119 & 0,034482759\\
-0,6/1 & 250	118	118	99	190	0,017241379\\
+0,6/1 & 250 & 118 & 118 & 99 & 190 & 0,017241379\\
 0,6/0,6 & 250 & 120 & 122,6666667 & 110 & 135 & 0,034482759\\
 0,4/0,8 & 250 & 120 & 122,6666667 & 99 & 142,6666667 & 0,034482759\\
 0,4/0,4 & 250 & 120 & 124,6666667 & 185 & 224,6666667 & 0,034482759\\
@@ -508,7 +493,7 @@ W poniższych tabelach znajdują się rezultaty testów dla poszczególnych inst
 0,6/0,6 & 3896 & 3807 & 3809,666667 & 52 & 111,6666667 & 0,033668205\\
 0,4/0,8 & 3896 & 3817 & 3837,333333 & 51 & 69 & 0,036383383\\
 0,4/0,4 & 3896 & 3808 & 3810,333333 & 89 & 142,3333333 & 0,033939723\\
-0,2/0,6 & 3896	3822 & 3831,333333 & 9 & 64,66666667 & 0,037740972\\
+0,2/0,6 & 3896 & 3822 & 3831,333333 & 9 & 64,66666667 & 0,037740972\\
 \hline
 \end{tabular}
 \caption{Rezultaty dla instancji lipa20a}
@@ -823,7 +808,7 @@ rankingowa, $\eta = 2$ & 14510 & 7940 & 8378,666667 & 79 & 112,3333333 & 1,09167
 \hline
 ruletkowa & 248 & 122 & 125,3333333 & 87 & 132 & 0,051724138\\
 rankingowa, $\eta = 1$ & 248 & 120 & 122 & 105 & 159,6666667 & 0,034482759\\
-rankingowa, $\eta = 1,5$ & 248 & 122 & 125,3333333 & 103109,6666667 & 0,051724138\\
+rankingowa, $\eta = 1,5$ & 248 & 122 & 125,3333333 & 103 & 109,6666667 & 0,051724138\\
 rankingowa, $\eta = 2$ & 248 & 118 & 120 & 92 & 102,3333333 & 0,017241379\\
 \hline
 \end{tabular}
@@ -838,7 +823,7 @@ rankingowa, $\eta = 2$ & 248 & 118 & 120 & 92 & 102,3333333 & 0,017241379\\
 \hline
 ruletkowa & 1762 & 1690 & 1698 & 17 & 34,66666667 & 0,023002421\\
 rankingowa, $\eta = 1$ & 1762 & 1672 & 1676,666667 & 25 & 65 & 0,012106538\\
-rankingowa, $\eta = 1,5$ & 1762 & 1686 & 1689,33333322 & 30 & 0,020581114\\
+rankingowa, $\eta = 1,5$ & 1762 & 1686 & 1689,33333322 & 22 & 30 & 0,020581114\\
 rankingowa, $\eta = 2$ & 1762 & 1680 & 1686,666667 & 22 & 48,66666667 & 0,016949153\\
 \hline
 \end{tabular}
@@ -918,4 +903,44 @@ rankingowa, $\eta = 2$ & 367017 & 365296 & 365355 & 234 & 270,3333333 & 0,012938
 \hline
 \end{tabular}
 \caption{Rezultaty dla instancji lipa90a}
+\end{table}
+
+\section{Najlepsze parametry}
+W tabeli poniżej znajdują się wartości parametrów, które zostały uznane na podstawie wcześniejszych eksperymentów za najlepsze. Uzasadnienie ich wyboru znajduje się kolejnym rozdziale:
+
+\begin{table}[H]
+\label{best_param}
+\begin{tabular}{l l l l l l}
+\hline
+bramka & operator & min. prawd. & maks. prawd & prawd. & operator \\
+kwantowa & krzyżowania & krzyżowania & krzyżowania & mutacji & selekcji\\
+\hline
+zmodyfikowana & CX & 0,6 & 0,6 & 0,4 & rankingowa, $\eta=2$\\
+\hline
+\end{tabular}
+\caption{Najlepsze wartości testowanych parametrów}
+\end{table}
+
+Tabela znajdująca się poniżej zawiera rezultaty eksperymentu dla każdej z instancji z parametrami algorytmu ustawionymi na najlepsze wartości:
+
+\begin{table}[H]
+\label{test_best_param}
+\begin{tabular}{l l l l l l l}
+\hline
+instancja & $f_{init}$ & $f_{best}$ & $\overline{f_{best}}$ & n & $\overline{n}$ & $\delta$\\
+\hline
+bur26a & 5715964 & 5480950 & 5500345,333 & 107 & 140,6666667 & 0,010002451\\
+chr15b & 37200 & 15514 & 16730 & 38 & 39 & 0,941677096\\
+chr18b & 3464 & 1718 & 1776 & 36 & 44 & 0,119947849\\
+chr25a & 15420 & 8904 & 9217,333333 & 108 & 202,6666667 & 1,345626976\\
+esc64a & 206 & 116 & 121,3333333 & 98 & 149,3333333 & 0\\
+had12 & 1790 & 1676 & 1695,333333 & 28 & 32,66666667 & 0,014527845\\
+kra32 & 126930 & 101670 & 102790 & 100 & 118 & 0,146223224\\
+lipa20a & 3885 & 3816 & 3825,666667 & 53 & 57,66666667 & 0,036111865\\
+lipa50b & 1538103 & 1487146 & 1490913,667 & 169 & 207,3333333 & 0,22879849\\
+lipa80a & 257950 & 256698 & 256759,3333 & 264 & 278,3333333 & 0,013835186\\
+lipa90a & 366979 & 365277 & 365396 & 248 & 269,6666667 & 0,012885783\\
+\hline
+\end{tabular}
+\caption{Rezultaty testu dla wszystkich instancji testowych dla najlepszych wartości parametrów algorytmu}
 \end{table}

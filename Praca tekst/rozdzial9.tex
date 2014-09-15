@@ -1,2 +1,140 @@
 \chapter{Analiza uzyskanych wyników}
 \label{cha:analiza}
+
+Stwierdzenie, która wartość wybranego parametru algorytmu jest lepsza, jest zadaniem trudnym. Przyjęto więc, że w pierwszej kolejności decyzję należy podjąć w oparciu o wartość błędu względnego, a w przypadku gdy różnice są niewielkie, wybór najlepszej wartości testowanego parametru podejmowany jest na podstawie średniej wartości numerów iteracji algorytmu, w których uzyskano najlepsze rozwiązania.
+
+Należy oczywiście podkreślić, iż stwierdzenie, że wybrana wartość parametru jest najlepsza, dotyczy tylko wartości testowanych. Nie jest wiadomym, czy inna wartość, która nie była sprawdzana eksperymentalnie nie pozwoliłaby na uzyskanie lepszych rezultatów. Natomiast wartości te starano się dobrać w taki sposób, by można było odpowiedzieć na pytanie czy, przykładowo, testowany parametr powinien przyjmować wartości większe bądź mniejsze.
+
+Można zauważyć, że dla pewnych instancji testowych wartości błędów względnych są duże i nie ma znaczenia, który parametr algorytmu był testowany. Sytuacja ta może wynikać z wielu powodów. Przyczyną niewątpliwie może być zły dobór parametrów, które nie podlegały aktualnie testowaniu. Być może dla jednej konkretnej instancji, dużo lepiej spisywałby się inny operator krzyżowania, pod warunkiem, że prawdopodobieństwo mutacji było inne. Być może instancja problemu skonstruowana jest tak, by istniało wiele minimów lokalnych o podobnej postaci do rozwiązania optymalnego.
+
+\subsection{Bramka kwantowa}
+Testowane były trzy warianty: brak bramki kwantowej, wersja bramki zaproponowana w \cite{NPQGA} oraz wersja nazywana zmodyfikowaną, zaproponowana przez autora niniejszej pracy. Poniżej znajduje się tabela zawierająca informację na temat, ile razy dany wariant pozwolił na uzyskanie lepszych rezultatów:
+
+\begin{table}[H]
+\label{bramka_results}
+\begin{tabular}{l l l}
+\hline
+brak bramki & wersja oryginalna & wersja zmodyfikowana \\
+\hline
+0 & 0 & 11\\
+\hline
+\end{tabular}
+\end{table}
+
+Powyższa tabela jednoznacznie pokazuje, przy opisanych wyżej kryteriach oceny, która ,,wartość'' bramki kwantowej jest najlepsza. Jednakże, dla niektórych instancji testowych różnice bywały niewielkie. 
+
+Przy analizie jedynie średniej wartości numerów iteracji, zauważyć można, że wartość była najmniejsza dla sytuacji, gdy bramka kwantowa w ogóle była niewykorzystywana, a największa dla wersji zmodyfikowanej. Świadczy to o tym, że bramka ta pozwala unikać zbyt szybkiej zbieżności do minimum lokalnego. Natomiast różnice na korzyść wersji zmodyfikowanej można tłumaczyć tym, że sposób jej działania ma lepszy wpływ na szersze przeszukiwanie przestrzeni rozwiązań - nakierowuje ona przetwarzane rozwiązania na rozwiązanie lepsze od nich, lecz w przeciwieństwie do wersji oryginalnej zmiana kąta jest dużo mniejsza. Dzięki temu ewentualna zbieżność do minimum lokalnego jest mniej prawdopodobna.
+
+Należy też wspomnieć, że publikacja \cite{NPQGA} zawierała opis algorytmu i jego wykorzystanie w problemie szeregowania zadań. W eksperymentach użyty algorytm był po wielu modyfikacjach względem swojej oryginalnej wersji i posłużył do rozwiązywania innego problemu. Być może to również miało wpływ na efekty uzyskiwane przy wykorzystani oryginalnej wersji bramki kwantowej. Możliwe jest, że wartości w tablicy \textit{Look Up} dobrane były specjalnie pod kątem problemu szeregowania zadań i dla innych problemów wartości te nie koniecznie muszą być odpowiednie.
+
+Dla jednej instancji - \textit{esc64a} korzystając z bramki w wersji zmodyfikowanej udało się uzyskać rozwiązanie równe optymalnemu, gdzie średnia wartość numerów iteracji wynosiła około 126, a dla wersji oryginalnej przy wartości błędu około 0,19 średnia wartości iteracji wynosiła mniej więcej 122.
+
+\subsection{Operator krzyżowania}
+Kolejnym, drugim testowanym parametrem był operator krzyżowania. Testowane były operatory CX, OX oraz PMX. W poniższej tabeli znajduje się podsumowanie ile razy dany operator okazał się najlepszy:
+
+\begin{table}[H]
+\label{cross_oper_results}
+\begin{tabular}{l l l}
+\hline
+CX & OX & PMX \\
+\hline
+8 & 1 & 2\\
+\hline
+\end{tabular}
+\end{table}
+
+Z powyższej tabeli wynika, że najlepszym operatorem okazał się operator CX, jednakże nie było tak w każdym przypadku. Dla instancji \textit{chr15b} lepszy okazał się operator OX, natomiast dla instancji \textit{bur26a} i \textit{chr18b} PMX.
+
+Ciężko w przypadku operatorów krzyżowania ocenić, dlaczego jeden działa lepiej od innych. Sam proces krzyżowania w problemie, którego rozwiązaniem jest permutacja, powoduje duże zmiany w rozwiązaniach potomnych. Oczywiście rozwiązania te mają cechy swoich rodziców, lecz sposób w jaki informacja jest wymieniana wprowadza duże modyfikacje. W permutacji ważna jest kolejność jej elementów, natomiast krzyżowanie nierzadko kolejność tę zaburza. Wynikać może z tego to, że operator CX w mniejszym stopniu powoduje te modyfikacje.
+
+W żadnym z przypadków nie udało się uzyskać rozwiązania optymalnego, choć często błąd względny był niewielki. Natomiast w przypadku instancji \textit{chr25a} dla każdego z operatorów wartość błędu wynosiła grubo ponad 1, a dla operatora OX nawet ponad 2.
+
+\subsection{Prawdopodobieństwo krzyżowania}
+Algorytm NPQGA w swych założeniach pozwala na zmianę wartości krzyżowania w czasie. Wartość ta wraz z rosnącą ilości wykonanych iteracji algorytmu malała do określonej wartości minimalnej by osiągnąwszy ją nie zmieniać się już do końca działania algorytmu. Testy dotyczące wpływu prawdopodobieństwa krzyżowania na otrzymywane rezultaty miały na celu pokazania, czy zmieniająca się jego wartość ma realny wpływ na rezultaty i jaka jego wartość jest najlepsza. Poniższa tabela pokazuje, ile razy dla jakiej wartości prawdopodobieństwa uzyskano najlepsze rezultaty:
+
+\begin{center}
+\begin{table}[H]
+\label{cross_prob_results}
+\begin{tabular}{l l l l l l}
+\hline
+0,8/0,8 & 0,6/1 & 0,6/0,6 & 0,4/0,8 & 0,4/0,4 & 0,2/0,6\\
+\hline
+1 & 4 & 2 & 0 & 3 & 1\\
+\hline
+\end{tabular}
+\end{table}
+\end{center}
+
+Z powyższej tabeli wynika wprawdzie jednoznacznie, która wartość prawdopodobieństwa jest lepsza od innych, nie wynika jednak z niej, która wartość jest wyraźnie lepsza od innych. Sytuacja ta wydaje się być ciekawa - krzyżowanie jest zasadniczą częścią algorytmów genetycznych, a więc dobór właściwej wartości jego prawdopodobieństwa powinna być rzeczą bardzo ważna. Być może obecność bramki kwantowej powoduje to, że krzyżowanie traci na znaczeniu - nie jest już jedynym operatorem polepszającym wartość populacji z pokolenia na pokolenie.
+
+Analizując tabelę \ref{cross_prob_results} można dojść do wniosku, że najlepsze rezultaty pozwoli osiągnąć prawdopodobieństwo krzyżowania o wartości równiej mniej więcej 0,6. Warto jednak przy tym podkreślić, że różnice pomiędzy błędami względnymi wyliczonymi dla każdej sytuacji nie są duże.
+
+\subsection{Prawdopodobieństwo mutacji}
+Niewątpliwie, sposób w jaki przeprowadzana jest mutacja w algorytmie NPQGA powoduje, że jej wpływ na rozwiązania, które zostały jej poddane jest dużo większy niż w innych algorytmach genetycznych.
+
+Poniższa tabela prezentuje, ile razy testowana wartość prawdopodobieństwa mutacji pozwoliła na uzyskanie lepszych rezultatów niż pozostałe:
+
+\begin{table}[H]
+\label{bramka_results}
+\begin{tabular}{l l l}
+\hline
+0,4 & 0,05 & 0 \\
+\hline
+5 & 3 & 3 \\
+\hline
+\end{tabular}
+\end{table}
+
+Podsumowanie wyników przedstawione w powyższej tabeli może wydawać się lekko zaskakujące. Lepsze rezultaty uzyskano przeważnie w sytuacji, gdy wartość prawdopodobieństwa mutacji wynosiła 0,4. Wynikać z tego może fakt, że częstsza mutacja zwiększa prawdopodobieństwo zdekodowania rozwiązania w taki sposób, że jest ono bardziej podobne do rozwiązania lepszego, uwzględnianego w działaniu bramki kwantowej. Równocześnie, małe różnice w uzyskiwanych rezultatach dla wszystkich testowanych wartości prawdopodobieństwa mutacji może potwierdzać tezę, że mutacja ma dużo mniejszy wpływ na osiągane przez algorytm wyniki niż operacja krzyżowania.
+
+Dla instancji testowej o nazwie \textit{chr15b} uzyskany błąd względny dla każdego przypadku był duży, a dla wartości prawdopodobieństwa mutacji równego 0,4 osiągnął wartość przekraczającą 1. Udało się także raz znaleźć rozwiązanie optymalne. Sytuacja ta miała miejsce dla instancji \textit{esc64a} i wartości prawdopodobieństwa mutacji równego 0,05.
+
+\section{Operator selekcji}
+Ostatnim testowanym parametrem algorytmu był operator selekcji. Testom podlegała selekcja ruletkowa oraz rankingowa dla różnych wartości parametru $\eta$. Poniższa tabela przedstawia, ile razy dany z wariantów okazał się lepszy od pozostałych:
+
+\begin{table}[H]
+\label{bramka_results}
+\begin{tabular}{l l l l}
+\hline
+selekcja & selekcja & selekcja & selekcja\\
+ruletkowa & rankingowa, $\eta = 1$ & rankingowa, $\eta = 1,5$ & rankingowa, $\eta = 2$\\
+\hline
+2 & 2 & 2 & 5\\
+\hline
+\end{tabular}
+\end{table}
+
+Z poniższej tabeli wynika, że najczęściej najlepsze rezultaty uzyskano, gdy wybrana była selekcja rankingowa, z parametrem $\eta$ równym 2, czyli dla wartości największej możliwej i najbardziej premiującej rozwiązania lepsze od gorszych. Co ciekawe, dla dwóch instancji testowych  mimo ustawienia parametru $\eta$ na wartość 1 udało się uzyskać lepsze rezultaty niż dla wartości innych. W takim przypadku rozwiązania są wybierane losowo, gdyż każde z nich ma takie same prawdopodobieństwo bycia wybranym. Sytuacja ta mogła być wynikiem tego, że przy danym rozmiarze populacji różnice w prawdopodobieństwach wyboru rozwiązań dla parametru $\eta$ różnego od 1 i dla selekcji ruletkowej są małe i rozwiązanie najgorsze w pokoleniu ma niewiele mniejszą szansę bycia wybranym niż najlepsze. Z tego powodu selekcja w każdym z możliwych przypadków przebiega dość podobnie.
+
+\section{Najlepsze parametry}
+Ostatni podsumowujący eksperyment miał na celu zweryfikowanie, czy uzyskane najlepsze wartości parametrów w każdym z wcześniejszych testów, ustawione razem poprawią uzyskiwane rezultaty. Poniższa tabela zawiera informacje na temat tego, ile razy dla danej instancji testowej udało się uzyskać poprawę, a ile razy wynik był gorszy w stosunku do poprzednich eksperymentów:
+\begin{table}[H]
+\label{best_porownanie}
+\begin{tabular}{l l l}
+\hline
+instancja testowa & ile razy lepszy wynik & ile razy gorszy wynik\\
+\hline
+bur26a & 4 & 1\\
+chr15b & 2 & 3\\
+chr18b & 2 & 3\\
+chr25a & 1 & 4\\
+esc64a & 4 & 1\\
+had12 & 5 & 0\\
+kra32 & 0 & 5\\
+lipa20a & 3 & 2\\
+lipa50b & 0 & 5\\
+lipa80a & 1 & 4\\
+lipa90a & 2 & 3\\
+\hline
+$\Sigma$ & 24 & 31\\
+\hline
+\end{tabular}
+\caption{Porównanie wyników eksperymentów}
+\end{table}
+
+Powyższa tabela nie pozwala stwierdzić, że ustawienie parametrów na wartości uznane w poprzednich eksperymentach za najlepsze, spowodowało ogólne polepszenie działania algorytmu. Jednakże nie pozwala ona również stwierdzić, że taki dobór parametrów spowodował pogorszenie wyników. Zaistniała sytuacja może mieć swoją przyczynę w tym, że pewne parametry dobrane razem dadzą gorsze wyniki niż, gdyby każdy z nich był ustawiony na swoją teoretycznie najlepszą wartość w osobnych testach. Należy jednak wspomnieć, że różnice pomiędzy wcześniejszymi testami a testem ,,podsumowującym'' były niewielkie.
+
+\section{Podsumowanie eksperymentów obliczeniowych}
+Przeprowadzone eksperymenty przy użyciu napisanej aplikacji zweryfikowały poprawności jej działania - algorytm działa poprawnie, w większości przypadków otrzymane rezultaty były dość dobre. Jeden z testów pozwolił nawet na znalezienie rozwiązania optymalnego. Jednakże dla pewnych instancji testowych otrzymywane wyniki były złe, niezależnie od dobranych parametrów algorytmu. 
+
+Niewielkie różnice pomiędzy uzyskiwanymi rezultatami eksperymentów pozwalają stwierdzić, że choć istnieją różne wersje operatorów genetycznych, każda z nich pozwala na uzyskiwanie dobrych rezultatów. Liczba parametrów algorytmu, które można zmienić oraz ich zakres, nie pozwolił na przetestowanie każde możliwej opcji, dlatego należy jeszcze raz podkreślić, że wartości uznane za najlepsze, najlepszymi były tylko w obrębie danego eksperymentu, co niejako potwierdza eksperyment podsumowujący. Jednak rezultaty testów pozwalają na wyrobienie pewnej intuicji, dzięki której możliwy będzie właściwy dobór parametrów w przypadku rozwiązywania problemów, dla których nieznane jest rozwiązanie optymalne.  
