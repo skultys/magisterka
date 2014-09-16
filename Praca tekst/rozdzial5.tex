@@ -36,16 +36,20 @@ Ustawienie parametru $\eta_{max}$ na 1 powoduje, że prawdopodobieństwo wyboru 
 Oprócz proponowanego przez autorów operatora krzyżowania cyklicznego, zostały również wykorzystane operatory PMX oraz OX.
 Operator PMX, czyli operator krzyżowania z częściowym odwzorowaniem, polega na zamianie w wybranym fragmencie genów pomiędzy rodzicami i utworzeniu na tej podstawie listy odwzorowań. Fragment ten nazywany jest sekcją kojarzenia. W przypadku odwzorowań \textit{a - b} i \textit{b - c}, oba odwzorowania redukuje się do postaci \textit{a - c}, natomiast w przypadku występowania cyklu, tworzące ten cykl odwzorowania pomija się. Elementy spoza wybranego fragmentu są wymieniane na zasadzie element za element, jeśli taka wymiana znajduje się na liście z odwzorowaniami, a pozostałe elementy w osobnikach przepisywane są bez zmian. Poniżej znajduje się schemat z przykładowym działaniem tegoż operatora:
 \begin{figure}[h]
-\includegraphics[scale=1]{pmx}
+\begin{center}
+\includegraphics[scale=0.7]{pmx}
 \caption{Krzyżowanie PMX}
+\end{center}
 \end{figure}
 
 Podczas działania operatora OX, czyli operatora z zachowaniem porządku, wybierane są dwie pozycje genów z rozwiązań rodziców i spomiędzy tych pozycji kopiowane są geny z rodzica pierwszego do potomka pierwszego i z rodzica drugiego do potomka drugiego. Następnie, począwszy od pierwszej pozycji za kopiowanym fragmentem, przenoszone są geny z rodzica pierwszego do rozwiązania potomnego nr 2, z wyłączeniem elementów już się w nim znajdujących i na odwrót, czyli geny rodzica drugiego przenoszone są do potomka pierwszego. Przeniesione elementy są również umieszczane od pierwszej pozycji za skopiowanym fragmentem. Poniżej znajduje się rysunek obrazujący działanie tego operatora:
 
 \newpage
 \begin{figure}[h]
-\includegraphics[scale=1]{ox}
+\begin{center}
+\includegraphics[scale=0.7]{ox}
 \caption{Krzyżowanie OX}
+\end{center}
 \end{figure}
 
 Zgodnie z założeniem autorów algorytmu, prawdopodobieństwo zajścia krzyżowania powinno zmniejszać się wraz z rosnącą liczbą iteracji algorytmu. W zmodyfikowanej wersji algorytmu możliwe jest ustawienie maksymalnego i minimalnego prawdopodobieństwa na tę samą wartość, co skutkuje niezmiennym prawdopodobieństwem krzyżowania podczas działania algorytmu.

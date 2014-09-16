@@ -24,16 +24,18 @@ Interfejsy \textit{IPopulation} i \textit{ISolution} posłużyły do napisania k
 By algorytm mógł znaleźć rozwiązanie problemu, musi przetwarzać całą populację rozwiązań. Dlatego też została napisana klasa \textit{Population}, dziedzicząca po interfejsie \textit{IPopulation}. Populacja natomiast zawiera w sobie listę osobników, rozwiązań, które reprezentowane są przez obiekty klasy \textit{Solution} dziedziczącej z kolei po interfejsie \textit{ISolution}. Postacią rozwiązania w problemie przydziału kwadratowego jest permutacja, określająca, który obiekt został przypisany do kolejnych lokalizacji. Z tego powodu obiekty klasy \textit{Solution} zawierają w sobie listę obiektów reprezentujących elementy permutacji. Klasa tych obiektów została nazwana \textit{Chromosome}. Należy tutaj wyjaśnić pewną nieścisłość w terminach używanych w algorytmach genetycznych. \textit{Chromosomami} zwykło się nazywać kompletne rozwiązania, a ich fragmenty kodujące rozwiązanie \textit{genami}. Z racji, iż w aplikacji rozwiązania problemu reprezentowane są przez obiekty klasy \textit{Solution}, a element permutacji nie jest najmniejsza porcją informacji, postanowiono nazwać te porcje chromosomami, a ich najmniejszą część \textit{genem}. A więc \textit{chromosomy} składają się z kubitów reprezentowanych przez klasę \textit{Qbit}. Poprzez zdekodowanie stanu kubitów określa się wartość chromosomu, a następnie poprzez omówioną w rozdziale czwartym konwersję otrzymuje się permutacyjną postać rozwiązania problemu QAP.
 \newpage
 \begin{figure}[!t]
+\begin{center}
 \includegraphics[scale=0.4]{data_structure}
 \caption{Struktura danych}
+\end{center}
 \end{figure}
 
 W kontekście struktury danych należy jeszcze wspomnieć o macierzach przepływu i odległości problemu QAP. Ich wartości są wczytywane z plików \textit{.dat} zawierających rozmiar problemu oraz odpowiednio macierze odległości i przepływu i są następnie trzymane w obiekcie klasy \textit{QapData} zrealizowanej jako singleton, czyli jako specjalna klasa o globalnym dostępnie pozwalająca na utworzenie tylko jednego jej obiektu. Posiada ona także mechanizmy, które bez wiedzy użytkownika same dbają o to, by faktycznie istniał jeden jej obiekt i jej instancja została utworzona podczas pierwszej próby jej użycia.
 
 \section{Funkcja testująca działanie algorytmu}
-Oprócz klas związanych z samym algorytmem NPQGA, została napisana klasa pozwalająca na przetestowanie algorytmu. Składa się ona z dwóch funkcji: testującej oraz wczytującej instancje problemu QAP i zapisującej wartości macierzy przepływu i odległości do opisanego wyżej singletona.
+Oprócz klas związanych z samym algorytmem NPQGA została napisana klasa pozwalająca na przetestowanie algorytmu. Składa się ona z dwóch funkcji: testującej oraz wczytującej instancje problemu QAP i zapisującej wartości macierzy przepływu i odległości do opisanego wyżej singletona.
 
-Po wywołaniu funkcji testującej algorytm użytkownik proszony jest o podanie dla ilu wartość testowanego parametru chce przeprowadzić testy oraz ile razy powtórzyć eksperyment dla danej wartości parametru. Następnie należy podać, który parametr algorytmu (operator selekcji, operator krzyżowania, prawdopodobieństwo krzyżowania, prawdopodobieństwo mutacji, operator bramki kwantowej) ma być testowany. Po tym wyborze użytkownik proszony jest o podanie kolejnych wartości wybranego parametru algorytmu. Kolejnym krokiem jest wybór instancji testowych, dla których mają zostać przeprowadzone eksperymenty, a następnie należy ustawić pozostałe parametry algorytmu, których wartość będzie stała podczas wszystkich testów. Ostatnim krokiem jest podanie szablonu nazwy pliku, do którego zostaną zapisane rezultaty testów. 
+Po wywołaniu funkcji testującej algorytm użytkownik proszony jest o podanie, dla ilu wartości testowanego parametru chce przeprowadzić testy oraz ile razy powtórzyć eksperyment dla danej wartości. Następnie należy podać, który parametr algorytmu (operator selekcji, operator krzyżowania, prawdopodobieństwo krzyżowania, prawdopodobieństwo mutacji, operator bramki kwantowej) ma być testowany. Po tym wyborze użytkownik proszony jest o podanie kolejnych wartości wybranego parametru algorytmu. Kolejnym krokiem jest wybór instancji testowych, dla których mają zostać przeprowadzone eksperymenty, a następnie należy ustawić pozostałe parametry algorytmu, których wartość będzie stała podczas wszystkich testów. Ostatnim krokiem jest podanie szablonu nazwy pliku, do którego zostaną zapisane rezultaty testów. 
 
 W przypadku operatora selekcji do wyboru są dwie metody: ruletkowa oraz rankingowa. Spośród metod krzyżowania dostępne są trzy opcje: CX, OX i PMX. Wersje bramki kwantowej zostały opisane w rozdziałach 4 i 5. Istnieje także możliwość uruchomienia algorytmu bez bramki kwantowej.
 
@@ -44,7 +46,7 @@ Aplikacja została napisana w sposób niepozwalający na przyjęcie nieprawidło
 Po zakończeniu testów użytkownik ma możliwość ponownego rozpoczęcia eksperymentów lub zamknięcia aplikacji.
 
 \section{Rezultaty działania aplikacji}
-Wyniki działania eksperymentów zapisywane są w pliku \textit{xls} bądź \textit{xlsx}, w zależności od wersji oprogramowania \textit{Microsoft Excel} zainstalowanej na komputerze użytkownika aplikacji. Dla każdej z wybranych instancji testowych tworzony jest osobny plik o nazwie w formacie [szablon nazwy]\_[parametr testowany]. W osobnych arkuszach danego pliku znajdują się rezultaty testów dla poszczególnych wartości testowanego parametru.
+Wyniki działania eksperymentów zapisywane są w pliku o nazwie w formacie [szablon nazwy]\_[parametr testowany] i rozszerzeniu \textit{xls} bądź \textit{xlsx}, w zależności od wersji oprogramowania \textit{Microsoft Excel} zainstalowanej na komputerze użytkownika aplikacji. W osobnych arkuszach danego pliku znajdują się rezultaty testów dla poszczególnych wartości instancji testowych.
 
 Na rezultaty eksperymentów składają się następujące wartości:
 \begin{itemize}
@@ -52,18 +54,68 @@ Na rezultaty eksperymentów składają się następujące wartości:
 \item wartość funkcji celu najlepszego rozwiązania znalezionego podczas wszystkich przeprowadzonych testów dla danej wartości testowanego parametru,
 \item średnia wartość najlepszych rozwiązań zwróconych przez algorytm w powyższych testach,
 \item numer iteracji, w której najlepsze rozwiązanie zostało znalezione,
-\item średnia wartość numerów iteracji najlepszych rozwiązań w poszczególnych testach.  
+\item średnia wartość numerów iteracji najlepszych rozwiązań w poszczególnych testach,
+\item wartość błędu względnego najlepszego rozwiązania.
 \end{itemize}
 
 \section{Szczegóły związane z implementacją poszczególnych elementów algorytmu}
-Kilka szczegółów związanych z działaniem algorytmu nie zostało poruszonych w publikacji \cite{NPQGA}. Jednakże, by algorytm mógł działać, należało arbitralnie przyjąć pewne założenia. Jednym z takich założeń jest moment aktualizacji stanu kubitów. Zostało przyjęte, że należy ocenić, w którym ze stanów 1 lub 0 znajduje się bit kwantowy, gdy wiadome jest, że rozwiązanie, w którym dany kubit się znajduje, poddane zostało zmianom wynikającym z działania operatora bramki kwantowej, lub dla tego rozwiązania zostały spełnione warunki na zajście mutacji. Natomiast po dokonaniu operacji krzyżowania, nie jest oceniany stan kubitów rozwiązań potomnych. Taka ocena, szczególnie w początkowych iteracjach algorytmu powodowałaby, że rozwiązania otrzymane na drodze krzyżowania mogłyby tracić informację uzyskaną z rozwiązań rodziców. Ideą krzyżowania jest wymiana informacji.
+Kilka szczegółów związanych z działaniem algorytmu nie zostało poruszonych w publikacji \cite{NPQGA}. Jednakże, by algorytm mógł działać, należało arbitralnie przyjąć pewne założenia. Jednym z takich założeń jest moment aktualizacji stanu kubitów. Zostało przyjęte, że należy ocenić, w którym ze stanów 1 lub 0 znajduje się bit kwantowy, gdy wiadome jest, że rozwiązanie, w którym dany kubit się znajduje, poddane zostało zmianom wynikającym z działania operatora bramki kwantowej, lub dla tego rozwiązania zostały spełnione warunki zajścia mutacji. Natomiast po dokonaniu operacji krzyżowania, nie jest oceniany stan kubitów rozwiązań potomnych. Taka ocena, szczególnie w początkowych iteracjach algorytmu, powodowałaby, że rozwiązania otrzymane na drodze krzyżowania mogłyby tracić informację uzyskaną z rozwiązań rodziców. Ideą krzyżowania jest wymiana informacji.
 
-W przypadku, gdy użytkownik programu postanowi, że algorytm ma znajdywać rozwiązanie bez wykorzystania bramki kwantowej, kwantowa idea algorytmu przejawia się wtedy jedynie podczas tworzenia populacji początkowej oraz operacji mutacji, która dalej polega na zamianie wartości parametrów $\alpha$ i $\beta$.
+W przypadku, gdy użytkownik programu postanowi, że algorytm ma znajdować rozwiązanie bez wykorzystania bramki kwantowej, kwantowa idea algorytmu przejawia się wtedy jedynie podczas tworzenia populacji początkowej oraz operacji mutacji, która dalej polega na zamianie wartości parametrów $\alpha$ i $\beta$.
 
-Rozwiązanie, które jest podstawą do działania bramki kwantowej i nazywane jest najlepszym, jest faktycznie najlepszym rozwiązaniem, ale uzyskanym w poprzednim pokoleniu. Operator bramki kwantowej używany jest dopiero na populacji poddanej już działaniu operatorów krzyżowania i mutacji. Z tego powodu istnieje możliwość, że dopasowanie zapamiętanego rozwiązania będzie gorsze niż dopasowanie niektórych rozwiązań poddawanych działaniu bramki kwantowej. Wynika to z faktu, iż w efekcie działania operatorów mutacji i krzyżowania mogą powstać rozwiązania lepsze niż te, które dotychczas istniały w populacji. Dlatego rozważane są w tablicach \textit{Look Up} przypadki, dla których warunek $f(x)>f(best)$ może być prawdą.
+Rozwiązanie, które jest podstawą działania bramki kwantowej i nazywane jest najlepszym, jest faktycznie najlepszym rozwiązaniem, ale uzyskanym w poprzednim pokoleniu. Operator bramki kwantowej używany jest dopiero na populacji poddanej już działaniu operatorów krzyżowania i mutacji w danej iteracji algorytmu. Z tego powodu istnieje możliwość, że dopasowanie zapamiętanego rozwiązania będzie gorsze niż dopasowanie niektórych rozwiązań poddawanych działaniu bramki kwantowej. Wynika to z faktu, iż w efekcie działania operatorów mutacji i krzyżowania mogą powstać rozwiązania lepsze niż te, które dotychczas istniały w populacji. Dlatego rozważane są w tablicach \textit{Look Up} przypadki, dla których warunek $f(x)>f(best)$ może być prawdą.
 
-Foldery z rezultatami działania algorytmu - \textit{Results} i instancjami testowymi - \textit{QAPLib} znajdują się w tym samym folderze co plik wykonywalny aplikacji. Podczas uruchamiania funkcji testującej sprawdzane jest na początku czy wymienione foldery istnieją. Jeśli nie, są tworzone i użytkownik jest o tym powiadamiany. Następnie funkcja kończy swoje działanie.
+Foldery z rezultatami działania algorytmu - \textit{Results} i instancjami testowymi - \textit{QAPLib} znajdują się w tym samym folderze co plik wykonywalny aplikacji. Podczas uruchamiania funkcji testującej sprawdzane jest na początku, czy wymienione foldery istnieją. Jeśli nie, są tworzone i użytkownik jest o tym powiadamiany. Następnie funkcja kończy swoje działanie.
 
-Próba uruchomienia testów, gdy folder z instancjami jest pusty, gdy nie udało się odczytać danych z pliku z danymi dla problemu QAP bądź nastąpił błąd podczas zapisu danych do pliku z rezultatami działania algorytmu, zgłaszany jest błąd, po czym funkcja kończy swoje działanie.
+Próba uruchomienia testów, gdy folder z instancjami jest pusty, gdy nie udało się odczytać danych z pliku z danymi dla problemu QAP, bądź nastąpił błąd podczas zapisu danych do pliku z rezultatami działania algorytmu, kończy się zgłoszeniem błędu, po czym funkcja kończy swoje działanie.
 
 Dla operatorów OX i PMX przyjęto, że sekcja kojarzenia jest nie mniejsza niż 40\% całego rozwiązania.
+
+\section{Pseudokod algorytmu zaimplementowanego w aplikacji}
+Poniżej przedstawiony jest pseudokod algorytmu, który został zaimplementowany w utworzonej aplikacji, z uwzględnieniem opisanych w poprzednim rozdziale modyfikacji:
+
+\newpage
+\begin{algorithm}[H]
+	Wczytaj parametry algorytmu\;	
+	Zainicjuj populację\;
+	wyznacz permutacyjna postać rozwiązań w populacji\;
+	policz dopasowanie rozwiązań\;
+	zapamiętaj najlepsze rozwiązanie\;
+ 	\While{t < $t_{max}$}
+ 	{ 
+ 		$t\leftarrow t+1$\;
+		\If{wybrana selekcja rankingowa}
+		{
+			dokonaj selekcji rankingowej\;
+		}
+		\Else
+		{
+			dokonaj selekcji ruletkowej\;
+		}
+		
+		\If{wybrano operator krzyżowania CX}
+		{
+			dokonaj operacji krzyżowania przy pomocy operatora CX\;
+		}
+		\ElseIf {wybrano operator krzyżowania OX}
+		{
+			dokonaj operacji krzyżowania przy pomocy operatora CX\;
+		}
+		\Else
+		{
+			dokonaj operacji krzyżowania przy pomocy operatora PMX\;
+		}
+		
+		\If{wybrano oryginalną wersję operatora bramki kwantowej}
+		{
+			aktualizuj rozwiązania przy pomocy oryginalnej wersji bramki kwantowej\;
+		}
+		\ElseIf{wybrano zmodyfikowaną wersję operatora bramki kwantowej}
+		{
+			aktualizuj rozwiązania przy pomocy zmodyfikowanej wersji bramki kwantowej\;
+		}
+		
+		zapamiętaj najlepsze rozwiązanie\;
+ 	}
+ 	\caption{Algorytm NPQGA}
+\end{algorithm}
