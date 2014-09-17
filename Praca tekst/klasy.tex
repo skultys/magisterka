@@ -1,2 +1,144 @@
 \chapter*{DODATEK A}
 \addcontentsline{toc}{chapter}{DODATEK A}
+\begin{tikzpicture}
+\begin{class}[text width=10cm]{Qbit}{0,0}
+\attribute{Alpha : double}
+\attribute{Beta : double}
+\operation{Qbit()}
+\operation{Qbit(anotherQbit: Qbit)}
+\operation{Qbit(alpha: double, beta: double)}
+\operation{EvaluateState(): int}
+\operation{ExecuteRotationGate(theta: double): void}
+\operation{ExecuteNotGate(): void}
+\end{class}
+\end{tikzpicture}
+
+\begin{tikzpicture}
+\begin{class}[text width=10cm]{Chromosome}{0,0}
+\attribute{PermuationValue : int}
+\attribute{Value : int}
+\attribute{Size: int}
+\attribute{this[index: int]: Qbit}
+\operation{Chromosome(size: int)}
+\operation{Chromosome(anotherChromosome: Chromosome)}
+\operation{DecodeChromosome(): int}
+\end{class}
+\end{tikzpicture}
+
+\begin{tikzpicture}
+\begin{class}[text width=10cm]{Solution}{0,0}
+\attribute{Size: int}
+\attribute{this[index: int]: Chromosome}
+\attribute{Goal: double}
+\operation{Solution(size: int)}
+\operation{Solution(anotherSolution: Solution)}
+\operation{Solution(chromosomes: Chromosome[])}
+\operation{ToPermutation(): void}
+\operation{PrintSolution(): void}
+\operation{PrintSolution(file: System.IO.StreamWriter): void}
+\end{class}
+\end{tikzpicture}
+
+\begin{tikzpicture}
+\begin{class}[text width=10cm]{Population}{0,0}
+\attribute{ProblemSize: int}
+\attribute{this[index: int]: ISolution}
+\attribute{CurrentSize: int}
+\operation{Population()}
+\operation{Population(solutionsCount: int, problemSize: int)}
+\operation{Population(anotherPopulation: IPopulation)}
+\operation{Population(solutions: Isolution[])}
+\operation{SortAscending(): void}
+\operation{SortDescending(): void}
+\operation{Add(sol: ISolution): int}
+\operation{Remove(idx: int): void}
+\operation{GetEnumerator(): IEnumerator}
+\end{class}
+\end{tikzpicture}
+
+\begin{tikzpicture}
+\begin{class}[text width=10cm]{MutationOperator}{0,0}
+\attribute{MutationProbability: double}
+\operation{MutationOperator(probability: double = 0.0)}
+\operation{Execute(Population: IPopulation): ISolution}
+\end{class}
+\end{tikzpicture}
+
+\begin{tikzpicture}
+\begin{class}[text width=10cm]{CxCrossoverOperator}{0,0}
+\attribute{CrossoverProbability: double}
+\operation{CxCrossoverOperator(probability: double = 0.0)}
+\operation{Execute(population: Population): ISolution[]}
+\operation{Execute(parentOne: Solution, parentTwo: Solution): Solution[]}
+\end{class}
+\end{tikzpicture}
+
+\begin{tikzpicture}
+\begin{class}[text width=10cm]{OxCrossoverOperator}{0,0}
+\attribute{CrossoverProbability: double}
+\operation{OxCrossoverOperator(probability: double = 0.0)}
+\operation{Execute(population: Population): ISolution[]}
+\operation{Execute(parentOne: Solution, parentTwo: Solution): Solution[]}
+\end{class}
+\end{tikzpicture}
+
+\begin{tikzpicture}
+\begin{class}[text width=10cm]{PmxCrossoverOperator}{0,0}
+\attribute{CrossoverProbability: double}
+\operation{PmxCrossoverOperator(probability: double = 0.0)}
+\operation{Execute(population: Population): ISolution[]}
+\operation{Execute(parentOne: Solution, parentTwo: Solution): Solution[]}
+\end{class}
+\end{tikzpicture}
+
+\begin{tikzpicture}
+\begin{class}[text width=10cm]{RotationGateOperator}{0,0}
+\operation{RotationGateOperator()}
+\operation{ExecuteOriginal(population: IPopulation, best: Soultion): void}
+\operation{ExecuteModified(population: IPopulation, best: Soultion)}
+\end{class}
+\end{tikzpicture}
+
+\begin{tikzpicture}
+\begin{class}[text width=10cm]{QapData}{0,0}
+\attribute{Insstance: QapData}
+\operation{SetQapData(distance: doub;e[,], flow: double[,], size: int)}
+\operation{GetDistance(): double[,]}
+\operation{GetFlow(): double[,]}
+\operation{GetSize(): int}
+\end{class}
+\end{tikzpicture}
+\newline
+
+\begin{tikzpicture}
+\begin{class}[text width=10cm]{SelectionOperator}{0,0}
+\attribute{EtaMax: double}
+\operation{SelectionOperator(etaMax: double = 2.0)}
+\operation{RouletterMethod(population: IPopulation): Population}
+\operation{RankingMethod(population: IPopulation): Population}
+\end{class}
+\end{tikzpicture}
+\newline
+
+\begin{tikzpicture}
+\begin{class}[text width=10cm]{QgAlgorithm}{0,0}
+\attribute{Population: IPopulation}
+\operation{QgAlgorithm()}
+\operation{SetParameters(popSize: int,\newline iterations: int,\newline selMethod: SelectionMethdChosen,\newline eta: double,\newline crossMethod: CrossoverOperatorChosen,\newline crossMax: double,\newline crossMin: double,\newline mutProb: double,\newline rotVersion: RotationGateVersion,\newline initNew: bool): bool}
+\operation{EvaluateSolution{solution: ISoultion}: double}
+\operation{InitRandomPopulation(): void}
+\operation{Execute(): void}
+\operation{Stop(): bool}
+\operation{GetBestSolution(): ISolution}
+\operation{GetBestInitialSolution(): Soultion}
+\operation{GetBestIteration(): int}
+\end{class}
+\end{tikzpicture}
+\newline
+
+\begin{tikzpicture}
+\begin{class}[text width=10cm]{UserInterface}{0,0}
+\operation{RunTest(algorithm: QgAlgorithm): void}
+\operation{ReadQapFile(path: string): bool}
+\end{class}
+\end{tikzpicture}
