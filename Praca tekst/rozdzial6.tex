@@ -75,9 +75,11 @@ Dla operatorów OX i PMX przyjęto, że sekcja kojarzenia jest nie mniejsza niż
 Poniżej przedstawiony jest pseudokod algorytmu, który został zaimplementowany w utworzonej aplikacji, z uwzględnieniem opisanych w poprzednim rozdziale modyfikacji:
 
 \newpage
+\begin{small}
 \begin{algorithm}[H]
-	Wczytaj parametry algorytmu\;	
-	Zainicjuj populację\;
+	wczytaj parametry algorytmu\;	
+	zainicjuj populację\;
+	oceń stan bitów kwantowych w wygenerowanych rozwiązaniach\;
 	wyznacz permutacyjna postać rozwiązań w populacji\;
 	policz dopasowanie rozwiązań\;
 	zapamiętaj najlepsze rozwiązanie\;
@@ -106,16 +108,28 @@ Poniżej przedstawiony jest pseudokod algorytmu, który został zaimplementowany
 			dokonaj operacji krzyżowania przy pomocy operatora PMX\;
 		}
 		
+		dokonaj operacji mutacji\;
+		oceń stan kubitów zmutowanych rozwiązań\;
+		wyznacz permutacyjną postać zmutowanych rozwiązań\;
+		policz dopasowanie zmutowanych rozwiązań\;	
+		
 		\If{wybrano oryginalną wersję operatora bramki kwantowej}
 		{
 			aktualizuj rozwiązania przy pomocy oryginalnej wersji bramki kwantowej\;
+			oceń stan kubitów zaktualizowanych rozwiązań;\
+			wyznacz permutacyjna postać zaktualizowanych rozwiązań\;
+			policz dopasowanie zaktualizowanych rozwiązań\;
 		}
 		\ElseIf{wybrano zmodyfikowaną wersję operatora bramki kwantowej}
 		{
 			aktualizuj rozwiązania przy pomocy zmodyfikowanej wersji bramki kwantowej\;
+			oceń stan kubitów zaktualizowanych rozwiązań;\
+			wyznacz permutacyjna postać zaktualizowanych rozwiązań\;
+			policz dopasowanie zaktualizowanych rozwiązań\;
 		}
 		
 		zapamiętaj najlepsze rozwiązanie\;
  	}
- 	\caption{Algorytm NPQGA}
+ 	\caption{Zaimplementowana wersja algorytmu NPQGA}
 \end{algorithm}
+\end{small}
